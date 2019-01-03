@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?scenebuilder-stylesheet ../styles.css?>
+
+<VBox id="overviewRoot" fx:id="root" disable="false" minHeight="-1.0" prefHeight="465.0" prefWidth="555.0" spacing="0.0" styleClass="content" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.ixale.starparse.gui.main.OverviewPresenter">
+  <children>
+    <HBox fillHeight="true" prefHeight="-1.0" prefWidth="-1.0" spacing="10.0">
+      <children>
+        <CheckBox focusTraversable="false" mnemonicParsing="false" onAction="#toggleDpsChart" selected="true" text="DPS Chart" />
+        <CheckBox focusTraversable="false" mnemonicParsing="false" onAction="#toggleHpsChart" text="HPS Chart" />
+        <CheckBox focusTraversable="false" mnemonicParsing="false" onAction="#toggleDtpsChart" text="DTPS Chart" />
+        <CheckBox focusTraversable="false" mnemonicParsing="false" onAction="#toggleMineEffects" selected="true" text="Mine Effects" />
+        <CheckBox focusTraversable="false" mnemonicParsing="false" onAction="#toggleGroupEffects" text="Group Effects" />
+      </children>
+      <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </padding>
+    </HBox>
+    <ScrollPane id="ScrollPane" fx:id="containerWrapper" fitToHeight="true" fitToWidth="true" pannable="true" prefViewportHeight="242.0" prefViewportWidth="462.0" VBox.vgrow="ALWAYS">
+      <content>
+        <VBox id="VBox" alignment="TOP_LEFT" disable="false" fillWidth="true" spacing="0.0" visible="true">
+          <children>
+            <StackPane fx:id="dpsChartWrapper" minHeight="-Infinity" prefHeight="165.0" prefWidth="-1.0" visible="true">
+              <padding>
+                <Insets bottom="5.0" />
+              </padding>
+            </StackPane>
+            <StackPane fx:id="hpsChartWrapper" maxHeight="0.0" minHeight="-Infinity" prefHeight="0.0" prefWidth="-1.0" visible="false" />
+            <StackPane fx:id="dtpsChartWrapper" maxHeight="0.0" minHeight="-Infinity" prefHeight="0.0" prefWidth="-1.0" visible="false" />
+            <GridPane fx:id="mineEffectsWrapper" alignment="TOP_LEFT" gridLinesVisible="false" hgap="10.0" minHeight="-Infinity" prefHeight="165.0" prefWidth="-1.0" styleClass="simple-table" vgap="0.0" visible="true" VBox.vgrow="ALWAYS">
+              <children>
+                <TableView fx:id="procsTable" focusTraversable="false" prefHeight="-1.0" prefWidth="-1.0" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0" GridPane.vgrow="ALWAYS">
+                  <columns>
+                    <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="115.0" resizable="false" text="Effect" fx:id="procNameCol" />
+                    <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="35.0" resizable="false" text="#" fx:id="procCntCol" />
+                    <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="40.0" resizable="false" text="t" fx:id="procDurCol" />
+                    <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="40.0" resizable="false" text="\%" fx:id="procPctCol" />
+                  </columns>
+                </TableView>
+                <TableView fx:id="actTable" focusTraversable="false" prefHeight="-1.0" prefWidth="-1.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0" GridPane.vgrow="ALWAYS">
+                  <columns>
+                    <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="115.0" resizable="false" text="Ability" fx:id="actNameCol" />
+                    <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="35.0" resizable="false" text="#" fx:id="actCntCol" />
+                    <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="40.0" resizable="false" text="t" fx:id="actDurCol" />
+                    <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="40.0" resizable="false" text="\%" fx:id="actPctCol" />
+                  </columns>
+                </TableView>
+              </children>
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <padding>
+                <Insets bottom="5.0" />
+              </padding>
+              <rowConstraints>
+                <RowConstraints minHeight="150.0" prefHeight="-1.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+            </GridPane>
+            <GridPane fx:id="groupEffectsWrapper" alignment="TOP_LEFT" gridLinesVisible="false" hgap="10.0" maxHeight="0.0" minHeight="-Infinity" prefHeight="0.0" prefWidth="-1.0" styleClass="simple-table" vgap="0.0" visible="false" VBox.vgrow="ALWAYS">
+              <children>
+                <TableView fx:id="recTable" focusTraversable="false" prefHeight="-1.0" prefWidth="-1.0" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0" GridPane.vgrow="ALWAYS">
+                  <columns>
+                    <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="55.0" resizable="false" text="Source" fx:id="recSourceCol" />
+                    <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="65.0" resizable="false" text="Effect" fx:id="recNameCol" />
+                    <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="35.0" resizable="false" text="#" fx:id="recCntCol" />
+                    <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="40.0" resizable="false" text="t" fx:id="recDurCol" />
+                    <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="40.0" resizable="false" text="\%" fx:id="recPctCol" />
+                  </columns>
+                </TableView>
+                <TableView fx:id="givTable" focusTraversable="false" prefHeight="-1.0" prefWidth="-1.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0" GridPane.vgrow="ALWAYS">
+                  <columns>
+                    <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="55.0" resizable="false" text="Target" fx:id="givTargetCol" />
+                    <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="65.0" resizable="false" text="Effect" fx:id="givNameCol" />
+                    <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="35.0" resizable="false" text="#" fx:id="givCntCol" />
+                    <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="40.0" resizable="false" text="t" fx:id="givDurCol" />
+                    <TableColumn editable="false" maxWidth="5000.0" minWidth="10.0" prefWidth="40.0" resizable="false" text="\%" fx:id="givPctCol" />
+                  </columns>
+                </TableView>
+              </children>
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <padding>
+                <Insets />
+              </padding>
+              <rowConstraints>
+                <RowConstraints minHeight="150.0" prefHeight="-1.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+            </GridPane>
+          </children>
+        </VBox>
+      </content>
+    </ScrollPane>
+  </children>
+</VBox>

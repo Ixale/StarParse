@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.1.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
+
+	<!-- we can use annotations -->
+	<context:annotation-config /> 
+     
+	<!-- package to look for annotated classes -->
+	<context:component-scan base-package="com.ixale.starparse.service.impl" />
+
+    <bean class="org.springframework.jdbc.datasource.DriverManagerDataSource" id="dataSource">
+        <property name="driverClassName" value="org.h2.Driver"/>
+        <property name="url" value="jdbc:h2:mem:starparse;DB_CLOSE_DELAY=-1"/>
+        <property name="username" value="sa"/>
+        <property name="password" value=""/>
+    </bean>
+
+	<!-- <bean id="org.h2.tools.Server" class="org.h2.tools.Server"
+    	factory-method="createTcpServer" init-method="start" destroy-method="stop">
+    	<constructor-arg value="-tcp,-tcpAllowOthers,-tcpPort,8092" />
+    </bean>-->
+
+    <bean class="org.springframework.jdbc.core.JdbcTemplate" id="jdbcTemplate">
+      <constructor-arg ref="dataSource"/>
+    </bean>
+
+</beans>

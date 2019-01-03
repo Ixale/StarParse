@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?scenebuilder-stylesheet ../styles.css?>
+
+<VBox id="overviewRoot" fx:id="root" fillWidth="true" prefHeight="-1.0" prefWidth="-1.0" spacing="0.0" styleClass="content" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ixale.starparse.gui.main.RaidPresenter">
+  <children>
+    <HBox fx:id="raidBar" fillHeight="false" maxHeight="-Infinity" maxWidth="-1.0" minHeight="-Infinity" prefHeight="26.0" prefWidth="-1.0" spacing="10.0" VBox.vgrow="ALWAYS">
+      <children>
+        <Label fx:id="raidTitle" minWidth="40.0" styleClass="raid-title" text="notgoodenough" HBox.hgrow="NEVER" />
+        <Label fx:id="raidPlayers" styleClass="raid-players" text="(18) Ixale, Cryptica, Lancard, Rikacha, Ixale, Cryptica, Lancard, Rikacha" HBox.hgrow="ALWAYS" />
+        <HBox id="buttons" alignment="TOP_RIGHT" fillHeight="false" maxHeight="-Infinity" maxWidth="-1.0" prefWidth="-1.0" spacing="5.0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+        <children>
+        	<Button fx:id="pullButton" focusTraversable="false" minWidth="50" onAction="#handlePullCountdown" text="Pull!" HBox.hgrow="NEVER">
+                     <HBox.margin>
+                        <Insets top="-2.0" />
+                     </HBox.margin></Button>
+        	<Button fx:id="breakButton" focusTraversable="false" minWidth="50" onAction="#handleBreakCountdown" text="Break!" HBox.hgrow="NEVER">
+                     <HBox.margin>
+                        <Insets top="-2.0" />
+                     </HBox.margin></Button>
+        	<Button fx:id="raidNotesButton" focusTraversable="false" minWidth="50" onAction="#handleRaidNotes" text="Notes" HBox.hgrow="NEVER">
+                     <HBox.margin>
+                        <Insets top="-2.0" />
+                     </HBox.margin></Button>
+      	</children>
+      	</HBox>  	
+      </children>
+      <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </padding>
+    </HBox>
+      <HBox fx:id="raidDeaths" fillHeight="false" maxHeight="-Infinity" maxWidth="-1.0" minHeight="-Infinity" prefHeight="25.0" prefWidth="-1.0" spacing="5.0" VBox.vgrow="ALWAYS">
+         <children>
+            <Label fx:id="raidDeathsTitle" text="Deaths" textFill="#666666" HBox.hgrow="NEVER" />
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </HBox>
+      <HBox fx:id="combatLogFilter" fillHeight="false" maxHeight="-Infinity" maxWidth="-1.0" minHeight="-Infinity" prefHeight="25.0" prefWidth="-1.0" spacing="10.0" VBox.vgrow="ALWAYS">
+      <children>
+        <CheckBox fx:id="damageDealtButton" focusTraversable="false" mnemonicParsing="false" onAction="#toggleBreakdown" text="DPS" />
+        <CheckBox fx:id="damageTakenButton" focusTraversable="false" mnemonicParsing="false" onAction="#toggleBreakdown" text="DTPS" />
+        <CheckBox fx:id="healingDoneButton" focusTraversable="false" mnemonicParsing="false" onAction="#toggleBreakdown" text="HPS" />
+        <CheckBox fx:id="healingTakenButton" focusTraversable="false" mnemonicParsing="false" onAction="#toggleBreakdown" text="HTPS" />
+        <CheckBox fx:id="actionsButton" focusTraversable="false" mnemonicParsing="false" onAction="#toggleBreakdown" text="Actions" />
+        <HBox alignment="TOP_RIGHT" fillHeight="false" maxHeight="-Infinity" maxWidth="-1.0" prefWidth="-1.0" spacing="10.0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+        <children>
+	        <Label minWidth="40.0" text="Damage taken:" HBox.hgrow="NEVER" />
+	        <Label fx:id="damageTaken" minWidth="40.0" styleClass="total-damage" text="15 354" textAlignment="RIGHT" HBox.hgrow="NEVER" />
+	        <Label minWidth="40.0" text="Healing taken:" HBox.hgrow="NEVER" />
+	        <Label fx:id="healingTaken" minWidth="40.0" styleClass="total-healing" text="15 354" textAlignment="RIGHT" HBox.hgrow="NEVER" />
+	     </children>
+	     </HBox>
+      </children>
+      <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </padding>
+    </HBox>
+    <TableView fx:id="raidTable" focusTraversable="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="-1.0" prefWidth="-1.0" tableMenuButtonVisible="false" VBox.vgrow="ALWAYS">
+      <columns>
+        <TableColumn fx:id="nameCol" editable="false" minWidth="55.0" prefWidth="55.0" resizable="false" text="Name" />
+        <TableColumn editable="false" resizable="false" text="Damage Dealt">
+          <columns>
+            <TableColumn fx:id="damageCol" editable="false" maxWidth="45.0" minWidth="45.0" prefWidth="45.0" resizable="false" text="Total" />
+            <TableColumn fx:id="dpsCol" editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="DPS" />
+          </columns>
+        </TableColumn>
+        <TableColumn editable="false" resizable="false" text="Threat">
+          <columns>
+            <TableColumn fx:id="raidThreatCol" editable="false" maxWidth="45.0" minWidth="45.0" prefWidth="45.0" resizable="false" text="Total" />
+            <TableColumn fx:id="tpsCol" editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="TPS" />
+          </columns>
+        </TableColumn>
+        <TableColumn editable="false" resizable="false" text="Damage Taken">
+          <columns>
+            <TableColumn fx:id="damageTakenCol" editable="false" maxWidth="45.0" minWidth="45.0" prefWidth="45.0" resizable="false" text="Total" />
+            <TableColumn fx:id="dtpsCol" editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="DTPS" />
+            <TableColumn fx:id="apsCol" editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="APS" />
+          </columns>
+        </TableColumn>
+        <TableColumn editable="false" resizable="false" text="Healing">
+          <columns>
+            <TableColumn fx:id="healingCol" editable="false" maxWidth="45.0" minWidth="45.0" prefWidth="45.0" resizable="false" text="Total" />
+            <TableColumn fx:id="hpsCol" editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="HPS" />
+            <TableColumn fx:id="pctEffCol" editable="false" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" text="\%" />
+            <TableColumn fx:id="ehpsCol" editable="false" maxWidth="35.0" minWidth="35.0" prefWidth="35.0" resizable="false" text="EHPS" />
+          </columns>
+        </TableColumn>
+        <TableColumn editable="false" resizable="false" text="Shielding">
+          <columns>
+            <TableColumn fx:id="shieldingCol" editable="false" maxWidth="45.0" minWidth="45.0" prefWidth="45.0" resizable="false" text="Total" />
+          	<TableColumn fx:id="spsCol" editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="APS" />
+          </columns>
+        </TableColumn>
+        <TableColumn fx:id="raidTimeCol" editable="false" maxWidth="35.0" minWidth="35.0" prefWidth="35.0" resizable="false" text="Time" />
+        <TableColumn fx:id="rankCol" editable="false" maxWidth="25.0" minWidth="25.0" prefWidth="20.0" resizable="false" text="\%" visible="false" />
+      </columns>
+    </TableView>
+    <TableView fx:id="combatLogTable" focusTraversable="false" prefHeight="-1.0" prefWidth="-1.0" tableMenuButtonVisible="false" VBox.vgrow="ALWAYS">
+      <columns>
+        <TableColumn fx:id="timeCol" editable="false" maxWidth="55.0" minWidth="55.0" prefWidth="55.0" resizable="false" text="\@" />
+        <TableColumn fx:id="sourceNameCol" editable="false" minWidth="40.0" prefWidth="40.0" resizable="false" text="Source" />
+        <TableColumn fx:id="actionCol" editable="false" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" resizable="false" sortable="false" text="A" />
+        <TableColumn fx:id="targetNameCol" editable="false" minWidth="40.0" prefWidth="40.0" resizable="false" text="Target" />
+        <TableColumn fx:id="abilityCol" editable="false" minWidth="40.0" prefWidth="40.0" resizable="false" text="Ability" />
+        <TableColumn fx:id="valueCol" editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Value" />
+        <TableColumn fx:id="absorbedCol" editable="false" maxWidth="45.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Abs" />
+        <TableColumn fx:id="overhealCol" editable="false" maxWidth="45.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Over" />
+        <TableColumn fx:id="threatCol" editable="false" maxWidth="45.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Threat" />
+        <TableColumn fx:id="effectsCol" editable="false" minWidth="40.0" prefWidth="40.0" resizable="false" sortable="false" text="Effects" visible="false" />
+      </columns>
+    </TableView>
+  </children>
+  <padding>
+    <Insets bottom="5.0" />
+  </padding>
+</VBox>

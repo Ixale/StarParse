@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<package>  
+   <job id="postImage">  
+    <script language="JScript">  
+     <![CDATA[
+     	var oFSO = new ActiveXObject("Scripting.FileSystemObject");
+
+		var sounds = "p:\\Work\\java\\starparse\\starparse-client\\sounds.zip";
+		var sounds2 = "p:\\Work\\java\\starparse\\starparse-client\\sounds2.zip";
+		var icons = "p:\\Work\\java\\starparse\\starparse-client\\icons.zip";
+		var icons2 = "p:\\Work\\java\\starparse\\starparse-client\\icons2.zip";
+
+		var launcher = "p:\\Work\\java\\starparse\\starparse-client\\build\\starparse-launcher.zip";
+		var launcher86 = "p:\\Work\\java\\starparse\\starparse-client\\build\\starparse-launcherx86.zip";
+
+		var to = "p:\\Work\\java\\starparse\\starparse-client\\build\\deploy\\bundles\\StarParse\\app\\";
+		var tox86 = "p:\\Work\\java\\starparse\\starparse-client\\build\\deployx86\\bundles\\StarParse\\app\\";
+
+if (oFSO.FolderExists(tox86)) { 
+	oFSO.CopyFile(sounds, tox86);
+	oFSO.CopyFile(sounds2, tox86);
+	oFSO.CopyFile(icons, tox86);
+	oFSO.CopyFile(icons2, tox86);
+	oFSO.CopyFile(launcher86, tox86);
+} 
+if (oFSO.FolderExists(to)) {
+	oFSO.CopyFile(sounds, to);
+	oFSO.CopyFile(sounds2, to);
+	oFSO.CopyFile(icons, to);
+	oFSO.CopyFile(icons2, to);
+	oFSO.CopyFile(launcher, to);
+} 
+]]> 
+</script> 
+</job>
+</package>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?scenebuilder-stylesheet ../styles.css?>
+
+<VBox id="overviewRoot" fx:id="root" fillWidth="true" prefHeight="-1.0" prefWidth="540.0" spacing="0.0" styleClass="content" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.ixale.starparse.gui.main.CombatLogPresenter">
+  <children>
+    <HBox fillHeight="false" maxHeight="-Infinity" maxWidth="-1.0" prefHeight="20.0" prefWidth="-1.0" spacing="10.0" VBox.vgrow="ALWAYS">
+      <children>
+        <CheckBox fx:id="damageDealtButton" focusTraversable="false" mnemonicParsing="false" onAction="#toggleBreakdown" text="DPS" />
+        <CheckBox fx:id="damageTakenButton" focusTraversable="false" mnemonicParsing="false" onAction="#toggleBreakdown" text="DTPS" />
+        <CheckBox fx:id="healingDoneButton" focusTraversable="false" mnemonicParsing="false" onAction="#toggleBreakdown" text="HPS" />
+        <CheckBox fx:id="healingTakenButton" focusTraversable="false" mnemonicParsing="false" onAction="#toggleBreakdown" text="HTPS" />
+        <CheckBox fx:id="actionsButton" focusTraversable="false" mnemonicParsing="false" onAction="#toggleBreakdown" text="Actions" />
+        <CheckBox fx:id="eventsOnSelfButton" focusTraversable="false" mnemonicParsing="false" onAction="#toggleBreakdown" text="Buffs gained" />
+        <CheckBox fx:id="eventsOnOthersButton" focusTraversable="false" mnemonicParsing="false" onAction="#toggleBreakdown" text="Buffs given" />
+        <CheckBox fx:id="simplifiedButton" focusTraversable="false" mnemonicParsing="false" onAction="#toggleBreakdown" selected="true" text="Simplified" />
+      </children>
+      <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </padding>
+    </HBox>
+    <HBox fillHeight="false" prefHeight="-1.0" prefWidth="-1.0" spacing="10.0">
+      <children>
+        <MenuButton fx:id="sourceMenu" disable="false" focusTraversable="false" maxWidth="150.0" minWidth="100.0" mnemonicParsing="false" prefWidth="100.0" text="All Sources" />
+        <MenuButton fx:id="targetMenu" focusTraversable="false" maxWidth="150.0" minWidth="100.0" mnemonicParsing="false" prefWidth="100.0" text="All Targets" />
+        <TextField fx:id="searchText" focusTraversable="false" minWidth="50.0" onAction="#toggleBreakdown" prefWidth="150.0" HBox.hgrow="NEVER" />
+        <Button fx:id="filterButton" focusTraversable="false" minWidth="50.0" mnemonicParsing="false" onAction="#toggleBreakdown" prefWidth="50.0" text="Filter" />
+        <Button fx:id="findButton" focusTraversable="false" minWidth="50.0" mnemonicParsing="false" onAction="#searchTable" prefWidth="50.0" text="Find" />
+        <Button fx:id="resetButton" disable="true" focusTraversable="false" minWidth="50.0" mnemonicParsing="false" onAction="#resetBreakdown" prefWidth="50.0" text="Reset" />
+      </children>
+      <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </padding>
+    </HBox>
+    <TableView fx:id="combatLogTable" focusTraversable="false" prefHeight="-1.0" prefWidth="-1.0" tableMenuButtonVisible="false" VBox.vgrow="ALWAYS">
+      <columns>
+        <TableColumn editable="false" maxWidth="55.0" minWidth="55.0" prefWidth="55.0" resizable="false" text="\@" fx:id="timeCol" />
+        <TableColumn editable="false" minWidth="40.0" prefWidth="40.0" resizable="false" text="Source" fx:id="sourceNameCol" />
+        <TableColumn editable="false" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" resizable="false" sortable="false" text="A" fx:id="actionCol" />
+        <TableColumn editable="false" minWidth="40.0" prefWidth="40.0" resizable="false" text="Target" fx:id="targetNameCol" />
+        <TableColumn editable="false" minWidth="40.0" prefWidth="40.0" resizable="false" text="Ability" fx:id="abilityCol" />
+        <TableColumn editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Value" fx:id="valueCol" />
+        <TableColumn editable="false" maxWidth="45.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Abs" fx:id="absorbedCol" />
+        <TableColumn editable="false" maxWidth="45.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Over" fx:id="overhealCol" />
+        <TableColumn editable="false" maxWidth="45.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Threat" fx:id="threatCol" />
+        <TableColumn editable="false" minWidth="40.0" prefWidth="40.0" sortable="false" resizable="false" text="Effects" fx:id="effectsCol" />
+      </columns>
+    </TableView>
+  </children>
+  <padding>
+    <Insets bottom="5.0" />
+  </padding>
+</VBox>

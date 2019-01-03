@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?scenebuilder-stylesheet ../styles.css?>
+
+<VBox id="overviewRoot" fx:id="root" fillWidth="true" prefHeight="-1.0" prefWidth="540.0" spacing="0.0" styleClass="content" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.ixale.starparse.gui.main.DamageTakenPresenter">
+  <children>
+    <HBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="90.0" prefWidth="380.0">
+      <children>
+        <GridPane alignment="TOP_LEFT" prefHeight="-1.0" prefWidth="462.0" styleClass="combat-stats" HBox.hgrow="ALWAYS">
+          <children>
+            <Text text="Internal / Elemental" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <Text text="Kinetic / Energy" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <Text text="Force / Tech" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <Text text="Melee / Ranged" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+            <Label fx:id="iePercent" styleClass="ps" text="12,3 %" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+            <Label fx:id="ie" text="3 654 321" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+            <Label fx:id="kePercent" styleClass="ps" text="12,3 %" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+            <Label fx:id="ke" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+            <Label fx:id="ftPercent" styleClass="ps" text="12,3 %" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+            <Label fx:id="ft" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+            <Label fx:id="mrPercent" styleClass="ps" text="12,3 %" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+            <Label fx:id="mr" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+            <Separator prefWidth="-1.0" GridPane.columnIndex="0" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
+              <GridPane.margin>
+                <Insets top="2.0" fx:id="x1" />
+              </GridPane.margin>
+            </Separator>
+          </children>
+          <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="90.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
+          </columnConstraints>
+          <rowConstraints>
+            <RowConstraints maxHeight="20.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="2.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+          </rowConstraints>
+          <HBox.margin>
+            <Insets left="5.0" right="5.0" top="5.0" fx:id="x2" />
+          </HBox.margin>
+        </GridPane>
+        <GridPane alignment="TOP_LEFT" prefHeight="-1.0" prefWidth="462.0" styleClass="combat-stats" HBox.hgrow="ALWAYS" HBox.margin="$x2">
+          <children>
+            <Text text="Avoided" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <Text text="Shielded" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <Text text="Absorbed (self)" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <Text text="Absorbed (given)" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+            <Label fx:id="missPercent" styleClass="mitigation, taken, ps" text="17,2 %" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+            <Label fx:id="shieldPercent" styleClass="mitigation, taken, ps" text="25,0 %" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+            <Label fx:id="absorbedSelfPercent" styleClass="mitigation, taken, ps" text="12,5 %" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+            <Label fx:id="absorbedSelf" styleClass="mitigation, taken" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+            <Label fx:id="absorbedOthersPercent" styleClass="mitigation, taken, ps" text="12,5 %" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+            <Label fx:id="absorbedOthers" styleClass="mitigation, taken" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+            <Separator prefWidth="-1.0" GridPane.columnIndex="0" GridPane.columnSpan="2147483647" GridPane.margin="$x1" GridPane.rowIndex="2" />
+          </children>
+          <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="90.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
+          </columnConstraints>
+          <rowConstraints>
+            <RowConstraints maxHeight="20.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="2.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+          </rowConstraints>
+        </GridPane>
+      </children>
+    </HBox>
+    <HBox fillHeight="false" maxHeight="-Infinity" maxWidth="-1.0" prefHeight="20.0" prefWidth="-1.0" spacing="10.0" VBox.vgrow="ALWAYS">
+      <children>
+        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Breakdown by" />
+        <CheckBox fx:id="abilityButton" focusTraversable="false" mnemonicParsing="false" onAction="#toggleBreakdown" text="Ability" />
+        <CheckBox fx:id="sourceTypeButton" focusTraversable="false" mnemonicParsing="false" onAction="#toggleBreakdown" selected="true" text="Source type" />
+        <CheckBox fx:id="sourceInstanceButton" focusTraversable="false" mnemonicParsing="false" onAction="#toggleBreakdown" text="Source instance" />
+      </children>
+      <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </padding>
+    </HBox>
+    <TableView fx:id="damageTakenTable" focusTraversable="false" prefHeight="-1.0" prefWidth="-1.0" tableMenuButtonVisible="false" VBox.vgrow="ALWAYS">
+      <columns>
+        <TableColumn editable="false" resizable="false" text="Source">
+          <columns>
+            <TableColumn editable="false" minWidth="60.0" prefWidth="60.0" resizable="false" text="Name" fx:id="sourceNameCol" />
+            <TableColumn editable="false" minWidth="35.0" prefWidth="35.0" resizable="false" text="\@" fx:id="sourceTimeFromCol" />
+          </columns>
+        </TableColumn>
+        <TableColumn editable="false" resizable="false" text="Ability">
+          <columns>
+            <TableColumn editable="false" minWidth="60.0" prefWidth="60.0" resizable="false" text="Name" fx:id="nameCol" />
+            <TableColumn editable="false" minWidth="60.0" prefWidth="30.0" resizable="false" text="DT" fx:id="damageTypeCol" />
+            <TableColumn editable="false" minWidth="30.0" prefWidth="30.0" resizable="false" text="AT" fx:id="attackTypeCol" />
+          </columns>
+        </TableColumn>
+        <TableColumn editable="false" maxWidth="35.0" minWidth="40.0" prefWidth="35.0" resizable="false" text="Hits" fx:id="ticksCol" />
+        <TableColumn editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Avg" fx:id="avgNormalCol" />
+        <TableColumn editable="false" resizable="false" text="\%">
+          <columns>
+            <TableColumn editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Def" fx:id="pctMissCol" />
+            <TableColumn editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Shld" fx:id="pctShieldCol" />
+          </columns>
+        </TableColumn>
+        <TableColumn editable="false" maxWidth="60.0" minWidth="50.0" prefWidth="50.0" resizable="false" text="Abs" fx:id="absorbedCol" />
+        <TableColumn editable="false" maxWidth="45.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="DTPS" fx:id="dtpsCol" />
+        <TableColumn editable="false" maxWidth="60.0" minWidth="60.0" prefWidth="60.0" resizable="false" text="Total" fx:id="totalCol" />
+        <TableColumn editable="false" maxWidth="100.0" minWidth="60.0" prefWidth="60.0" resizable="false" text="Total %" fx:id="pctTotalCol" />
+      </columns>
+    </TableView>
+  </children>
+  <padding>
+    <Insets bottom="5.0" />
+  </padding>
+</VBox>

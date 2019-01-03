@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+<?scenebuilder-stylesheet ../styles.css?>
+
+<VBox fx:id="popoutRoot" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="220.0" prefWidth="200.0" spacing="0.0" styleClass="popout" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ixale.starparse.gui.popout.HotsPopoutPresenter">
+  <children>
+    <AnchorPane fx:id="popoutHeader" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="200.0" scaleX="1.0" scaleY="1.0" styleClass="popout-header" VBox.vgrow="NEVER">
+      <children>
+        <Rectangle fx:id="popoutTitleBackground" fill="BLACK" height="19.0" opacity="0.9" width="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+        <Label fx:id="popoutTitle" alignment="CENTER" minHeight="-Infinity" prefHeight="20.0" styleClass="popout-title" text="Raid Hots" textAlignment="CENTER" underline="false" wrapText="false" AnchorPane.leftAnchor="70.0" AnchorPane.topAnchor="0.0" />
+        <Button focusTraversable="false" onAction="#handleClose" text="X" AnchorPane.leftAnchor="175.0" AnchorPane.topAnchor="2.0" />
+        <Button fx:id="autosizeButton" focusTraversable="false" onAction="#handleAutosize" text="A" AnchorPane.leftAnchor="160.0" AnchorPane.topAnchor="2.0" />
+      </children>
+    </AnchorPane>
+    <AnchorPane VBox.vgrow="NEVER">
+      <children>
+        <Rectangle fx:id="popoutBackground" fill="BLACK" height="200.0" opacity="0.7" width="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <AnchorPane fx:id="frames" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="200.0">
+               <children>
+               </children>
+            </AnchorPane>
+        <AnchorPane fx:id="popoutFooter" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="19.0" prefWidth="200.0" styleClass="popout-footer" visible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+          <children>
+            <Rectangle height="19.0" opacity="0.5" width="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+            <Rectangle fx:id="resizeN" fill="TRANSPARENT" height="18.0" opacity="0.5" width="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="85.0" />
+            <Rectangle fx:id="resizeSE" fill="TRANSPARENT" height="18.0" opacity="0.5" width="18.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+            <Line disable="true" endX="10.0" endY="-10.0" fill="TRANSPARENT" rotate="0.0" startX="0.0" startY="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
+              <stroke>
+                <Color blue="0.376" green="0.376" red="0.376" fx:id="x1" />
+              </stroke>
+            </Line>
+            <Line disable="true" endX="5.0" endY="-5.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x1" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+            <Line disable="true" endX="20.0" endY="0.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x1" AnchorPane.bottomAnchor="11.0" AnchorPane.leftAnchor="90.0" />
+            <Line disable="true" endX="20.0" endY="0.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x1" AnchorPane.bottomAnchor="9.0" AnchorPane.leftAnchor="90.0" />
+            <Line disable="true" endX="20.0" endY="0.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x1" AnchorPane.bottomAnchor="7.0" AnchorPane.leftAnchor="90.0" />
+            <Line disable="true" endX="20.0" endY="0.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x1" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="90.0" />
+          </children>
+        </AnchorPane>
+            <AnchorPane fx:id="popoutRight" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="180.0" prefWidth="19.0" styleClass="popout-footer" visible="true" AnchorPane.leftAnchor="181.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <Rectangle height="181.0" opacity="0.5" width="19.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <Rectangle fx:id="resizeE" fill="TRANSPARENT" height="30.0" opacity="0.5" width="18.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="85.0" />
+                  <Line disable="true" endY="20.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x1" AnchorPane.rightAnchor="11.0" AnchorPane.topAnchor="90.0" />
+                  <Line disable="true" endY="20.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x1" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="90.0" />
+                  <Line disable="true" endY="20.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x1" AnchorPane.rightAnchor="7.0" AnchorPane.topAnchor="90.0" />
+                  <Line disable="true" endY="20.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x1" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="90.0" />
+               </children>
+            </AnchorPane>
+      </children>
+      <VBox.margin>
+        <Insets />
+      </VBox.margin>
+    </AnchorPane>
+  </children>
+</VBox>

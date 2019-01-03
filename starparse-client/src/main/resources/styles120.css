@@ -1,0 +1,855 @@
+.wrapper {
+	-fx-padding: 10;
+	-fx-background-color: transparent;
+}
+
+#root {
+	-fx-border-color: #444;
+	-fx-border-width: 1px;
+	-fx-border-radius: 0px;
+	-fx-effect: dropshadow(three-pass-box, rgba(100, 100, 100, .5), 15, 0.5, 0, 0);
+	-fx-background-color: transparent;
+	-fx-font: 11px "System";
+}
+
+#header {
+    -fx-background-size: cover;
+    -fx-background-position: left top;
+    -fx-background-repeat: no-repeat;
+    -fx-background-color: #444;
+}
+
+#buttons .toggle-button,
+#toolbar .button {
+	-fx-border-color: silver;
+	-fx-border-width: 0;
+	-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, silver 0%, gray 100%);
+	-fx-border-radius: 0;
+	-fx-background-insets: 0;
+	-fx-padding: 2px 8px 3px 8px;
+}
+
+#buttons .toggle-button:hover,
+#toolbar .button:hover {
+	-fx-base: #395bae;
+	-fx-background-color: white;
+	-fx-cursor: hand;
+}
+
+#buttons .toggle-button:selected {
+	-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, limegreen 0%, green 100%);
+	-fx-text-fill: #fff;
+}
+
+#buttons .toggle-button-inter:selected {
+	-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, yellow 0%, gold 100%);
+	-fx-text-fill: #444;
+}
+
+#logo {
+	-fx-effect: dropshadow(three-pass-box, #444, 5, .6, 0, 0);
+	-fx-opacity: 1;
+}
+
+.menu-bar {
+	-fx-background-color: transparent;
+}
+
+.context-menu {
+	-fx-color: #ccc;
+    -fx-background-color:
+        derive(-fx-color,-40%),
+        derive(-fx-color,100%),
+        linear-gradient(to bottom, derive(-fx-color,100%) 0%, derive(-fx-color,50%) 12%, derive(-fx-color,65%) 88%, derive(-fx-color,23%) 100%);
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 0 6 6 6, 0 5 5 5, 0 4 4 4;
+    -fx-padding: 4px 1px 8px 1px;
+}
+
+.menu-bar .menu-item > .label,
+.check-item {
+	-fx-text-fill: #333;
+	-fx-font-size: 13px;
+}
+
+.menu-bar .menu-item:focused > .label,
+.check-item:hover  {
+    -fx-text-fill: white;
+}
+
+.menu-bar .separator > .line {
+	-fx-border-color: silver transparent transparent transparent;
+    -fx-border-insets: 0;
+}
+
+.label-separator .line {
+	-fx-border-width: 0 0 1px 0;
+	-fx-border-color: #bbb;
+}
+ 
+.label-separator .label {
+    -fx-text-fill: gray;
+}
+
+/**
+ * Combat header
+ */
+
+.combat-head {
+	-fx-background-color: #eee;
+}
+
+.tab-pane .tab-header-background {
+	-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #eee 0%, #ddd 100%);
+	-fx-border-width: 0 0 1px 0;
+	-fx-border-color: #bbb;
+	-fx-effect: null;
+}
+
+#combat-list-menu {
+	-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #e5e5e5 0%, #fff 100%);
+	-fx-border-width: 1px 1px 1px 0;
+	-fx-border-color: white silver #ddd silver;
+}
+
+#characterPane, #headCombat {
+	-fx-border-width: 1px 0 1px 0;
+	-fx-border-color: white silver silver silver;
+	-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #e5e5e5 0%, #fff 100%);
+}
+
+#combatName, #combatTime, #characterName {
+	-fx-font-size: 12px;
+}
+
+#combatName {
+	-fx-font-weight: bold;
+}
+
+.combat-time {
+	-fx-text-fill: gray;
+}
+
+#characterName {
+	-fx-font-weight: bold;
+}
+
+#trashButton {
+	-fx-text-fill: #444;
+}
+
+.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+    -fx-border-color: transparent;
+	-fx-effect: inherit;
+}
+
+/**
+ * Timeline
+ */
+.timeline-axis {
+	-fx-stroke: #aaa;
+}
+
+.timeline-handle {
+	-fx-stroke: #666;
+	-fx-stroke-type: outside;
+	-fx-fill: #eee;
+}
+
+.timeline-handle-inner {
+	-fx-stroke: transparent;
+	-fx-fill: linear-gradient(from 0% 0% to 0% 100%, #eee 0%, silver 100%);
+}
+
+.timeline-phase {
+	-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, silver 0%, gray 100%);
+	-fx-border-width: 1px 1px 1px 0;
+	-fx-border-color: gray silver gray #ddd;
+	-fx-cursor: hand;
+	-fx-opacity: .5;
+}
+
+.timeline-phase-damage {
+	-fx-border-width: 0;
+	-fx-background-color: #ffcccc;
+}
+
+.timeline-phase-label {
+	-fx-text-fill: #fff;
+	-fx-font-size: 8px;
+	-fx-cursor: hand;
+}
+
+.timeline-phase-hover {
+	-fx-background-color: #0093ff;
+	-fx-opacity: 1;
+	-fx-border-width: 0;
+}
+
+.timeline-phase-damage.timeline-phase-hover {
+	-fx-background-color: #ffcccc;
+}
+
+.timeline-phase-selected {
+	-fx-border-color: #0093ff;
+	-fx-background-color: linear-gradient(#328BDB 0%, #207BCF 25%, #1973C9 75%, #0A65BF 100%);
+	-fx-opacity: 1;
+}
+.timeline-phase-damage.timeline-phase-selected {
+	-fx-background-color: linear-gradient(derive(maroon, +100%) 0%, derive(maroon, +80%) 25%, derive(maroon, +65%) 75%, derive(maroon, +50%) 100%);
+}
+
+.timeline-phase-label-selected {
+	-fx-text-fill: white;
+}
+
+.timeline-tick-line {
+	-fx-stroke: gray;
+}
+
+.timeline-handle-label {
+	-fx-fill: black;
+	-fx-font: 11px "System"; /* dynamic */
+}
+
+.timeline-handle-sign {
+	-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, white 0%, #ddd 100%);
+	-fx-stroke: #aaa;
+	-fx-border-radius: 4;
+	-fx-border-width: 1px;
+	-fx-border-color: silver;
+	-fx-background-insets: 1px;
+	-fx-padding: 2px;
+}
+
+.timeline-tick {
+	-fx-fill: gray;
+	-fx-font: 9px "System"; /* dynamic */
+}
+
+/**
+ * Bottom status
+ */
+
+#status {
+	-fx-border-color: gray;
+	-fx-border-width: 1px 0 0 0;
+}
+
+/**
+ * Tables
+ */
+
+.list-view,
+.list-view:focused {
+	-fx-border-width: 0 1px 0 0;
+	-fx-border-color: silver silver;
+	-fx-border-radius: 0;
+	-fx-background-insets: 0;
+}
+
+.list-cell {
+	-fx-border-width: 1px 0 1px 0;
+	-fx-border-color: white white #e5e5e5 #e5e5e5;
+	-fx-background-color: white;
+    -fx-padding: 2px; 
+}
+
+.combo-box .list-cell { /* java7 */
+	-fx-background-color: white;
+}
+
+.list-cell .label {
+	-fx-padding: 0;
+}
+
+.list-view .scroll-bar:horizontal .increment-arrow,
+.list-view .scroll-bar:horizontal .decrement-arrow,
+.list-view .scroll-bar:horizontal .increment-button,
+.list-view .scroll-bar:horizontal .decrement-button {
+    -fx-padding: 0;
+}
+
+.list-cell:even { /* <=== changed to even */
+	-fx-background-color: #eee;
+}
+
+.list-cell:filled:selected:focused, 
+.list-cell:filled:selected,
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected, 
+.combo-box-popup  > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover,
+.menu-bar .menu-item:hover {
+	-fx-background-color: linear-gradient(#328BDB 0%, #207BCF 25%, #1973C9 75%, #0A65BF 100%);
+}
+
+.list-cell:filled:hover,
+.combo-box-popup  > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
+	-fx-background-color: #0093ff;
+}
+
+.list-cell .combat-title.label {
+	-fx-text-fill: #333;
+}
+
+.list-cell.combat-pvp .combat-title {
+	-fx-font-weight: bold;
+	-fx-text-fill: maroon;
+}
+
+.list-cell.combat-boss .combat-title.label {
+	-fx-font-weight: bold;
+}
+
+.list-cell:filled:hover .combat-title.label,
+.list-cell:filled:selected:focused .combat-title.label, 
+.list-cell:filled:selected .combat-title.label,
+.list-cell:filled:hover .combat-time.label,
+.list-cell:filled:selected:focused .combat-time.label, 
+.list-cell:filled:selected .combat-time.label {
+	-fx-text-fill: white;
+}
+
+.content {
+	-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #e5e5e5 0%, #fff 100%);
+}
+
+.combat-stats {
+	-fx-background-color: #eee;
+	-fx-border-color: white silver #ddd silver;
+	-fx-border-width: 1px 1px 1px 0;
+	-fx-padding: 5px;
+}
+
+.combat-stats .ps, .total-damage, .total-healing {
+	-fx-font-weight: bold;
+}
+
+.combat-stats .damage, .total-damage {
+	-fx-text-fill: maroon;
+}
+
+.combat-stats .damage2 {
+	-fx-text-fill: derive(red, +50%);
+}
+
+.combat-stats .healing {
+	-fx-text-fill: DarkSeaGreen;
+}
+
+.combat-stats .healing-eff, .total-healing {
+	-fx-text-fill: LimeGreen;
+}
+
+.combat-stats .threat {
+	-fx-text-fill: Goldenrod;
+}
+
+.combat-stats .absorbed {
+	-fx-text-fill: #30cccd;
+}
+
+.combat-stats .apm,
+.combat-stats .damage,
+.combat-stats .healing,
+.combat-stats .healing-eff,
+.combat-stats .threat,
+.combat-stats .absorbed {
+	-fx-fill: #666;
+}
+
+.combat-stats .taken {
+}
+
+/***
+ * Panes
+ */
+
+.scroll-pane {
+	-fx-background-insets: 0;
+}
+
+.scroll-pane:focused {
+	-fx-background-insets: 0;
+}
+
+/**
+ * Tables
+ */
+
+.table-row-cell:empty {
+    -fx-background-color: transparent;
+}
+ 
+.table-row-cell:empty .table-cell {
+    -fx-border-width: 0px;
+}
+
+.table-view {
+	-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #e5e5e5 0%, #fff 100%);
+	-fx-border-color: silver;
+	-fx-border-width: 1px 0 0 0;
+	-fx-padding: 0;
+	-fx-control-inner-background: #fff;
+	-fx-focus-color: transparent;
+}
+
+.table-view .column-header .label {
+    -fx-alignment: center;
+    -fx-font-size: 11px;
+}
+
+.table-view .table-cell {
+	-fx-border-color: white;
+    -fx-border-width: 1 0 0 0;
+}
+
+.table-view .table-cell:focused:selected .text {
+	/* this will prevent the default "white" color from being used */
+	-fx-fill: black;
+}
+
+.table-view .damage-dealt {
+	-fx-background-color: maroon;
+}
+
+.table-view .damage-taken {
+	-fx-background-color: #cd31cc;
+}
+
+.table-view .healing-done {
+	-fx-background-color: limegreen;
+}
+
+.table-view .healing-taken {
+	-fx-background-color: DarkGreen;
+}
+
+#root .table-view .table-row-cell:filled:hover {
+	-fx-background-color: derive(Goldenrod, +80%);
+}
+
+#root .table-view .table-row-cell:filled:selected {
+	-fx-background-color: derive(Goldenrod, +70%);
+}
+
+#combatLogTable {
+	-fx-table-cell-border-color: transparent;
+	-fx-table-cell-padding: 0;
+}
+
+.table-view .event-activated {
+	-fx-background-color: #cce3f4;
+}
+
+.table-view .event-actor-enemy {
+	-fx-background-color: #ffcccc;
+}
+
+.table-view .event-actor-ally {
+	-fx-background-color: lightgreen;
+}
+
+.check-item-menu {
+	-fx-padding: 0;
+}
+
+.check-item {
+	-fx-padding: 2px;
+}
+
+.check-item .box {
+	-fx-background-insets: 0;
+	-fx-background-radius: 0;
+	-fx-background-color: transparent;
+}
+
+.check-item .box > .mark {
+	-fx-background-color: transparent;
+	-fx-background-insets: 0;
+	-fx-padding: 4px;
+	-fx-shape: "M0,5H2L4,8L8,0H10L5,10H3Z";
+	-fx-scale-shape: false;
+}
+
+.check-item:selected .box > .mark {
+	-fx-background-color: #333;
+}
+
+.check-item:hover:selected .box > .mark {
+	-fx-background-color: #fff;
+}
+
+.check-item:hover:selected {
+	-fx-text-fill: #fff;
+}
+
+#root .table-view  {
+    -fx-selection-bar-text: black;
+}
+
+#root .table-view .table-row-cell:focused  {
+   -fx-background-color: -fx-table-cell-border-color, -fx-control-inner-background;
+   -fx-background-insets: 0, 0 0 1 0;
+}
+
+/**
+ * Damage dealt
+ */
+.table-view .bolden {
+	-fx-font-weight: bold;
+}
+
+/**
+ * Effects
+ */
+#procsTable, #actTable, #givTable, #recTable {
+	-fx-table-cell-border-color: transparent;
+	-fx-table-header-border-color: transparent;
+}
+
+#actTable {
+}
+
+.simple-table .table-view .column-header .label,
+.simple-table .table-view .filler {
+	-fx-text-fill: #555;
+}
+
+.simple-table .table-view .filler {
+	-fx-text-fill: red;
+}
+
+.simple-table .table-view .column-header-background {
+	-fx-border-color: #eee;
+	-fx-border-width: 1px 0 0 0;
+	-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #ccc 0%, #eee 100%);
+}
+
+.simple-table .table-view .column-header,
+.simple-table .table-view .filler {
+	-fx-size: 22;
+    -fx-border-width: 0;
+}
+
+.simple-table .table-view .table-cell {
+	-fx-background-color: transparent;
+}
+
+#root .selected-overlay-none {
+	-fx-background-color: white;
+}
+
+#root .selected-overlay-none:even {
+	-fx-background-color: #eee;
+}
+
+#root .selected-overlay-none:hover {
+	-fx-background-color: #FFFFE0;
+}
+
+#root .selected-overlay-0 {
+	-fx-base-color: #ff3e3e;
+	-fx-fill: -fx-base-color;
+	-fx-background-color: derive(-fx-base-color, +60%);
+}
+
+#root .selected-overlay-1 {
+	-fx-base-color: #32cd32; /* limegreen */
+	-fx-fill: -fx-base-color;
+	-fx-background-color: derive(-fx-base-color, +60%);
+}
+
+#root .selected-overlay-2 {
+	-fx-base-color: #269b9b;
+	-fx-fill: -fx-base-color;
+	-fx-background-color: derive(-fx-base-color, +60%);
+}
+
+#root .selected-overlay-3 {
+	-fx-base-color: #ff963e;
+	-fx-fill: -fx-base-color;
+	-fx-background-color: derive(-fx-base-color, +60%);
+}
+
+#root .selected-overlay-4 {
+	-fx-base-color: #cd31cc;
+	-fx-fill: -fx-base-color;
+	-fx-background-color: derive(-fx-base-color, +60%);
+}
+
+#root .selected-overlay-5 {
+	-fx-base-color: gray;
+	-fx-fill: -fx-base-color;
+	-fx-background-color: derive(-fx-base-color, +60%);
+}
+
+/**
+ * Charts
+ * ----------------------------------------------------------------------------
+ */
+
+.chart-legend {
+	-fx-background-color: transparent;
+	-fx-padding: 0 45px 0 0;
+	-fx-margin: 0;
+}
+
+.chart-legend .label {
+	-fx-text-fill: gray;
+}
+
+.chart-legend .legend-symbol {
+	-fx-stroke-width: 2px;
+}
+
+.chart-overlay-button {
+	-fx-background-color: transparent;
+	-fx-margin: 0;
+	-fx-padding: 0px;
+	-fx-cursor: hand;
+	-fx-text-fill: gray;
+}
+
+.chart-overlay-button:hover {
+	-fx-text-fill: #444;
+}
+
+.chart-area-symbol {
+	-fx-background-color: null, null;
+	-fx-shape: "";
+}
+
+.chart-content {
+	-fx-padding: 10px 0 0 0;
+}
+
+.chart .chart-series-line {
+    -fx-stroke-width: 1px;
+    -fx-effect: null;
+}
+
+.chart-dps .default-color0 { 
+	-fx-stroke: red;
+}
+
+.chart-damage .default-color0 { 
+	-fx-stroke: maroon;
+}
+
+.chart-hps .default-color0 { 
+	-fx-stroke: DarkSeaGreen;
+}
+
+.chart-hps .default-color1 { 
+	-fx-stroke: LimeGreen;
+}
+
+.chart-healing .default-color0 { 
+	-fx-stroke: DarkGreen;
+}
+
+.chart-dtps .default-color0 { 
+	-fx-stroke: red;
+}
+
+.chart-damage-taken .default-color0 { 
+	-fx-stroke: #cd31cc;
+}
+
+.chart-damage-taken .default-color1 { 
+	-fx-stroke: LimeGreen;
+}
+
+.chart-damage-taken .default-color2 { 
+	-fx-stroke: maroon;
+}
+
+.raid-title {
+	-fx-font-weight: bold;
+}
+
+.raid-players {
+	-fx-text-fill: gray;
+}
+
+.raid-death {
+	-fx-background-color: #ddd; /* 123c62 classic theme XXX */
+	-fx-background-radius: 3;
+	-fx-padding: 0 3px;
+	-fx-cursor: hand;
+}
+
+.raid-death-inter {
+	-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, yellow 0%, gold 100%);
+	-fx-text-fill: #444;
+}
+
+.raid-death-active {
+	-fx-background-color: linear-gradient(#328BDB 0%, #207BCF 25%, #1973C9 75%, #0A65BF 100%);
+	-fx-text-fill: #fff;
+}
+
+/**
+ * Tooltip
+ */
+.tooltip {
+    -fx-background-radius: 2 2 2 2;
+    -fx-background-color: linear-gradient(#FFFFFF, #DEDEDE);
+	-fx-font: 12px "System"; /* dynamic */
+}
+
+.page-corner {
+    -fx-shape: " ";
+}
+
+.root {
+	-fx-glass-color: gray;
+}
+
+.modal-dialog {
+	-fx-padding: 1px;
+	-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #e5e5e5 0%, #fff 100%);
+	-fx-border-color: gray;
+	-fx-border-width: 1;
+	-fx-background-insets: 12;
+	-fx-border-insets: 10;
+	-fx-border-radius: 6;
+	-fx-background-radius: 6;
+	-fx-effect: dropshadow(three-pass-box, rgba(100, 100, 100, .5), 15, 0.5, 0, 0);
+}
+
+.modal-title {
+	-fx-font: 12px "System";
+	-fx-padding: 5px;
+	-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, transparent 0%, silver 100%);
+	-fx-border-width: 0 0 1px 0;
+	-fx-border-color: #bbb;
+}
+
+.modal-title .text {
+	-fx-fill: #444;
+}
+
+.modal-title .button {
+}
+
+.modal-title .button:hover {
+}
+
+.modal-text {
+	-fx-border-width: 1px 0 0 0;
+	-fx-border-color: white silver silver silver;
+	-fx-padding: 5px;
+}
+
+.modal-buttons {
+	-fx-padding: 15px 10px;
+}
+
+#dialogRoot {
+	-fx-border-width: 0;
+	-fx-background-color: transparent;
+	-fx-font: 11px "System";
+}
+
+#dialogRoot.tab-pane .tab-header-background {
+	-fx-background-color: transparent;
+}
+
+#dialogRoot.tab-pane .tab-content-area {
+	-fx-border-color: silver;
+	-fx-border-width: 0 1px 1px 1px;
+	-fx-background-color: derive(white, -5%);
+}
+
+.changelog {
+	-fx-padding: 5px;
+}
+
+.changelog .label {
+	-fx-padding: 5px;
+}
+
+/**
+ * Forms
+ */
+.modal-dialog .text-field {
+    -fx-background-color: -fx-shadow-highlight-color, -fx-text-box-border, -fx-control-inner-background;
+}
+
+.modal-dialog .color-picker {
+	-fx-background-color: #e5e5e5;
+}
+
+.modal-dialog .check-box {
+	-fx-background-color: transparent;
+}
+
+.modal-dialog .input-error {
+	-fx-background-color: #ffcccc;
+}
+
+.modal-dialog .input-nondefault {
+	-fx-background-color: lightyellow;
+}
+
+.modal-dialog .input-updated {
+	-fx-background-color: lightblue;
+}
+
+/**
+ * Flashes
+ */
+.flash-message {
+	-fx-border-width: 1;
+	-fx-border-radius: 6;
+	-fx-background-radius: 6;
+	-fx-padding: 0;
+	-fx-font-size: 11px;
+}
+
+.flash-message .label {
+	-fx-padding: 5px;
+}
+
+.flash-error {
+	-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #ffcccc 0%, derive(#ffcccc, +50%) 100%);
+	-fx-border-color: derive(maroon, +100%);
+}
+
+.flash-error .label, 
+.flash-error .button {
+	-fx-fill: maroon;
+	-fx-text-fill: maroon;
+}
+
+.flash-success {
+	-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, lightgreen 0%, derive(lightgreen, +50%) 100%);
+	-fx-border-color: derive(darkgreen, +100%);
+}
+
+.flash-success .label, 
+.flash-success .button {
+	-fx-fill: darkgreen;
+	-fx-text-fill: darkgreen;
+}
+
+.flash-info {
+	-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, lightblue 0%, derive(lightblue, +50%) 100%);
+	-fx-border-color: derive(darkblue, +100%);
+}
+
+.flash-info .label, 
+.flash-info .button {
+	-fx-fill: darkblue;
+	-fx-text-fill: darkblue;
+}
+
+.tree-cell {
+	-fx-padding: 2px 0.0em;
+	-fx-indent: 0;
+}
+
+.tree-cell .label {
+	-fx-padding: 2px 0.0em;
+}

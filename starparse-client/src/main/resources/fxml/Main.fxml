@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.effect.*?>
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.input.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+<?scenebuilder-stylesheet ../styles.css?>
+
+<BorderPane fx:id="root" minHeight="-1.0" minWidth="-1.0" prefHeight="520.0" prefWidth="805.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ixale.starparse.gui.main.MainPresenter">
+  <bottom>
+    <AnchorPane fx:id="status" minHeight="21.0" prefHeight="-1.0" prefWidth="-1.0">
+      <children>
+        <Rectangle fx:id="resizer" arcHeight="0.0" arcWidth="0.0" fill="#dfdfdf27" height="20.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="20.0" x="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+        <Label fx:id="statusMessage" text="Welcome to StarParse!" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="175.0" AnchorPane.topAnchor="2.0" />
+        <Hyperlink fx:id="linkTwitter" text="Follow Twitter" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="80.0" AnchorPane.topAnchor="0.0" />
+        <Hyperlink fx:id="linkDonate" text="Donate" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="0.0" />
+        <Line endX="10.0" endY="-10.0" rotate="0.0" startX="0.0" startY="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
+          <stroke>
+            <Color blue="0.376" green="0.376" red="0.376" fx:id="x2" />
+          </stroke>
+        </Line>
+        <Line endX="5.0" endY="-5.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x2" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+      </children>
+    </AnchorPane>
+  </bottom>
+  <center>
+    <VBox prefHeight="200.0" prefWidth="100.0">
+      <children>
+        <StackPane minHeight="-1.0" prefHeight="-1.0" prefWidth="-1.0" styleClass="combat-head" VBox.vgrow="NEVER">
+          <children>
+            <AnchorPane id="" fx:id="headCombat" minHeight="70.0" prefHeight="-1.0" prefWidth="-1.0">
+              <children>
+                <AnchorPane id="headCombat" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="27.0" prefWidth="-1.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <children>
+                    <Label fx:id="combatName" prefWidth="-1.0" styleClass="combat-boss" text="Dread Council" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="245.0" AnchorPane.topAnchor="5.0" />
+                    <Label fx:id="combatTime" styleClass="combat-time" text="21:45:15 - 21:58:17 (13:02)" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0" />
+                  </children>
+                </AnchorPane>
+              </children>
+            </AnchorPane>
+          </children>
+        </StackPane>
+        <TabPane fx:id="contentTabs" prefHeight="500.0" prefWidth="-1.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+          <tabs>
+            <Tab fx:id="contentOverview" text="Overview">
+              <content>
+                <AnchorPane id="contentOverview" minHeight="0.0" minWidth="0.0" prefHeight="-1.0" prefWidth="-1.0" />
+              </content>
+            </Tab>
+            <Tab fx:id="contentDamageDealt" disable="false" text="Damage">
+              <content>
+                <AnchorPane id="contentDamageDealt" minHeight="0.0" minWidth="0.0" prefHeight="-1.0" prefWidth="-1.0" />
+              </content>
+            </Tab>
+            <Tab fx:id="contentHealingDone" disable="false" text="Healing">
+              <content>
+                <AnchorPane id="contentHealingDone" minHeight="0.0" minWidth="0.0" prefHeight="-1.0" prefWidth="-1.0" />
+              </content>
+            </Tab>
+            <Tab fx:id="contentDamageTaken" disable="false" text="Damage Taken">
+              <content>
+                <AnchorPane id="contentDamageTaken" minHeight="0.0" minWidth="0.0" prefHeight="-1.0" prefWidth="-1.0" />
+              </content>
+            </Tab>
+            <Tab fx:id="contentHealingTaken" disable="false" text="Healing Taken">
+              <content>
+                <AnchorPane id="contentHealingTaken" minHeight="0.0" minWidth="0.0" prefHeight="-1.0" prefWidth="-1.0" />
+              </content>
+            </Tab>
+            <Tab fx:id="contentCombatLog" disable="false" text="Combat Log">
+              <content>
+                <AnchorPane id="contentCombatLog" minHeight="0.0" minWidth="0.0" prefHeight="-1.0" prefWidth="-1.0" />
+              </content>
+            </Tab>
+            <Tab fx:id="contentRaid" closable="true" text="Raid">
+              <content>
+                <AnchorPane id="contentRaid" minHeight="0.0" minWidth="0.0" prefHeight="-1.0" prefWidth="-1.0" />
+              </content>
+            </Tab>
+          </tabs>
+        </TabPane>
+      </children>
+    </VBox>
+  </center>
+  <left>
+    <VBox prefHeight="-1.0" prefWidth="155.0">
+      <children>
+        <Pane id="characterPane" minHeight="-Infinity" prefHeight="27.0" prefWidth="-1.0" visible="true">
+          <children>
+            <Label fx:id="characterName" contentDisplay="CENTER" disable="false" layoutX="5.0" layoutY="5.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="90.0" text="Ready!" textAlignment="CENTER" />
+          </children>
+        </Pane>
+        <GridPane alignment="TOP_LEFT" hgap="0.0" prefHeight="-1.0" prefWidth="-1.0" styleClass="combat-stats" vgap="2.0" VBox.vgrow="NEVER">
+          <children>
+            <Text styleClass="apm" text="APM" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <Text styleClass="damage" text="DPS" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <Text styleClass="healing" text="HPS" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <Text styleClass="healing-eff" text="Eff" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <Text styleClass="threat" text="TPS" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+            <Text styleClass="damage" text="DTPS" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+            <Text styleClass="healing" text="HTPS" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+            <Text styleClass="healing-eff" text="Eff" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+            <Text styleClass="threat" text="Abs" GridPane.columnIndex="0" GridPane.rowIndex="8" />
+            <Label fx:id="apm" styleClass="apm" text="46.35" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+            <Label fx:id="time" styleClass="apm" text="07:35" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+            <Label fx:id="dps" styleClass="damage, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+            <Label fx:id="damage" styleClass="damage" text="3 654 321" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+            <Label fx:id="hps" styleClass="healing, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+            <Label fx:id="heal" styleClass="healing" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+            <Label fx:id="ehps" styleClass="healing-eff, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+            <Label fx:id="ehpsPercent" styleClass="healing-eff" text="67 %" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+            <Label fx:id="tps" styleClass="threat, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+            <Label fx:id="threat" styleClass="threat" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+            <Label fx:id="dtps" styleClass="damage, taken, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+            <Label fx:id="damageTaken" styleClass="damage, taken" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+            <Label fx:id="hpsTaken" styleClass="healing, taken, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="6" />
+            <Label fx:id="healTaken" styleClass="healing, taken" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="6" />
+            <Label fx:id="ehpsTaken" styleClass="healing-eff, taken, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="7" />
+            <Label fx:id="ehpsTakenPercent" styleClass="healing-eff, taken" text="54 %" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="7" />
+            <Label fx:id="aps" styleClass="absorbed, taken, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="8" />
+            <Label fx:id="absorbed" styleClass="absorbed, taken" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="8" />
+          </children>
+          <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="-1.0" prefWidth="-1.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" prefWidth="55.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" prefWidth="35.0" />
+          </columnConstraints>
+          <rowConstraints>
+            <RowConstraints vgrow="NEVER" />
+            <RowConstraints minHeight="20.0" valignment="BOTTOM" vgrow="NEVER" />
+            <RowConstraints vgrow="NEVER" />
+            <RowConstraints vgrow="NEVER" />
+            <RowConstraints vgrow="NEVER" />
+            <RowConstraints minHeight="20.0" valignment="BOTTOM" />
+                  <RowConstraints />
+                  <RowConstraints />
+                  <RowConstraints />
+          </rowConstraints>
+        </GridPane>
+        <Pane id="combat-list-menu" minHeight="-Infinity" prefHeight="29.0" prefWidth="-1.0" visible="true">
+          <children>
+            <Label fx:id="logTime" disable="false" layoutX="5.0" layoutY="7.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" styleClass="combat-time" text="21.5.14 (1h 7m)" textAlignment="CENTER" />
+            <CheckBox fx:id="trashButton" focusTraversable="false" indeterminate="false" layoutX="95.0" layoutY="7.0" mnemonicParsing="false" onAction="#handleToggleThrash" selected="false" text="Trash" visible="true" />
+          </children>
+        </Pane>
+        <ListView fx:id="combatList" editable="false" focusTraversable="true" maxWidth="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="-1.0" prefWidth="155.0" VBox.vgrow="ALWAYS" />
+      </children>
+    </VBox>
+  </left>
+  <top>
+    <GridPane fx:id="header" gridLinesVisible="false" maxWidth="-1.0" prefHeight="40.0" prefWidth="-1.0">
+      <children>
+        <ImageView id="logo" fx:id="logoImage" GridPane.columnIndex="0" GridPane.rowIndex="0">
+          <image>
+            <Image url="@../img/starparse3.png" />
+          </image>
+          <GridPane.margin>
+            <Insets left="5.0" />
+          </GridPane.margin>
+        </ImageView>
+        <MenuBar maxWidth="-Infinity" minWidth="-Infinity" prefWidth="210.0" useSystemMenuBar="false" GridPane.columnIndex="1" GridPane.rowIndex="0">
+          <menus>
+            <Menu mnemonicParsing="false" text="File">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#handleOpenLog" text="Open log...">
+                  <accelerator>
+                    <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                  </accelerator>
+                </MenuItem>
+                <Menu fx:id="recentMenu" mnemonicParsing="false" text="Open recent..." />
+                <SeparatorMenuItem mnemonicParsing="false" text="" />
+                <MenuItem mnemonicParsing="false" onAction="#handleSettings" text="Settings" />
+                <SeparatorMenuItem mnemonicParsing="false" text="" />
+                <MenuItem mnemonicParsing="false" onAction="#handleClose" text="Exit" />
+              </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Interface">
+              <items>
+                <CheckMenuItem fx:id="personalStatsPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Personal Stats" />
+                <CheckMenuItem fx:id="timersPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Combat Timers" />
+                <CheckMenuItem fx:id="timersCenterPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Timers Center" visible="false" />
+                <SeparatorMenuItem mnemonicParsing="false" text="" />
+                <CheckMenuItem fx:id="challengesPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Raid Challenges" />
+                <CheckMenuItem fx:id="raidDpsPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Raid Damage" />
+                <CheckMenuItem fx:id="raidHpsPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Raid Healing" />
+                <CheckMenuItem fx:id="raidTpsPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Raid Threat" />
+                <CheckMenuItem fx:id="hotsPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Raid Hots" />
+                <CheckMenuItem fx:id="raidNotesPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Raid Notes" />
+                <SeparatorMenuItem mnemonicParsing="false" text="" />
+                <CheckMenuItem fx:id="lockOverlaysMenu" mnemonicParsing="false" onAction="#handleOverlaysLock" text="Lock Overlays" />
+                <MenuItem mnemonicParsing="false" onAction="#handleOverlaysSettings" text="Settings" />
+              </items>
+            </Menu>
+            <Menu fx:id="timersMenu" mnemonicParsing="false" text="Timers">
+              <items>
+                <SeparatorMenuItem mnemonicParsing="false" text="" />
+                <MenuItem fx:id="timersSettingsMenu" mnemonicParsing="false" onAction="#handleTimersSettings" text="Settings" />
+              </items>
+            </Menu>
+            <Menu fx:id="raidGroupsMenu" mnemonicParsing="false" text="Raiding">
+              <items>
+                <SeparatorMenuItem mnemonicParsing="false" text="" />
+                <MenuItem fx:id="raidGroupsSettingsMenu" mnemonicParsing="false" onAction="#handleRaidGroupsSettings" text="Settings" />
+              </items>
+            </Menu>
+          </menus>
+          <GridPane.margin>
+            <Insets top="-1.0" />
+          </GridPane.margin>
+        </MenuBar>
+        <HBox id="buttons" alignment="CENTER" prefHeight="40.0" prefWidth="144.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="0" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
+          <children>
+            <ToggleButton fx:id="parseButton" focusTraversable="false" onAction="#handleParse" text="Parse">
+              <HBox.margin>
+                <Insets right="5.0" />
+              </HBox.margin>
+            </ToggleButton>
+            <ToggleButton fx:id="raidButton" focusTraversable="false" onAction="#handleRaid" selected="false" text="Raid">
+              <HBox.margin>
+                <Insets fx:id="x1" />
+              </HBox.margin>
+            </ToggleButton>
+          </children>
+        </HBox>
+        <HBox id="toolbar" alignment="CENTER_RIGHT" prefHeight="40.0" prefWidth="109.0" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0">
+          <children>
+            <Button onAction="#handleAbout" text="?" />
+            <Button onAction="#handleMinimize" text="_">
+              <HBox.margin>
+                <Insets left="1.0" right="1.0" />
+              </HBox.margin>
+            </Button>
+            <Button onAction="#handleClose" text="x" />
+          </children>
+          <padding>
+            <Insets right="10.0" />
+          </padding>
+        </HBox>
+      </children>
+      <columnConstraints>
+        <ColumnConstraints fillWidth="false" hgrow="NEVER" maxWidth="-Infinity" minWidth="150.0" prefWidth="215.0" />
+        <ColumnConstraints hgrow="ALWAYS" maxWidth="-1.0" minWidth="220.0" />
+        <ColumnConstraints fillWidth="false" hgrow="NEVER" maxWidth="-Infinity" minWidth="130.0" prefWidth="136.0" />
+        <ColumnConstraints fillWidth="false" hgrow="NEVER" maxWidth="-Infinity" minWidth="100.0" prefWidth="109.0" />
+      </columnConstraints>
+      <rowConstraints>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      </rowConstraints>
+    </GridPane>
+  </top>
+</BorderPane>

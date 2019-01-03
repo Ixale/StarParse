@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+<?scenebuilder-stylesheet ../styles.css?>
+
+<VBox fx:id="popoutRoot" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" prefWidth="150.0" spacing="0.0" styleClass="popout" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.ixale.starparse.gui.popout.TimersCenterPopoutPresenter">
+  <children>
+    <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" prefWidth="150.0" VBox.margin="$x1" VBox.vgrow="NEVER">
+      <children>
+        <Label fx:id="popoutTitle" text="Timers Center" visible="false" />
+        <VBox fx:id="timersGrid" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-1.0" minWidth="-Infinity" opacity="1.0" prefHeight="100.0" prefWidth="150.0" spacing="1.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+          <padding>
+            <Insets fx:id="x1" />
+          </padding>
+        </VBox>
+      </children>
+    </AnchorPane>
+  </children>
+</VBox>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+ 
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.ixale</groupId>
+		<artifactId>starparse</artifactId>
+		<version>1.0</version>
+	</parent>
+ 
+	<artifactId>starparse-shared</artifactId>
+	<name>StarParse - Shared</name>
+
+	<packaging>jar</packaging>
+ 
+	<properties>
+		<java-version>1.7</java-version>
+	</properties>
+
+	<dependencies>
+		<!-- Websockets -->
+		<dependency>
+			<groupId>javax.websocket</groupId>
+			<artifactId>javax.websocket-api</artifactId>
+			<version>1.1</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.esotericsoftware.kryo</groupId>
+			<artifactId>kryo</artifactId>
+			<version>2.24.0</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${java-version}</source>
+					<target>${java-version}</target>
+				</configuration>
+				<version>3.1</version>
+			</plugin>
+		</plugins>
+	</build>
+</project>

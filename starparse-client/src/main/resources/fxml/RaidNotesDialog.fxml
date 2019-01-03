@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.input.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+<?scenebuilder-stylesheet ../styles.css?>
+
+<VBox fx:id="dialogRoot" minHeight="-Infinity" minWidth="-Infinity" prefHeight="220.0" prefWidth="300.0" spacing="5.0" styleClass="modal-text" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ixale.starparse.gui.dialog.RaidNotesDialogPresenter">
+  <children>
+    <Label alignment="TOP_LEFT" minHeight="-Infinity" text="Enter a message for all raid members (will be displayed on their Raid Notes overlays). You can preview the message before saving it (see your own Raid Note overlay)." wrapText="true" VBox.vgrow="NEVER">
+      <VBox.margin>
+        <Insets />
+      </VBox.margin>
+    </Label>
+    <TextArea fx:id="raidNote" prefRowCount="10" prefWidth="-1.0" wrapText="true" VBox.vgrow="ALWAYS" />
+    <HBox alignment="TOP_LEFT" fillHeight="false" prefHeight="-1.0" prefWidth="-1.0" spacing="5.0" VBox.vgrow="NEVER">
+      <children>
+        <Button fx:id="saveButton" cancelButton="false" defaultButton="true" onAction="#handleSave" text="Save &amp; broadcast" />
+        <Button fx:id="previewButton" onAction="#handlePreview" text="Preview only">
+          <HBox.margin>
+            <Insets />
+          </HBox.margin>
+        </Button>
+        <Button fx:id="cancelButton" cancelButton="true" onAction="#handleClose" text="Cancel">
+          <HBox.margin>
+            <Insets />
+          </HBox.margin>
+        </Button>
+      </children>
+    </HBox>
+  </children>
+  <padding>
+    <Insets bottom="10.0" left="10.0" right="10.0" top="20.0" />
+  </padding>
+</VBox>

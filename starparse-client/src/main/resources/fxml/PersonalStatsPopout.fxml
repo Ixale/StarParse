@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+<?scenebuilder-stylesheet ../popouts.css?>
+
+<VBox fx:id="popoutRoot" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="211.0" prefWidth="150.0" spacing="0.0" styleClass="popout" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.ixale.starparse.gui.popout.PersonalStatsPopoutPresenter">
+  <children>
+    <AnchorPane minHeight="-1.0" prefHeight="-1.0" prefWidth="-1.0" scaleX="1.0" scaleY="1.0" styleClass="popout-header" VBox.vgrow="NEVER">
+      <children>
+        <Rectangle fx:id="popoutTitleBackground" fill="BLACK" height="19.0" opacity="0.9" width="150.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+        <Label fx:id="popoutTitle" alignment="CENTER" minHeight="-Infinity" prefHeight="19.0" styleClass="popout-title" text="Personal" textAlignment="CENTER" underline="false" wrapText="false" AnchorPane.leftAnchor="55.0" AnchorPane.topAnchor="0.0" />
+        <Button focusTraversable="false" onAction="#handleIncreaseOpacity" text="+" AnchorPane.leftAnchor="2.0" AnchorPane.topAnchor="2.0" />
+        <Button focusTraversable="false" onAction="#handleDecreaseOpacity" text="-" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="2.0" />
+        <Button focusTraversable="false" onAction="#handleToggleMode" text="M" AnchorPane.leftAnchor="110.0" AnchorPane.topAnchor="2.0" />
+        <Button focusTraversable="false" onAction="#handleToggleBars" text="B" AnchorPane.leftAnchor="125.0" AnchorPane.topAnchor="2.0" />
+        <Button focusTraversable="false" onAction="#handleClose" text="X" AnchorPane.leftAnchor="137.0" AnchorPane.topAnchor="2.0" />
+      </children>
+    </AnchorPane>
+    <AnchorPane fx:id="statsWrapper" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="191.0" prefWidth="150.0" VBox.vgrow="NEVER">
+      <children>
+        <Rectangle fx:id="popoutBackground" fill="BLACK" height="191.0" opacity="0.7" width="150.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+        <VBox fx:id="statsGrid" alignment="TOP_LEFT" layoutX="0.0" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" opacity="1.0" prefHeight="191.0" prefWidth="150.0" spacing="0.5" AnchorPane.topAnchor="0.0">
+          <children>
+            <GridPane fx:id="modeDamage" alignment="TOP_LEFT" hgap="0.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="80.0" prefWidth="150.0" styleClass="combat-stats" vgap="2.0" visible="true" VBox.vgrow="NEVER">
+              <children>
+                <Text text="APM" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <Text text="DPS" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <Text text="Crit" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <Label fx:id="time2" styleClass="apm" text="07:35" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+                <Label fx:id="apm2" styleClass="apm" text="46.35" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+                <Label fx:id="damage2" styleClass="damage2" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+                <Label fx:id="dps2" styleClass="damage2, bigger" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                <Label fx:id="critTotal2" styleClass="crit" text="31 %" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+                <Label fx:id="crit2" styleClass="crit, bigger" text="42 %" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+              </children>
+              <columnConstraints>
+                <ColumnConstraints hgrow="NEVER" minWidth="-Infinity" prefWidth="30.0" />
+                <ColumnConstraints hgrow="NEVER" minWidth="-Infinity" prefWidth="45.0" />
+                <ColumnConstraints hgrow="NEVER" minWidth="-Infinity" prefWidth="65.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" valignment="BOTTOM" vgrow="NEVER" />
+                <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" valignment="BOTTOM" vgrow="NEVER" />
+                <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" valignment="BOTTOM" vgrow="NEVER" />
+              </rowConstraints>
+            </GridPane>
+            <GridPane fx:id="modeHealing" alignment="TOP_LEFT" hgap="0.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="105.0" prefWidth="150.0" styleClass="combat-stats" vgap="2.0" visible="true" VBox.vgrow="NEVER">
+              <children>
+                <Text text="APM" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <Text text="HPS" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <Text text="Eff" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <Text text="Shield" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                <Label fx:id="time3" styleClass="apm" text="07:35" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+                <Label fx:id="apm3" styleClass="apm" text="46.35" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+                <Label fx:id="heal3" styleClass="healing" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+                <Label fx:id="hps3" styleClass="healing, bigger" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                <Label fx:id="ehpsPercent3" styleClass="healing-eff" text="67 %" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+                <Label fx:id="ehps3" styleClass="healing-eff, bigger" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+                <Label fx:id="shield3" styleClass="absorbed" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+                <Label fx:id="sps3" styleClass="absorbed, bigger" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
+              </children>
+              <columnConstraints>
+                <ColumnConstraints hgrow="NEVER" minWidth="-Infinity" prefWidth="30.0" />
+                <ColumnConstraints hgrow="NEVER" minWidth="-Infinity" prefWidth="45.0" />
+                <ColumnConstraints hgrow="NEVER" minWidth="-Infinity" prefWidth="65.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" valignment="BOTTOM" vgrow="NEVER" />
+                <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" valignment="BOTTOM" vgrow="NEVER" />
+                <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" valignment="BOTTOM" vgrow="NEVER" />
+                <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" valignment="BOTTOM" vgrow="NEVER" />
+              </rowConstraints>
+            </GridPane>
+            <GridPane fx:id="modeAll" alignment="TOP_LEFT" hgap="0.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="171.0" prefWidth="150.0" styleClass="combat-stats" vgap="2.0" VBox.vgrow="NEVER">
+              <children>
+                <Text text="APM" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <Text text="DPS" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <Text text="HPS" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <Text text="Eff" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                <Text text="TPS" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                <Text text="DTPS" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                <Text text="HTPS" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                <Text text="Eff" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+                <Text text="Abs" GridPane.columnIndex="0" GridPane.rowIndex="8" />
+                <Label fx:id="apm" styleClass="apm" text="46.35" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+                <Label fx:id="time" styleClass="apm" text="07:35" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+                <Label fx:id="dps" styleClass="damage2, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+                <Label fx:id="damage" styleClass="damage2" text="3 654 321" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+                <Label fx:id="hps" styleClass="healing, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+                <Label fx:id="heal" styleClass="healing" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+                <Label fx:id="ehps" styleClass="healing-eff, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+                <Label fx:id="ehpsPercent" styleClass="healing-eff" text="67 %" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+                <Label fx:id="tps" styleClass="threat, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+                <Label fx:id="threat" styleClass="threat" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+                <Label fx:id="dtps" styleClass="damage2, taken, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+                <Label fx:id="damageTaken" styleClass="damage2, taken" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+                <Label fx:id="hpsTaken" styleClass="healing, taken, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="6" />
+                <Label fx:id="healTaken" styleClass="healing, taken" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="6" />
+                <Label fx:id="ehpsTaken" styleClass="healing-eff, taken, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="7" />
+                <Label fx:id="ehpsTakenPercent" styleClass="healing-eff, taken" text="54 %" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="7" />
+                <Label fx:id="aps" styleClass="absorbed, taken, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="8" />
+                <Label fx:id="absorbed" styleClass="absorbed, taken" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="8" />
+              </children>
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="-1.0" prefWidth="-1.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" prefWidth="55.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" prefWidth="35.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" valignment="BOTTOM" vgrow="NEVER" />
+                <RowConstraints maxHeight="-1.0" minHeight="20.0" prefHeight="-1.0" valignment="BOTTOM" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="-1.0" minHeight="-1.0" prefHeight="-1.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="-1.0" minHeight="-1.0" prefHeight="-1.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="-1.0" minHeight="-1.0" prefHeight="-1.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="20.0" valignment="BOTTOM" />
+              </rowConstraints>
+            </GridPane>
+          </children>
+          <padding>
+            <Insets top="1.0" />
+          </padding>
+        </VBox>
+        <AnchorPane fx:id="popoutFooter" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="19.0" prefWidth="-1.0" styleClass="popout-footer" visible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+          <children>
+            <Rectangle height="19.0" opacity="0.5" width="150.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+            <Rectangle fx:id="resizeSW" fill="TRANSPARENT" height="18.0" opacity="0.5" width="18.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+            <Rectangle fx:id="resizeSE" fill="TRANSPARENT" height="18.0" opacity="0.5" width="18.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="132.0" />
+            <Line disable="true" endX="10.0" endY="-10.0" fill="TRANSPARENT" rotate="0.0" startX="0.0" startY="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="138.0">
+              <stroke>
+                <Color blue="0.376" green="0.376" red="0.376" fx:id="x1" />
+              </stroke>
+            </Line>
+            <Line disable="true" endX="5.0" endY="-5.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x1" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="143.0" />
+            <Line disable="true" endX="-10.0" endY="-10.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x1" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+            <Line disable="true" endX="-5.0" endY="-5.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x1" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+          </children>
+        </AnchorPane>
+      </children>
+      <VBox.margin>
+        <Insets top="1.0" />
+      </VBox.margin>
+    </AnchorPane>
+  </children>
+</VBox>

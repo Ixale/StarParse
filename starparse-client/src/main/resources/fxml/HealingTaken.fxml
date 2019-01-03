@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?scenebuilder-stylesheet ../styles.css?>
+
+<VBox id="overviewRoot" fx:id="root" fillWidth="true" prefHeight="-1.0" prefWidth="-1.0" spacing="0.0" styleClass="content" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.ixale.starparse.gui.main.HealingTakenPresenter">
+  <children>
+    <HBox fillHeight="false" maxHeight="-Infinity" maxWidth="-1.0" prefHeight="20.0" prefWidth="-1.0" spacing="10.0" VBox.vgrow="ALWAYS">
+      <children>
+      	<Text strokeType="OUTSIDE" strokeWidth="0.0" text="Breakdown by" />
+        <CheckBox fx:id="sourceButton" focusTraversable="false" mnemonicParsing="false" onAction="#toggleBreakdown" selected="true"  text="Source" />
+        <CheckBox fx:id="abilityButton" focusTraversable="false" mnemonicParsing="false" onAction="#toggleBreakdown" text="Ability" />
+      </children>
+      <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </padding>
+    </HBox>
+    <TableView fx:id="healingTakenTable" focusTraversable="false" prefHeight="-1.0" prefWidth="-1.0" tableMenuButtonVisible="false" VBox.vgrow="ALWAYS">
+      <columns>
+        <TableColumn editable="false" resizable="false" minWidth="65.0" prefWidth="65.0" text="Source" fx:id="sourceNameCol" />
+        <TableColumn editable="false" resizable="false" minWidth="65.0" prefWidth="65.0" text="Ability" fx:id="nameCol" />
+        <TableColumn editable="false" maxWidth="35.0" minWidth="35.0" prefWidth="35.0" resizable="false" text="#" fx:id="ticksCol" />
+        <TableColumn editable="false" resizable="false" text="Average">
+          <columns>
+            <TableColumn editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Heal" fx:id="avgNormalCol" />
+            <TableColumn editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Crit" fx:id="avgCritCol" />
+          </columns>
+        </TableColumn>
+        <TableColumn editable="false" resizable="false" text="\%">
+          <columns>
+            <TableColumn editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Crit" fx:id="pctCritCol" />
+            <TableColumn editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Eff" fx:id="pctEffectiveCol" />
+          </columns>
+        </TableColumn>
+        <TableColumn editable="false" maxWidth="45.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="HPS" fx:id="htpsCol" />
+        <TableColumn editable="false" maxWidth="45.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="EHPS" fx:id="ehtpsCol" />
+        <TableColumn editable="false" maxWidth="60.0" minWidth="60.0" prefWidth="60.0" resizable="false" text="Total Eff" fx:id="totalCol" />
+ 
+        <TableColumn editable="false" resizable="false"  text="Absorbed">
+        	<columns>
+        	<TableColumn editable="false" maxWidth="60.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="APS" fx:id="apsCol" />
+        	<TableColumn editable="false" maxWidth="60.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Total" fx:id="absorbedCol" />
+        	</columns>
+        </TableColumn>
+ 
+        <TableColumn editable="false" maxWidth="100.0" minWidth="60.0" prefWidth="60.0" resizable="false" text="Total %" fx:id="pctTotalCol" />
+      </columns>
+    </TableView>
+  </children>
+  <padding>
+    <Insets bottom="5.0" />
+  </padding>
+</VBox>

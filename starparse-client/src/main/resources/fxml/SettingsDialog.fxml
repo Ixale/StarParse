@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.input.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+<?scenebuilder-stylesheet ../styles.css?>
+
+<TabPane fx:id="dialogRoot" maxHeight="-Infinity" minHeight="-Infinity" minWidth="520.0" prefHeight="330.0" styleClass="modal-text" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ixale.starparse.gui.dialog.SettingsDialogPresenter">
+  <tabs>
+    <Tab fx:id="contentGeneral" text="General">
+      <content>
+        <VBox prefHeight="-1.0" prefWidth="-1.0" spacing="10.0">
+          <children>
+            <HBox alignment="CENTER_LEFT" prefHeight="-1.0" prefWidth="-1.0" spacing="5.0" VBox.vgrow="NEVER">
+              <children>
+                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Log Directory" />
+                <TextField fx:id="logDirectoryField" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
+                <Button minWidth="60.0" onAction="#handleLogDirectory" text="Choose" />
+              </children>
+            </HBox>
+            <GridPane VBox.vgrow="ALWAYS">
+              <children>
+                <Label text="Display last parsed logs" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <Label text="Display last opened logs" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                  <GridPane.margin>
+                    <Insets left="10.0" fx:id="x8" />
+                  </GridPane.margin>
+                </Label>
+                <TextField fx:id="recentParsedLogsLimitField" alignment="CENTER_RIGHT" maxWidth="-Infinity" prefWidth="30.0" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.rowIndex="0">
+                  <GridPane.margin>
+                    <Insets right="10.0" />
+                  </GridPane.margin>
+                </TextField>
+                <TextField fx:id="recentOpenedLogsLimitField" maxWidth="-Infinity" prefWidth="30.0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+                <CheckBox fx:id="timeSyncEnabledButton" text="Resolve local clock offset when the application starts" GridPane.columnIndex="0" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
+                  <GridPane.margin>
+                    <Insets bottom="5.0" fx:id="x1" />
+                  </GridPane.margin>
+                </CheckBox>
+                <Label text="Time Server" GridPane.columnIndex="0" GridPane.columnSpan="2147483647" GridPane.rowIndex="2" />
+                <CheckBox fx:id="serverStoreEnabledButton" selected="true" text="Allow server to save summarized combat data while raiding" GridPane.columnIndex="0" GridPane.columnSpan="2147483647" GridPane.rowIndex="5" />
+                <Text text="When enabled, general statistics will be saved on the Star Parse server while raiding (e.g. only total DPS, HPS and other summarized data, but no rotation, effects etc)" wrappingWidth="460.0" GridPane.columnIndex="0" GridPane.rowIndex="6">
+                  <font>
+                    <Font size="10.0" fx:id="x2" />
+                  </font>
+                </Text>
+                <Button onAction="#handleSettingsDefaults" text="Load Defaults" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.margin="$x1" GridPane.rowIndex="7" />
+                <HBox alignment="BOTTOM_LEFT" fillHeight="false" prefHeight="-1.0" prefWidth="-1.0" spacing="5.0" GridPane.columnIndex="0" GridPane.margin="$x1" GridPane.rowIndex="7">
+                  <children>
+                    <Button onAction="#handleSettingsSave" text="Save Settings" />
+                    <Button cancelButton="true" onAction="#handleClose" text="Cancel" />
+                  </children>
+                </HBox>
+                <TextField fx:id="timeSyncHostField" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="366.0" GridPane.columnIndex="0" GridPane.columnSpan="2147483647" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+                        <Label text="Timezone" GridPane.rowIndex="3" />
+                        <ChoiceBox fx:id="timezoneList" prefWidth="150.0" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
+                           <GridPane.margin>
+                              <Insets right="10.0" />
+                           </GridPane.margin>
+                        </ChoiceBox>
+                        <Text text="Override the auto-detected Timezone if experiencing issues with Timers, Raiding etc" wrappingWidth="443.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="4">
+                           <font>
+                              <Font size="10.0" fx:id="x21" />
+                           </font>
+                           <GridPane.margin>
+                              <Insets />
+                           </GridPane.margin>
+                        </Text>
+                        <Text fx:id="currentTime" text="Time:" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+              </children>
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-1.0" minWidth="-Infinity" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-1.0" minWidth="-Infinity" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0" vgrow="SOMETIMES" />
+                <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="35.0" valignment="BOTTOM" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0" valignment="CENTER" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="15.0" valignment="CENTER" vgrow="SOMETIMES" />
+                <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" valignment="BOTTOM" vgrow="SOMETIMES" />
+                <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" valignment="BOTTOM" vgrow="SOMETIMES" />
+                <RowConstraints fillHeight="true" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="40.0" valignment="BOTTOM" vgrow="ALWAYS" />
+              </rowConstraints>
+            </GridPane>
+          </children>
+          <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="20.0" />
+          </padding>
+        </VBox>
+      </content>
+    </Tab>
+    <Tab fx:id="contentRaidGroups" text="Raiding">
+      <content>
+        <VBox fillWidth="false">
+          <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Raid Groups" />
+                  <Separator prefWidth="490.0" />
+            <GridPane hgap="10.0" vgap="0.0" VBox.vgrow="NEVER">
+              <children>
+                <ListView fx:id="raidGroupList" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="160.0" prefWidth="220.0" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <GridPane gridLinesVisible="false" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0" GridPane.valignment="TOP" GridPane.vgrow="ALWAYS">
+                  <children>
+                    <Label text="Name" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <Label text="Password" wrapText="true" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <Label text="Admin Password" wrapText="true" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                    <TextField fx:id="raidGroupNameField" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                    <TextField fx:id="raidGroupClientPasswordField" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                    <TextField fx:id="raidGroupAdminPasswordField" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0" promptText="Enter for privileged access" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                    <Button fx:id="raidGroupJoinButton" onAction="#handleRaidGroupJoin" text="Join group" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
+                    <Button fx:id="raidGroupCreateButton" onAction="#handleRaidGroupCreate" text="Create group" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
+                    <Text font="$x2" strokeType="OUTSIDE" strokeWidth="0.0" text="Admin password allows raid-wide announcements and more (required when creating a brand new group)" wrappingWidth="255.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin></Text>
+                  </children>
+                  <columnConstraints>
+                    <ColumnConstraints fillWidth="false" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="75.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="-1.0" />
+                  </columnConstraints>
+                  <rowConstraints>
+                    <RowConstraints minHeight="30.0" prefHeight="-1.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="30.0" prefHeight="-1.0" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="45.0" vgrow="SOMETIMES" />
+                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="-1.0" vgrow="SOMETIMES" />
+                    <RowConstraints fillHeight="false" minHeight="-Infinity" prefHeight="30.0" valignment="CENTER" vgrow="NEVER" />
+                  </rowConstraints>
+                </GridPane>
+              </children>
+              <columnConstraints>
+                <ColumnConstraints fillWidth="false" hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" />
+                <ColumnConstraints fillWidth="false" hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="165.0" valignment="BOTTOM" vgrow="NEVER" />
+              </rowConstraints>
+            </GridPane>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Announcements">
+                     <VBox.margin>
+                        <Insets top="15.0" />
+                     </VBox.margin>
+                  </Text>
+                  <Separator prefWidth="490.0" />
+                  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="55.0" prefWidth="490.0">
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Raid Pull (sec)" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="3.0" />
+                        <TextField fx:id="raidPullSec" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="25.0" promptText="10" AnchorPane.leftAnchor="82.0" AnchorPane.topAnchor="0.0" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Hotkey" AnchorPane.leftAnchor="115.0" AnchorPane.topAnchor="3.0" />
+                        <TextField fx:id="raidPullHotkey" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="85.0" promptText="control shift X" AnchorPane.leftAnchor="155.0" AnchorPane.topAnchor="0.0" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Raid Break (min)" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" />
+                        <TextField fx:id="raidBreakMin" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="25.0" promptText="15" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="82.0" />
+                        <Button mnemonicParsing="false" onAction="#handleAnnouncementsSave" text="Save Announcements" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="100.0" />
+                        <Button mnemonicParsing="false" onAction="#handleAnnouncementsDefaults" text="Load Defaults" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="0.0" />
+                        <Text font="$x2" layoutX="123.0" layoutY="12.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Must be unique in your system (use control, shift etc.)" wrappingWidth="255.0" AnchorPane.leftAnchor="245.0" AnchorPane.topAnchor="4.0" />
+                     </children>
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </AnchorPane>
+          </children>
+          <padding>
+            <Insets left="10.0" right="10.0" top="10.0" />
+          </padding>
+        </VBox>
+      </content>
+    </Tab>
+    <Tab fx:id="contentOverlays" text="Overlays">
+      <content>
+        <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0">
+          <children>
+            <GridPane gridLinesVisible="false" hgap="0.0" vgap="3.0">
+              <children>
+                <Label text="Background" GridPane.columnIndex="0" GridPane.halignment="LEFT" GridPane.rowIndex="0">
+                  <GridPane.margin>
+                    <Insets fx:id="x3" />
+                  </GridPane.margin>
+                </Label>
+                <ColorPicker fx:id="popoutBackgroundColor" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                <Label text="Text Color" GridPane.columnIndex="0" GridPane.halignment="LEFT" GridPane.margin="$x3" GridPane.rowIndex="1" />
+                <ColorPicker fx:id="popoutTextColor" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label text="Damage Bar" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                  <GridPane.margin>
+                    <Insets left="5.0" fx:id="x5" />
+                  </GridPane.margin>
+                </Label>
+                <ColorPicker fx:id="popoutDamageColor" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                <Label text="Healing Bar" GridPane.columnIndex="2" GridPane.margin="$x5" GridPane.rowIndex="1" />
+                <ColorPicker fx:id="popoutHealingColor" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                <Label text="Threat Bar" GridPane.columnIndex="4" GridPane.margin="$x5" GridPane.rowIndex="0" />
+                <ColorPicker fx:id="popoutThreatColor" GridPane.columnIndex="5" GridPane.rowIndex="0" />
+                <Label text="Friendly Bar" GridPane.columnIndex="4" GridPane.margin="$x5" GridPane.rowIndex="1" />
+                <ColorPicker fx:id="popoutFriendlyColor" GridPane.columnIndex="5" GridPane.rowIndex="1" />
+              </children>
+              <columnConstraints>
+                <ColumnConstraints fillWidth="true" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="70.0" />
+                <ColumnConstraints fillWidth="false" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="85.0" />
+                <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="70.0" />
+                <ColumnConstraints fillWidth="false" halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="85.0" />
+                <ColumnConstraints fillWidth="true" halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="70.0" />
+                <ColumnConstraints fillWidth="false" halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="85.0" />
+              </columnConstraints>
+              <padding>
+                <Insets fx:id="x4" />
+              </padding>
+              <rowConstraints>
+                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+              <VBox.margin>
+                <Insets fx:id="x4" />
+              </VBox.margin>
+            </GridPane>
+            <GridPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="-1.0" VBox.vgrow="NEVER">
+              <children>
+                <Label text="Raid Damage" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <Slider fx:id="raidDamageOpacitySlider" blockIncrement="10.0" majorTickUnit="1.0" maxWidth="-Infinity" min="1.0" minHeight="-1.0" minWidth="-Infinity" minorTickCount="0" orientation="HORIZONTAL" prefWidth="60.0" showTickLabels="false" showTickMarks="false" snapToTicks="true" value="70.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                <TextField fx:id="raidDamageOpacityText" alignment="CENTER_RIGHT" disable="false" editable="true" maxWidth="-Infinity" prefWidth="30.0" text="70" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+                <CheckBox fx:id="raidDamageBars" selected="true" text="Bars" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                <Label text="Raid Healing" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <Slider fx:id="raidHealingOpacitySlider" blockIncrement="10.0" majorTickUnit="1.0" maxWidth="-Infinity" min="1.0" minHeight="-1.0" minWidth="-Infinity" minorTickCount="0" orientation="HORIZONTAL" prefWidth="60.0" showTickLabels="false" showTickMarks="false" snapToTicks="true" value="70.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <TextField fx:id="raidHealingOpacityText" alignment="CENTER_RIGHT" disable="false" editable="true" maxWidth="-Infinity" prefWidth="30.0" text="70" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+                <CheckBox fx:id="raidHealingBars" selected="true" text="Bars" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                <ChoiceBox fx:id="raidHealingMode" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                <Label text="Raid Threat" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <Slider fx:id="raidThreatOpacitySlider" blockIncrement="10.0" majorTickUnit="1.0" maxWidth="-Infinity" min="1.0" minHeight="-1.0" minWidth="-Infinity" minorTickCount="0" orientation="HORIZONTAL" prefWidth="60.0" showTickLabels="false" showTickMarks="false" snapToTicks="true" value="70.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                <TextField fx:id="raidThreatOpacityText" alignment="CENTER_RIGHT" disable="false" editable="true" maxWidth="-Infinity" prefWidth="30.0" text="70" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+                <CheckBox fx:id="raidThreatBars" selected="true" text="Bars" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                <Label text="Challenges" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                <Slider fx:id="raidChallengesOpacitySlider" blockIncrement="10.0" majorTickUnit="1.0" maxWidth="-Infinity" min="1.0" minHeight="-1.0" minWidth="-Infinity" minorTickCount="0" orientation="HORIZONTAL" prefWidth="60.0" showTickLabels="false" showTickMarks="false" snapToTicks="true" value="70.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                <TextField fx:id="raidChallengesOpacityText" alignment="CENTER_RIGHT" disable="false" editable="true" maxWidth="-Infinity" prefWidth="30.0" text="70" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+                <CheckBox fx:id="raidChallengesBars" selected="true" text="Bars" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                <Label text="Timers" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                <Slider fx:id="timersOpacitySlider" blockIncrement="10.0" majorTickUnit="1.0" maxWidth="-Infinity" min="1.0" minHeight="-1.0" minWidth="-Infinity" minorTickCount="0" orientation="HORIZONTAL" prefWidth="60.0" showTickLabels="false" showTickMarks="false" snapToTicks="true" value="70.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                <TextField fx:id="timersOpacityText" alignment="CENTER_RIGHT" disable="false" editable="true" maxWidth="-Infinity" prefWidth="30.0" text="70" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+                <CheckBox fx:id="timersBars" selected="true" text="Bars" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                <Label text="Fractions below" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                <TextField fx:id="timersFractions" alignment="CENTER_RIGHT" disable="false" editable="true" maxWidth="-Infinity" prefWidth="20.0" promptText="s" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+                	<GridPane.margin>
+                		<Insets right="10.0" />
+                	</GridPane.margin>
+                </TextField>
+                <CheckBox fx:id="timersCenter" selected="false" text="Expiring window" GridPane.columnIndex="4" GridPane.rowIndex="4">
+                	<GridPane.margin>
+                		<Insets left="5.0" />
+                	</GridPane.margin>
+                </CheckBox>
+                <Button fx:id="timersCenterMoveButton" text="Move" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+                <Label text="Personal" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                <Slider fx:id="personalOpacitySlider" blockIncrement="10.0" majorTickUnit="1.0" maxWidth="-Infinity" min="1.0" minHeight="-1.0" minWidth="-Infinity" minorTickCount="0" orientation="HORIZONTAL" prefWidth="60.0" showTickLabels="false" showTickMarks="false" snapToTicks="true" value="70.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                <TextField fx:id="personalOpacityText" alignment="CENTER_RIGHT" disable="false" editable="true" maxWidth="-Infinity" prefWidth="30.0" text="70" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+                <CheckBox fx:id="personalBars" selected="true" text="Bars" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                <ChoiceBox fx:id="personalMode" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+              </children>
+              <columnConstraints>
+                <ColumnConstraints fillWidth="false" hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" percentWidth="-1.0" prefWidth="70.0" />
+                <ColumnConstraints fillWidth="false" hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" percentWidth="-1.0" prefWidth="95.0" />
+                <ColumnConstraints fillWidth="false" halignment="CENTER" hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" percentWidth="-1.0" prefWidth="60.0" />
+                <ColumnConstraints fillWidth="false" halignment="LEFT" hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" percentWidth="-1.0" prefWidth="110.0" />
+                <ColumnConstraints fillWidth="false" halignment="LEFT" hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" percentWidth="-1.0" prefWidth="155.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" vgrow="NEVER" />
+                <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" vgrow="NEVER" />
+                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" vgrow="NEVER" />
+                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" vgrow="NEVER" />
+                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" vgrow="NEVER" />
+                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" vgrow="NEVER" />
+              </rowConstraints>
+              <VBox.margin>
+                <Insets fx:id="x3" />
+              </VBox.margin>
+            </GridPane>
+            <HBox alignment="CENTER_LEFT" prefHeight="-1.0" prefWidth="-1.0" spacing="10.0" VBox.vgrow="NEVER">
+              <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Lock hotkey" />
+                        <TextField fx:id="lockOverlaysHotkey" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="85.0" promptText="control shift Z" />
+                        <Text font="$x2" strokeType="OUTSIDE" strokeWidth="0.0" text="Must be unique in your system" wrappingWidth="75.0" />
+                <CheckBox fx:id="popoutSolid" mnemonicParsing="false" text="Disable transparency (streaming friendly)" />
+              </children>
+              <padding>
+                <Insets fx:id="x3" />
+              </padding>
+            </HBox>
+            <HBox alignment="BOTTOM_LEFT" fillHeight="false" prefHeight="-1.0" prefWidth="-1.0" spacing="5.0" VBox.vgrow="ALWAYS">
+              <children>
+                <Button onAction="#handleOverlaysSave" text="Save Overlays" />
+                <Button cancelButton="true" onAction="#handleClose" text="Cancel" />
+                <Button fx:id="overlaysResetButton" onAction="#handleOverlaysReset" text="Reset Positions" />
+                <HBox alignment="BOTTOM_RIGHT" prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS">
+                  <children>
+                    <Button onAction="#handleOverlaysDefaults" text="Load Defaults" />
+                  </children>
+                  <padding>
+                    <Insets fx:id="x3" />
+                  </padding>
+                </HBox>
+              </children>
+              <padding>
+                <Insets top="5.0" fx:id="x4" />
+              </padding>
+            </HBox>
+          </children>
+          <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+          </padding>
+        </VBox>
+      </content>
+    </Tab>
+    <Tab fx:id="contentTimers" text="Timers">
+      <content>
+        <VBox prefHeight="-1.0" prefWidth="-1.0">
+          <children>
+            <GridPane gridLinesVisible="false" hgap="7.0" maxWidth="-1.0" minWidth="-1.0" prefWidth="-1.0" vgap="0.0" VBox.vgrow="NEVER">
+              <children>
+                <VBox id="VBox" alignment="TOP_LEFT" spacing="0.0" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.valignment="TOP">
+                  <children>
+                    <AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" prefWidth="-1.0">
+                      <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Name" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="2.0" />
+                        <TextField fx:id="timerName" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="105.0" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="0.0" />
+                        <Text fx:id="timerBossLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="Boss" AnchorPane.leftAnchor="170.0" AnchorPane.topAnchor="2.0" />
+                        <ChoiceBox fx:id="timerBoss" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="110.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                      </children>
+                    </AnchorPane>
+                    <AnchorPane fx:id="timerTriggerContainer" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" prefWidth="-1.0">
+                      <children>
+                        <Text scaleX="1.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Trigger on" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="2.0" />
+                        <ChoiceBox fx:id="timerTrigger" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="105.0" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="0.0" />
+                        <Text id="timerTriggerLabel" fx:id="timerTriggerTimerLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="Timer" AnchorPane.leftAnchor="170.0" AnchorPane.topAnchor="2.0" />
+                        <ChoiceBox fx:id="timerTriggerTimer" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="110.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                      </children>
+                    </AnchorPane>
+                    <AnchorPane fx:id="timerSourceContainer" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" prefWidth="-1.0">
+                      <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Source" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="2.0" />
+                        <RadioButton id="sourceYou" fx:id="timerSourceYou" mnemonicParsing="false" text="You" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="2.0">
+                          <toggleGroup>
+                            <ToggleGroup fx:id="timerSource" />
+                          </toggleGroup>
+                        </RadioButton>
+                        <RadioButton id="sourceOther" fx:id="timerSourceOther" mnemonicParsing="false" text="Other" toggleGroup="$timerSource" AnchorPane.leftAnchor="110.0" AnchorPane.topAnchor="2.0" />
+                        <RadioButton fx:id="timerSourceCustom" contentDisplay="RIGHT" graphicTextGap="5.0" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="150.0" text="Custom" toggleGroup="$timerSource" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="2.0" />
+                        <TextField fx:id="timerSourceName" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="90.0" promptText="Name or ID" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                      </children>
+                    </AnchorPane>
+                    <AnchorPane fx:id="timerTargetContainer" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" prefWidth="-1.0">
+                      <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Target" visible="true" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="2.0" />
+                        <RadioButton fx:id="timerTargetYou" mnemonicParsing="false" text="You" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="2.0">
+                          <toggleGroup>
+                            <ToggleGroup fx:id="timerTarget" />
+                          </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="timerTargetOther" mnemonicParsing="false" text="Other" toggleGroup="$timerTarget" AnchorPane.leftAnchor="110.0" AnchorPane.topAnchor="2.0" />
+                        <RadioButton fx:id="timerTargetCustom" contentDisplay="RIGHT" graphicTextGap="5.0" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="150.0" text="Custom" toggleGroup="$timerTarget" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="2.0" />
+                        <TextField fx:id="timerTargetName" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="90.0" promptText="Name or ID" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                      </children>
+                    </AnchorPane>
+                    <AnchorPane fx:id="timerAbilityContainer" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" prefWidth="-1.0">
+                      <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Ability" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="2.0" />
+                        <TextField fx:id="timerAbilityName" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="105.0" promptText="Name or ID" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="0.0" />
+                        <Text fx:id="timerEffectLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="Effect" AnchorPane.leftAnchor="170.0" AnchorPane.topAnchor="2.0" />
+                        <TextField fx:id="timerEffectName" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="110.0" promptText="Name or ID" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                      </children>
+                    </AnchorPane>
+                    <AnchorPane fx:id="timerIntervalContainer" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" prefWidth="-1.0">
+                      <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Duration" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="2.0" />
+                        <TextField fx:id="timerDuration" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="50.0" promptText="0-1000" text="" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="0.0" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Repeat" AnchorPane.leftAnchor="170.0" AnchorPane.topAnchor="2.0" />
+                        <TextField fx:id="timerRepeat" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="50.0" promptText="0-999" text="" AnchorPane.rightAnchor="60.0" AnchorPane.topAnchor="0.0" />
+                      </children>
+                    </AnchorPane>
+                    <AnchorPane fx:id="timerCancelContainer" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="23.0" prefWidth="-1.0">
+                      <children>
+                        <Text scaleX="1.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Cancel on" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="2.0" />
+                        <ChoiceBox fx:id="timerCancel" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="105.0" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="0.0" />
+                        <CheckBox fx:id="timersIgnoreRepeated" mnemonicParsing="false" text="Ignore repeated triggers" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="2.0" />
+                      </children>
+                    </AnchorPane>
+                    <AnchorPane maxHeight="-Infinity" maxWidth="-1.0" minHeight="-Infinity" prefHeight="27.0" prefWidth="-1.0">
+                      <children>
+                        <CheckBox fx:id="timerDisplay" mnemonicParsing="false" text="Display" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="2.0" />
+                        <ColorPicker fx:id="timerColor" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="-1.0" />
+                      </children>
+                    </AnchorPane>
+                    <AnchorPane maxHeight="-Infinity" maxWidth="-1.0" minHeight="-Infinity" prefHeight="27.0" prefWidth="-1.0">
+                      <children>
+                        <CheckBox fx:id="timerPlaySound" mnemonicParsing="false" text="Sound" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="2.0" />
+                        <Text fx:id="timerSoundOffsetLabel" strokeWidth="0.0" text="Offset" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="2.0" />
+                        <TextField fx:id="timerSoundOffset" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="25.0" promptText="1+" AnchorPane.leftAnchor="95.0" AnchorPane.topAnchor="0.0" />
+                        <ComboBox fx:id="timerSoundFile" focusTraversable="false" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" AnchorPane.leftAnchor="130.0" AnchorPane.topAnchor="0.0" />
+                        <Button fx:id="timerSoundButton" mnemonicParsing="false" text="&gt;" AnchorPane.leftAnchor="240.0" AnchorPane.topAnchor="0.0" />
+                        <Slider fx:id="timerSoundVolume" majorTickUnit="50.0" max="100.0" maxWidth="-Infinity" minWidth="-Infinity" minorTickCount="25" prefWidth="50.0" showTickLabels="false" showTickMarks="false" snapToTicks="false" value="80.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="4.0" />
+                      </children>
+                    </AnchorPane>
+                    <AnchorPane maxHeight="-Infinity" maxWidth="-1.0" minHeight="-Infinity" prefHeight="27.0" prefWidth="-1.0">
+                      <children>
+                        <CheckBox fx:id="timerPlayCountdown" mnemonicParsing="false" text="Countdown" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="2.0" />
+                        <TextField fx:id="timerCountdownCount" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="35.0" promptText="1-10" text="" AnchorPane.leftAnchor="85.0" AnchorPane.topAnchor="0.0" />
+                        <ComboBox fx:id="timerCountdownVoice" focusTraversable="false" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" AnchorPane.leftAnchor="130.0" AnchorPane.topAnchor="0.0" />
+                        <Button fx:id="timerCountdownButton" mnemonicParsing="false" text="&gt;" AnchorPane.leftAnchor="240.0" AnchorPane.topAnchor="0.0" />
+                        <Slider fx:id="timerCountdownVolume" majorTickUnit="50.0" max="100.0" maxWidth="-Infinity" minWidth="-Infinity" minorTickCount="25" prefWidth="50.0" showTickLabels="false" showTickMarks="false" snapToTicks="false" value="80.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="4.0" />
+                      </children>
+                    </AnchorPane>
+                    <HBox spacing="5.0" VBox.vgrow="ALWAYS">
+                      <children>
+                        <Button fx:id="timerSaveButton" mnemonicParsing="false" onAction="#handleTimerSave" text="Save as new" />
+                        <Button fx:id="timerCopyButton" mnemonicParsing="false" onAction="#handleTimerCopy" text="Save as copy" />
+                        <Button mnemonicParsing="false" onAction="#handleTimerReset" text="Cancel" translateX="100.0" />
+                      </children>
+                    </HBox>
+                  </children>
+                </VBox>
+                <TreeView fx:id="timersList" focusTraversable="false" prefHeight="-1.0" prefWidth="-1.0" showRoot="false" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0" GridPane.vgrow="ALWAYS" />
+              </children>
+              <columnConstraints>
+                <ColumnConstraints fillWidth="true" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="160.0" />
+                <ColumnConstraints fillWidth="true" hgrow="ALWAYS" minWidth="-1.0" prefWidth="-1.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints fillHeight="true" minHeight="-1.0" prefHeight="-1.0" valignment="TOP" vgrow="ALWAYS" />
+              </rowConstraints>
+            </GridPane>
+          </children>
+          <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+          </padding>
+        </VBox>
+      </content>
+    </Tab>
+    <Tab fx:id="contentUpload" text="Log Upload">
+      <content>
+        <VBox prefHeight="-1.0" prefWidth="-1.0" spacing="10.0">
+          <children>
+            <GridPane alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">
+              <children>
+                <Text text="Timezone" GridPane.columnIndex="0" GridPane.halignment="LEFT" GridPane.rowIndex="0" GridPane.valignment="CENTER" />
+                <Text text="See 'General' tab" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="0" GridPane.valignment="CENTER" />
+                <Text fx:id="serverLabel" text="Server" GridPane.columnIndex="0" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                <ChoiceBox fx:id="serverList" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                  <items>
+                    <FXCollections fx:factory="observableArrayList" />
+                  </items>
+                </ChoiceBox>
+                <Text text="Guild" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                  <GridPane.margin>
+                    <Insets left="10.0" fx:id="x8" />
+                  </GridPane.margin>
+                </Text>
+                <TextField fx:id="guildField" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Parsely Profile" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <Separator prefWidth="-1.0" GridPane.columnIndex="0" GridPane.columnSpan="2147483647" GridPane.rowIndex="3">
+                  <GridPane.margin>
+                    <Insets top="3.0" />
+                  </GridPane.margin>
+                </Separator>
+                <Text text="Login Name" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
+                <TextField fx:id="parselyLoginField" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                <Text text="Password" GridPane.columnIndex="2" GridPane.margin="$x8" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
+                <PasswordField fx:id="parselyPasswordField" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                <HBox alignment="BOTTOM_LEFT" fillHeight="false" prefHeight="-1.0" prefWidth="-1.0" spacing="5.0" GridPane.columnIndex="0" GridPane.columnSpan="2147483647" GridPane.margin="$x1" GridPane.rowIndex="9">
+                  <children>
+                    <Button onAction="#handleUploadSave" text="Save Upload Settings" />
+                    <Button cancelButton="true" onAction="#handleClose" text="Cancel" />
+                  </children>
+                </HBox>
+                <Text font="$x2" strokeType="OUTSIDE" strokeWidth="0.0" text="You can upload whole logs or selected combats via right-click menu in the combat list." GridPane.columnIndex="0" GridPane.columnSpan="2147483647" GridPane.halignment="LEFT" GridPane.rowIndex="8" GridPane.valignment="CENTER" />
+              </children>
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-1.0" minWidth="-Infinity" prefWidth="80.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-1.0" minWidth="-Infinity" prefWidth="-1.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" prefWidth="80.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" prefWidth="-1.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints fillHeight="false" maxHeight="25.0" minHeight="-Infinity" prefHeight="25.0" vgrow="NEVER" />
+                <RowConstraints fillHeight="false" maxHeight="25.0" minHeight="-Infinity" prefHeight="25.0" valignment="BOTTOM" vgrow="NEVER" />
+                <RowConstraints fillHeight="false" maxHeight="30.0" minHeight="-Infinity" prefHeight="30.0" valignment="BOTTOM" vgrow="NEVER" />
+                <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" valignment="TOP" vgrow="NEVER" />
+                <RowConstraints maxHeight="25.0" minHeight="-Infinity" prefHeight="25.0" valignment="CENTER" vgrow="NEVER" />
+                <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="25.0" valignment="BOTTOM" vgrow="NEVER" />
+                <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" valignment="TOP" vgrow="NEVER" />
+                <RowConstraints fillHeight="false" maxHeight="20.0" minHeight="-Infinity" prefHeight="20.0" valignment="BOTTOM" vgrow="NEVER" />
+                <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="35.0" valignment="BOTTOM" vgrow="NEVER" />
+                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="35.0" valignment="BOTTOM" vgrow="NEVER" />
+              </rowConstraints>
+            </GridPane>
+          </children>
+          <padding>
+            <Insets left="10.0" right="10.0" top="20.0" />
+          </padding>
+        </VBox>
+      </content>
+    </Tab>
+  </tabs>
+</TabPane>

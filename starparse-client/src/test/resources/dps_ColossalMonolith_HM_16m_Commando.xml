@@ -1,0 +1,77 @@
+<com.ixale.starparse.domain.Ranking>
+	<description>
+		<boss>ColossalMonolith HM 16m</boss>
+		<className>Commando</className>
+		<type>dps</type>
+		<date>2015-05-27T05:10:37+02:00</date>
+		<tick>360000</tick>
+	</description>
+	<percentiles>
+		<pct p='98' v='3665' />
+		<pct p='97' v='3660' />
+		<pct p='95' v='3464' />
+		<pct p='94' v='3451' />
+		<pct p='92' v='3422' />
+		<pct p='91' v='3365' />
+		<pct p='89' v='3295' />
+		<pct p='88' v='3242' />
+		<pct p='86' v='3204' />
+		<pct p='85' v='3153' />
+		<pct p='83' v='3144' />
+		<pct p='82' v='3125' />
+		<pct p='80' v='3124' />
+		<pct p='79' v='3099' />
+		<pct p='77' v='3068' />
+		<pct p='76' v='3044' />
+		<pct p='74' v='3043' />
+		<pct p='73' v='3043' />
+		<pct p='71' v='3015' />
+		<pct p='70' v='3007' />
+		<pct p='68' v='3005' />
+		<pct p='67' v='2978' />
+		<pct p='65' v='2964' />
+		<pct p='64' v='2963' />
+		<pct p='62' v='2940' />
+		<pct p='61' v='2937' />
+		<pct p='59' v='2933' />
+		<pct p='58' v='2925' />
+		<pct p='56' v='2925' />
+		<pct p='55' v='2921' />
+		<pct p='53' v='2913' />
+		<pct p='52' v='2899' />
+		<pct p='50' v='2893' />
+		<pct p='48' v='2893' />
+		<pct p='47' v='2891' />
+		<pct p='45' v='2880' />
+		<pct p='44' v='2863' />
+		<pct p='42' v='2862' />
+		<pct p='41' v='2814' />
+		<pct p='39' v='2801' />
+		<pct p='38' v='2746' />
+		<pct p='36' v='2669' />
+		<pct p='35' v='2649' />
+		<pct p='33' v='2629' />
+		<pct p='32' v='2628' />
+		<pct p='30' v='2594' />
+		<pct p='29' v='2574' />
+		<pct p='27' v='2571' />
+		<pct p='26' v='2560' />
+		<pct p='24' v='2559' />
+		<pct p='23' v='2554' />
+		<pct p='21' v='2543' />
+		<pct p='20' v='2541' />
+		<pct p='18' v='2483' />
+		<pct p='17' v='2440' />
+		<pct p='15' v='2438' />
+		<pct p='14' v='2385' />
+		<pct p='12' v='2338' />
+		<pct p='11' v='2287' />
+		<pct p='9' v='2283' />
+		<pct p='8' v='2202' />
+		<pct p='6' v='2166' />
+		<pct p='5' v='1887' />
+		<pct p='3' v='1747' />
+		<pct p='2' v='1670' />
+		<pct p='0' v='1500' />
+	</percentiles>
+</com.ixale.starparse.domain.Ranking>
