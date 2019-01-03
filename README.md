@@ -1,0 +1,2 @@
+# StarParse
+SWTOR Ixale StarParse
