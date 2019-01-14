@@ -44,12 +44,12 @@ public class Parser {
 
 	// combat_2014-01-26_21_17_31_474300
 	private final static Pattern filePattern = Pattern
-		.compile("^combat_(?<Year>\\d{4})\\-(?<Month>\\d{2})\\-(?<Day>\\d{2})_(?<HH>\\d{2})_\\d{2}_\\d{2}_\\d{6}\\.txt$");
+			.compile("^combat_(?<Year>\\d{4})\\-(?<Month>\\d{2})\\-(?<Day>\\d{2})_(?<HH>\\d{2})_\\d{2}_\\d{2}_\\d{6}\\.txt$");
 	private Matcher fileMatcher;
 
 	// combat log line pattern
 	private final static Pattern basePattern = Pattern.compile(
-		"^\\[(?<TimeStamp>"
+			"^\\[(?<TimeStamp>"
 			+ "(?<HH>\\d{2}):(?<MM>\\d{2}):(?<SS>\\d{2})\\.(?<MS>\\d{3})"
 			+ ")\\]"
 			+ " \\[(?<Source>"
@@ -77,7 +77,7 @@ public class Parser {
 
 	// combat log line pattern for enter/exit combat since 5.4
 	private final static Pattern combat54Pattern = Pattern.compile(
-		"^\\[(?<TimeStamp>"
+			"^\\[(?<TimeStamp>"
 			+ "(?<HH>\\d{2}):(?<MM>\\d{2}):(?<SS>\\d{2})\\.(?<MS>\\d{3})"
 			+ ")\\]"
 			+ " \\[(?<Source>"
@@ -99,7 +99,7 @@ public class Parser {
 
 	// combat log line pattern for GSF only (fallback)
 	private final static Pattern gsfPattern = Pattern.compile(
-		"^\\[(?<TimeStamp>"
+			"^\\[(?<TimeStamp>"
 			+ "(?<HH>\\d{2}):(?<MM>\\d{2}):(?<SS>\\d{2})\\.(?<MS>\\d{3})"
 			+ ")\\]"
 			+ " \\[(?<SourceGsfName>|\\d{10,})\\]"
@@ -107,24 +107,23 @@ public class Parser {
 
 	// healing threat ratios
 	private static final double THREAT_HEAL = .5,
-		THREAT_HEAL_REDUCTION = .1, // 10% reduction on healers
-		THREAT_TANK = 2, // 200% for tanks (even for their self heals / medpacs)
-		THREAT_GUARD = .75;
+			THREAT_HEAL_REDUCTION = .1, // 10% reduction on healers
+			THREAT_TANK = 2, // 200% for tanks (even for their self heals / medpacs)
+			THREAT_GUARD = .75;
 
 	private static final long COMBAT_DELAY_WINDOW = 4 * 1000, // window to 1) include any lagged damage or healing 2) detect combat drop abilities 3)
-		// reconnect "shattered" combats
-		COMBAT_REVIVE_WINDOW = 60 * 1000, // window to use revive after death
-		COMBAT_RETURN_WINDOW = 30 * 1000, // window to re-enter the combat after revival or combat drop
+			// reconnect "shattered" combats
+			COMBAT_REVIVE_WINDOW = 60 * 1000, // window to use revive after death
+			COMBAT_RETURN_WINDOW = 30 * 1000, // window to re-enter the combat after revival or combat drop
 
-	EFFECT_OVERLAP_TOLERANCE = 500, // start A ... (start B ... end A ~ within 0.5s) ... end B
+			EFFECT_OVERLAP_TOLERANCE = 500, // start A ... (start B ... end A ~ within 0.5s) ... end B
 
-	ABSORPTION_OUTSIDE_DELAY_WINDOW = 4 * 1000, // window to include lagged absorption after the effect has ended
-		ABSORPTION_INSIDE_DELAY_WINDOW = 500, // effect A ... effect B ... (end A ... absorption A ~ within 0.5s) ... end B ...
+			ABSORPTION_OUTSIDE_DELAY_WINDOW = 4 * 1000, // window to include lagged absorption after the effect has ended
+			ABSORPTION_INSIDE_DELAY_WINDOW = 500, // effect A ... effect B ... (end A ... absorption A ~ within 0.5s) ... end B ...
 
-	PHASE_DAMAGE_WINDOW = 7 * 1000, // if no damage even occurs within 5s, create close the "damage phase"
-		PHASE_DAMAGE_MININUM = 5 * 1000,
-
-	HEALING_THREAT_TOLERANCE = 5;
+			PHASE_DAMAGE_WINDOW = 7 * 1000, // if no damage even occurs within 5s, create close the "damage phase"
+			PHASE_DAMAGE_MININUM = 5 * 1000,
+			HEALING_THREAT_TOLERANCE = 5;
 
 	private Calendar c;
 	private int lastHour;
@@ -183,6 +182,7 @@ public class Parser {
 	private boolean isDualWield = false;
 
 	public class ActorState {
+
 		// effective guard state (0, 1, 2)
 		public int guarded = 0;
 		// detected role
@@ -298,7 +298,7 @@ public class Parser {
 		if (events.size() > 0 || combats.size() > 0 || combat != null) {
 			if (logger.isDebugEnabled()) {
 				logger.debug(
-					"Setting new file without finishing the last, discarding: " + events.size() + " events and " + combats.size() + " combats");
+						"Setting new file without finishing the last, discarding: " + events.size() + " events and " + combats.size() + " combats");
 			}
 		}
 
@@ -333,7 +333,7 @@ public class Parser {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param line
 	 * @throws Exception
 	 */
@@ -373,8 +373,8 @@ public class Parser {
 
 		// auto detect name if not already
 		if (combatLog.getCharacterName() == null
-			&& baseMatcher.group("SourcePlayerName") != null && !baseMatcher.group("SourcePlayerName").isEmpty()
-			&& baseMatcher.group("SourcePlayerName").equals(baseMatcher.group("TargetPlayerName"))) {
+				&& baseMatcher.group("SourcePlayerName") != null && !baseMatcher.group("SourcePlayerName").isEmpty()
+				&& baseMatcher.group("SourcePlayerName").equals(baseMatcher.group("TargetPlayerName"))) {
 			// found, set
 			combatLog.setCharacterName(baseMatcher.group("SourcePlayerName"));
 
@@ -399,27 +399,28 @@ public class Parser {
 				}
 			}
 		}
-		
+
 		if (baseMatcher.group("Value") != null && "836045448945489".equals(baseMatcher.group("EffectGuid"))) {
 			// enter, any ops details?
 			Raid.Size s = null;
 			Raid.Mode m = null;
-			if (baseMatcher.group("Value").contains("16 ")) {
+			final String diff = baseMatcher.group("Value");
+			if (diff.contains("16 ") || diff.contains("16 ")) {
 				s = Size.Sixteen;
-			} else if (baseMatcher.group("Value").contains("8 ")) {
+			} else if (diff.contains("8 ") || diff.contains("8 ")) {
 				s = Size.Eight;
 			}
-			if (baseMatcher.group("Value").contains("Story")) {
+			if (diff.contains("Story") || diff.contains("histoire")) {
 				m = Mode.SM;
-			} else if (baseMatcher.group("Value").contains("Veteran")) {
+			} else if (diff.contains("Veteran") || diff.contains("vétéran")) {
 				m = Mode.HM;
-			} else if (baseMatcher.group("Value").contains("Master")) {
+			} else if (diff.contains("Master") || diff.contains("maître")) {
 				m = Mode.NiM;
 			}
 			if (s != null && m != null) {
 				instanceMode = m;
 				instanceSize = s;
-				if (logger.isDebugEnabled()) { 
+				if (logger.isDebugEnabled()) {
 					logger.debug("Instance set as " + s + " " + m + " at " + e.getTs());
 				}
 			}
@@ -431,12 +432,12 @@ public class Parser {
 		// source
 		if (baseMatcher.group("Source") != null && !baseMatcher.group("Source").isEmpty()) {
 			e.setSource(getActor(
-				baseMatcher.group("SourcePlayerName"),
-				baseMatcher.group("SourceCompanionName"),
-				baseMatcher.group("SourceCompanionGuid"),
-				baseMatcher.group("SourceNpcName"),
-				baseMatcher.group("SourceNpcGuid"),
-				baseMatcher.group("SourceNpcInstance")));
+					baseMatcher.group("SourcePlayerName"),
+					baseMatcher.group("SourceCompanionName"),
+					baseMatcher.group("SourceCompanionGuid"),
+					baseMatcher.group("SourceNpcName"),
+					baseMatcher.group("SourceNpcGuid"),
+					baseMatcher.group("SourceNpcInstance")));
 		} else {
 			e.setSource(context.getActor("Unknown", Actor.Type.NPC));
 		}
@@ -444,12 +445,12 @@ public class Parser {
 		// target
 		if (baseMatcher.group("Target") != null && !baseMatcher.group("Target").isEmpty()) {
 			e.setTarget(getActor(
-				baseMatcher.group("TargetPlayerName"),
-				baseMatcher.group("TargetCompanionName"),
-				baseMatcher.group("TargetCompanionGuid"),
-				baseMatcher.group("TargetNpcName"),
-				baseMatcher.group("TargetNpcGuid"),
-				baseMatcher.group("TargetNpcInstance")));
+					baseMatcher.group("TargetPlayerName"),
+					baseMatcher.group("TargetCompanionName"),
+					baseMatcher.group("TargetCompanionGuid"),
+					baseMatcher.group("TargetNpcName"),
+					baseMatcher.group("TargetNpcGuid"),
+					baseMatcher.group("TargetNpcInstance")));
 		} else {
 			e.setTarget(context.getActor("Unknown", Actor.Type.NPC));
 		}
@@ -457,24 +458,24 @@ public class Parser {
 		// ability
 		if (baseMatcher.group("Ability") != null && !baseMatcher.group("Ability").isEmpty()) {
 			e.setAbility(getEntity(
-				baseMatcher.group("AbilityName"),
-				baseMatcher.group("AbilityGuid")));
+					baseMatcher.group("AbilityName"),
+					baseMatcher.group("AbilityGuid")));
 		}
 
 		// action
 		e.setAction(getEntity(
-			baseMatcher.group("ActionName"),
-			baseMatcher.group("ActionGuid")));
+				baseMatcher.group("ActionName"),
+				baseMatcher.group("ActionGuid")));
 
 		// effect
 		e.setEffect(getEntity(
-			baseMatcher.group("EffectName"),
-			baseMatcher.group("EffectGuid")));
+				baseMatcher.group("EffectName"),
+				baseMatcher.group("EffectGuid")));
 
 		// value (healing / damage)
 		if (baseMatcher.group("Value") != null
-			&& !"836045448945489".equals(baseMatcher.group("EffectGuid"))
-			&& !"836045448945490".equals(baseMatcher.group("EffectGuid"))) {
+				&& !"836045448945489".equals(baseMatcher.group("EffectGuid"))
+				&& !"836045448945490".equals(baseMatcher.group("EffectGuid"))) {
 			e.setValue(Integer.parseInt(baseMatcher.group("Value")));
 			// critical hit?
 			e.setCrit(baseMatcher.group("IsCrit") != null);
@@ -482,44 +483,44 @@ public class Parser {
 			// damage
 			if (baseMatcher.group("DamageType") != null) {
 				e.setDamage(getEntity(
-					baseMatcher.group("DamageType"),
-					baseMatcher.group("DamageTypeGuid")));
+						baseMatcher.group("DamageType"),
+						baseMatcher.group("DamageTypeGuid")));
 			}
 
 			// reflect
 			if (baseMatcher.group("ReflectType") != null) {
 				e.setReflect(getEntity(
-					baseMatcher.group("ReflectType"),
-					baseMatcher.group("ReflectTypeGuid")));
+						baseMatcher.group("ReflectType"),
+						baseMatcher.group("ReflectTypeGuid")));
 			}
 
 			// mitigation
 			if (baseMatcher.group("IsMitigation") != null) {
 				if (baseMatcher.group("MitigationType") != null) {
 					e.setMitigation(getEntity(
-						baseMatcher.group("MitigationType"),
-						baseMatcher.group("MitigationTypeGuid")));
+							baseMatcher.group("MitigationType"),
+							baseMatcher.group("MitigationTypeGuid")));
 
 					// attack type (PvE bosses and PvP players only)
 					if (combat != null
-						&& (combat.getBoss() != null || isSourceOtherPlayer(e))
-						&& isTargetThisPlayer(e)) {
+							&& (combat.getBoss() != null || isSourceOtherPlayer(e))
+							&& isTargetThisPlayer(e)) {
 						processAttackType(e);
 					}
 
 				} else {
 					// unknown mitigation
 					e.setMitigation(getEntity(
-						"unknown",
-						"-1"));
+							"unknown",
+							"-1"));
 				}
 			}
 
 			// absorption
 			if (baseMatcher.group("AbsorbValue") != null) {
 				e.setAbsorption(getEntity(
-					baseMatcher.group("AbsorbType"),
-					baseMatcher.group("AbsorbTypeGuid")));
+						baseMatcher.group("AbsorbType"),
+						baseMatcher.group("AbsorbTypeGuid")));
 				e.setAbsorbed(Integer.parseInt(baseMatcher.group("AbsorbValue")));
 			}
 		}
@@ -530,7 +531,6 @@ public class Parser {
 		}
 
 		// calculated context values
-
 		// guard
 		if (isTargetThisPlayer(e) || isSourceThisPlayer(e)) {
 			processEventGuard(e);
@@ -579,8 +579,8 @@ public class Parser {
 
 		// hots tracking
 		if (isSourceThisPlayer(e)
-			&& e.getTarget() != null
-			&& (combat == null || combat.getDiscipline() == null || CharacterRole.HEALER.equals(combat.getDiscipline().getRole()))) {
+				&& e.getTarget() != null
+				&& (combat == null || combat.getDiscipline() == null || CharacterRole.HEALER.equals(combat.getDiscipline().getRole()))) {
 			processEventHots(e);
 		}
 
@@ -588,7 +588,7 @@ public class Parser {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param m
 	 * @return
 	 */
@@ -609,7 +609,7 @@ public class Parser {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param playerName
 	 * @param companionName
 	 * @param companionGuid
@@ -619,19 +619,19 @@ public class Parser {
 	 * @return
 	 */
 	private Actor getActor(String playerName,
-		String companionName, String companionGuid,
-		String npcName, String npcGuid, String npcInstanceId) {
+			String companionName, String companionGuid,
+			String npcName, String npcGuid, String npcInstanceId) {
 
 		if (companionName != null) {
 			return context.getActor(companionName,
-				Actor.Type.COMPANION,
-				Long.parseLong(companionGuid));
+					Actor.Type.COMPANION,
+					Long.parseLong(companionGuid));
 		}
 
 		if (playerName != null) {
 			return context.getActor(
-				playerName,
-				playerName.equals(combatLog.getCharacterName()) ? Actor.Type.SELF : Actor.Type.PLAYER);
+					playerName,
+					playerName.equals(combatLog.getCharacterName()) ? Actor.Type.SELF : Actor.Type.PLAYER);
 		}
 
 		if (npcGuid != null) {
@@ -664,17 +664,17 @@ public class Parser {
 				resolveCombatUpgrade(combatBossUpgrade.upgradeByNpc(guid), true);
 			}
 			return context.getActor(
-				npcName,
-				Actor.Type.NPC,
-				guid,
-				npcInstanceId != null ? Long.parseLong(npcInstanceId) : 0L);
+					npcName,
+					Actor.Type.NPC,
+					guid,
+					npcInstanceId != null ? Long.parseLong(npcInstanceId) : 0L);
 		}
 
 		throw new IllegalArgumentException("Invalid actor");
 	}
 
 	/**
-	 * 
+	 *
 	 * @param name
 	 * @param guid
 	 * @return
@@ -697,15 +697,15 @@ public class Parser {
 				}
 
 				actorStates.get(e.getTarget()).guarded = (actorStates.get(e.getTarget()).guarded < 2
-					? (actorStates.get(e.getTarget()).guarded + 1)
-					: 2);
+						? (actorStates.get(e.getTarget()).guarded + 1)
+						: 2);
 
 			} else if (isActionRemove(e)) {
 				// guard lost
 				if (actorStates.containsKey(e.getTarget())) {
 					actorStates.get(e.getTarget()).guarded = (actorStates.get(e.getTarget()).guarded > 0
-						? (actorStates.get(e.getTarget()).guarded - 1)
-						: 0);
+							? (actorStates.get(e.getTarget()).guarded - 1)
+							: 0);
 				}
 
 			} else {
@@ -722,7 +722,7 @@ public class Parser {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param e
 	 * @throws Exception
 	 */
@@ -750,7 +750,7 @@ public class Parser {
 			} else {
 				// setup new combat
 				combat = new Combat(++combatId, combatLogId, e.getTimestamp(), e.getEventId());
-				for (final Actor a: actorStates.keySet()) {
+				for (final Actor a : actorStates.keySet()) {
 					actorStates.get(a).role = null; // might have re-specced
 				}
 				if (isUsingMimCrystal) {
@@ -759,7 +759,7 @@ public class Parser {
 			}
 
 		} else if (combat != null && combatConnectLimit == null
-			&& (isEffectExitCombat(e) || (isTargetThisPlayer(e) && isEffectDeath(e)) || isEffectLoginImmunity(e))) {
+				&& (isEffectExitCombat(e) || (isTargetThisPlayer(e) && isEffectDeath(e)) || isEffectLoginImmunity(e))) {
 			// exit event detected (and no window is set yet), setup candidates
 			combat.setEventIdTo(e.getEventId());
 			combat.setTimeTo(e.getTimestamp());
@@ -772,9 +772,9 @@ public class Parser {
 
 			// ... and setup limit for either revive or quick reconnect (and for lagged damage and healing)
 			combatConnectLimit = e.getTimestamp() + (isEffectDeath(e)
-				// died - setup REVIVE limit
-				? COMBAT_REVIVE_WINDOW
-				: ((lastCombatDropEvent != null && (lastCombatDropEvent.getTimestamp() > (e.getTimestamp() - COMBAT_RETURN_WINDOW))
+					// died - setup REVIVE limit
+					? COMBAT_REVIVE_WINDOW
+					: ((lastCombatDropEvent != null && (lastCombatDropEvent.getTimestamp() > (e.getTimestamp() - COMBAT_RETURN_WINDOW))
 					// recent (yet already consumed) combat drop event - "drop->enter->exit[now]->?enter" sequence can happen - setup RETURN window
 					? COMBAT_RETURN_WINDOW
 					// just regular window for delayed damage/healing events
@@ -813,7 +813,7 @@ public class Parser {
 		// resolve combat phase
 		if (combat != null && combat.getBoss() != null) {
 			if ((newBossPhaseName = combat.getBoss().getRaid().getNewPhaseName(e, combat,
-				currentBossPhase != null ? currentBossPhase.getName() : null)) != null) {
+					currentBossPhase != null ? currentBossPhase.getName() : null)) != null) {
 				// new phase detected
 				if (currentBossPhase != null) {
 					// close old - bounds are explicitly as <from, to)
@@ -821,9 +821,9 @@ public class Parser {
 				}
 				// setup new (if this is the very first one, assume it started at the beginning of this combat)
 				currentBossPhase = new Phase(++phaseId, newBossPhaseName, Phase.Type.BOSS,
-					combat.getCombatId(),
-					(currentBossPhase == null ? combat.getEventIdFrom() : e.getEventId()),
-					(currentBossPhase == null ? 0 : e.getTimestamp() - combat.getTimeFrom()));
+						combat.getCombatId(),
+						(currentBossPhase == null ? combat.getEventIdFrom() : e.getEventId()),
+						(currentBossPhase == null ? 0 : e.getTimestamp() - combat.getTimeFrom()));
 			}
 
 			if (combatBossUpgrade != null && e.getAbility() != null && e.getAbility().getGuid() != null) {
@@ -878,12 +878,11 @@ public class Parser {
 
 		if (currentBossPhase != null && combat.getEventIdTo() != null) {
 			// close running phase - bounds explicitly set as <from, to>
-			closePhase(currentBossPhase, combat.getEventIdTo(), (
-				// extend after the combat boundary if there was a delayed damage event
-				lastDamageEvent != null && lastDamageEvent.getTimestamp() > combat.getTimeTo()
+			closePhase(currentBossPhase, combat.getEventIdTo(), ( // extend after the combat boundary if there was a delayed damage event
+					lastDamageEvent != null && lastDamageEvent.getTimestamp() > combat.getTimeTo()
 					? lastDamageEvent.getTimestamp()
 					: combat.getTimeTo())
-				- combat.getTimeFrom());
+					- combat.getTimeFrom());
 			currentBossPhase = null;
 		}
 		if (lastDamageEvent != null) {
@@ -903,10 +902,10 @@ public class Parser {
 			return;
 		}
 		closePhase(new Phase(++phaseId, "Damage", Phase.Type.DAMAGE,
-			combat.getCombatId(),
-			eventFrom.getEventId(),
-			eventFrom.getTimestamp() - combat.getTimeFrom()),
-			eventTo.getEventId(), eventTo.getTimestamp() - combat.getTimeFrom());
+				combat.getCombatId(),
+				eventFrom.getEventId(),
+				eventFrom.getTimestamp() - combat.getTimeFrom()),
+				eventTo.getEventId(), eventTo.getTimestamp() - combat.getTimeFrom());
 	}
 
 	private void closePhase(final Phase phase, int eventIdTo, long tickTo) {
@@ -962,12 +961,11 @@ public class Parser {
 
 		// calculate effective heal using the threat generated
 		int effectiveHeal = getEffectiveHeal(e.getThreat(),
-			isHealer && !isAbilityNonreducedThreat(e),
-			isGuarded,
-			isTank);
+				isHealer && !isAbilityNonreducedThreat(e),
+				isGuarded,
+				isTank);
 
 		// sanity check
-
 		if (effectiveHeal == e.getValue() || Math.abs(effectiveHeal - e.getValue()) <= HEALING_THREAT_TOLERANCE) {
 			// fully effective (possibly with rounding issue)
 			e.setEffectiveHeal(e.getValue());
@@ -981,9 +979,9 @@ public class Parser {
 			if (!isGuarded) {
 				// try with guard on
 				effectiveHeal = getEffectiveHeal(e.getThreat(),
-					isHealer && !isAbilityNonreducedThreat(e),
-					true,
-					isTank);
+						isHealer && !isAbilityNonreducedThreat(e),
+						true,
+						isTank);
 				if (Math.abs(effectiveHeal - e.getValue()) <= HEALING_THREAT_TOLERANCE) {
 					// target is guarded, fix the flag
 //					if (logger.isDebugEnabled()) {
@@ -1001,13 +999,12 @@ public class Parser {
 		}
 
 		// value is too high - the ratios are off, try to detect the error ...
-
 		if (isHealer && !isAbilityNonreducedThreat(e)) {
 			// try without the 10% healing reduction
 			effectiveHeal = getEffectiveHeal(e.getThreat(),
-				false,
-				isGuarded,
-				isTank);
+					false,
+					isGuarded,
+					isTank);
 
 			if (effectiveHeal < (e.getValue() + HEALING_THREAT_TOLERANCE)) {
 				if (CharacterRole.HEALER.equals(actorStates.get(e.getSource()).role)) {
@@ -1030,9 +1027,9 @@ public class Parser {
 		if (isGuarded) {
 			// try without the guard 25% reduction
 			effectiveHeal = getEffectiveHeal(e.getThreat(),
-				isHealer && !isAbilityNonreducedThreat(e),
-				false,
-				isTank);
+					isHealer && !isAbilityNonreducedThreat(e),
+					false,
+					isTank);
 			if (effectiveHeal <= (e.getValue() + HEALING_THREAT_TOLERANCE)) {
 				// supposedly guarded, but the threat is not reduced (possibly SWTOR bug) - reset the flag
 				actorStates.get(e.getSource()).guarded = 0;
@@ -1048,9 +1045,9 @@ public class Parser {
 		if (isGuarded && isHealer && !isAbilityNonreducedThreat(e)) {
 			// both of the above combined (without 35% reduction)
 			effectiveHeal = getEffectiveHeal(e.getThreat(),
-				false,
-				false,
-				isTank);
+					false,
+					false,
+					isTank);
 			if (effectiveHeal <= (e.getValue() + HEALING_THREAT_TOLERANCE)) {
 				actorStates.get(e.getSource()).guarded = 0;
 				if (logger.isDebugEnabled()) {
@@ -1076,9 +1073,9 @@ public class Parser {
 		if (!isTank) {
 			// try with tanking 200% ratio (and without the reduction if any)
 			effectiveHeal = getEffectiveHeal(e.getThreat(),
-				false,
-				isGuarded,
-				true);
+					false,
+					isGuarded,
+					true);
 
 			if (effectiveHeal <= (e.getValue() + HEALING_THREAT_TOLERANCE)) {
 				actorStates.get(e.getSource()).role = CharacterRole.TANK;
@@ -1094,9 +1091,9 @@ public class Parser {
 		if (!isTank && isGuarded) {
 			// try again, this time even without a guard
 			effectiveHeal = getEffectiveHeal(e.getThreat(),
-				false,
-				false,
-				true);
+					false,
+					false,
+					true);
 
 			if (effectiveHeal <= (e.getValue() + HEALING_THREAT_TOLERANCE)) {
 				actorStates.get(e.getSource()).guarded = 0;
@@ -1122,9 +1119,9 @@ public class Parser {
 	public int getEffectiveHeal(long threat, boolean isReduced, boolean isGuarded, boolean isTank) {
 		// default with guard: (0.5*0.75)-(0.5*0.1)
 		return (int) Math.ceil(threat
-			/ THREAT_HEAL
-			/ (isTank ? THREAT_TANK : 1)
-			/ ((isGuarded ? THREAT_GUARD : 1) - (isReduced ? THREAT_HEAL_REDUCTION : 0)));
+				/ THREAT_HEAL
+				/ (isTank ? THREAT_TANK : 1)
+				/ ((isGuarded ? THREAT_GUARD : 1) - (isReduced ? THREAT_HEAL_REDUCTION : 0)));
 	}
 
 	public void processEventEffect(final Event e) {
@@ -1192,11 +1189,11 @@ public class Parser {
 				// start new effect
 				final boolean isAbsorption = isEffectAbsorption(e);
 				final Effect newEffect = new Effect(++effectId,
-					e.getEventId(), e.getTimestamp(),
-					e.getSource(), e.getTarget(),
-					e.getAbility(), e.getEffect(),
-					activatedAbilities.contains(e.getEffect().getGuid()),
-					isAbsorption);
+						e.getEventId(), e.getTimestamp(),
+						e.getSource(), e.getTarget(),
+						e.getAbility(), e.getEffect(),
+						activatedAbilities.contains(e.getEffect().getGuid()),
+						isAbsorption);
 
 				if (effectInstances != null) {
 					// another occurrence of known effect (debuff, overlapping etc)
@@ -1232,7 +1229,7 @@ public class Parser {
 				// finishing running effect
 
 				if (effectInstances == null && e.getSource().getName().equals("Unknown")) {
-					for (EffectKey k: runningEffects.keySet()) {
+					for (EffectKey k : runningEffects.keySet()) {
 						if (k.getEffect().equals(e.getEffect()) && k.getTarget().equals(e.getTarget())) {
 							// effect is being removed from a "missing" source, guess it by its type and target
 							effectKey = k;
@@ -1324,7 +1321,7 @@ public class Parser {
 
 		if (!absorptionEffectsClosing.isEmpty()) {
 			// resolve already closed effects (in the order of their end)
-			for (Effect effect: absorptionEffectsClosing.toArray(new Effect[absorptionEffectsClosing.size()])) {
+			for (Effect effect : absorptionEffectsClosing.toArray(new Effect[absorptionEffectsClosing.size()])) {
 
 				if (!absorptionEventsInside.isEmpty()) {
 					// link pending INSIDE events to this effects as it was the first one ending
@@ -1332,9 +1329,9 @@ public class Parser {
 				}
 
 				if (effect.getTimeTo() < e.getTimestamp() - ((absorptionEffectsClosing.size() + absorptionEffectsRunning.size() > 1)
-					// resolve possible delay (long if this is the only effect, short if another is available as well)
-					? ABSORPTION_INSIDE_DELAY_WINDOW
-					: ABSORPTION_OUTSIDE_DELAY_WINDOW)) {
+						// resolve possible delay (long if this is the only effect, short if another is available as well)
+						? ABSORPTION_INSIDE_DELAY_WINDOW
+						: ABSORPTION_OUTSIDE_DELAY_WINDOW)) {
 					// effect is expiring
 
 					if (!absorptionEventsOutside.isEmpty() && absorptionEffectsClosing.size() == 1) {
@@ -1352,13 +1349,12 @@ public class Parser {
 				}
 
 				// we are here = this event is an absorption & this closing effect is within a delay window
-
 				if (!absorptionEventsOutside.isEmpty()) {
 					// link queued OUTSIDE events to this effect (since this is another absorption, so there is nothing to wait for)
 					linkAbsorptionEvents(absorptionEventsOutside, effect);
 
 					if ((absorptionEffectsClosing.size() + absorptionEffectsRunning.size() > 1)
-						&& !(e.getAbsorbed().equals(e.getValue()))) {
+							&& !(e.getAbsorbed().equals(e.getValue()))) {
 						// ... and consume the effect as there are another active
 						// (unless the mitigation was full - high chance the remaining charge will be used in a bit)
 						absorptionEffectsClosing.remove(effect);
@@ -1367,7 +1363,6 @@ public class Parser {
 				}
 
 				// try to link this absorption event
-
 				if (absorptionEffectsClosing.size() > 1) {
 					// not clear to which effect to link to, queue as OUTSIDE and wait
 					absorptionEventsOutside.add(e.getEventId());
@@ -1377,7 +1372,7 @@ public class Parser {
 					absorptions.add(new Absorption(e.getEventId(), effect.getEffectId()));
 
 					if ((absorptionEffectsClosing.size() + absorptionEffectsRunning.size() > 1)
-						&& !(e.getAbsorbed().equals(e.getValue()))) {
+							&& !(e.getAbsorbed().equals(e.getValue()))) {
 						// ... and consume the effect as there are another active
 						// (unless the mitigation was full - high chance the remaining charge will be used in a bit)
 						absorptionEffectsClosing.remove(effect);
@@ -1421,7 +1416,7 @@ public class Parser {
 	}
 
 	private void linkAbsorptionEvents(final List<Integer> events, final Effect effect) {
-		for (Integer pendingEventId: events) {
+		for (Integer pendingEventId : events) {
 			absorptions.add(new Absorption(pendingEventId, effect.getEffectId()));
 		}
 		events.clear();
@@ -1443,8 +1438,8 @@ public class Parser {
 		}
 
 		if (EntityGuid.Parry.getGuid() == e.getMitigation().getGuid()
-			|| EntityGuid.Deflect.getGuid() == e.getMitigation().getGuid()
-			|| EntityGuid.Dodge.getGuid() == e.getMitigation().getGuid()) {
+				|| EntityGuid.Deflect.getGuid() == e.getMitigation().getGuid()
+				|| EntityGuid.Dodge.getGuid() == e.getMitigation().getGuid()) {
 			context.addAttack(AttackType.MR, e.getAbility().getGuid());
 
 		} else if (EntityGuid.Resist.getGuid() == e.getMitigation().getGuid()) {
@@ -1456,11 +1451,9 @@ public class Parser {
 	}
 
 	/**
-	 * Triggered if:
-	 * - no discipline yet (brand new log)
-	 * - outside of combat (possible discipline swap)
-	 * - confirmed healer discipline (current combat)
-	 * 
+	 * Triggered if: - no discipline yet (brand new log) - outside of combat
+	 * (possible discipline swap) - confirmed healer discipline (current combat)
+	 *
 	 * @param e
 	 */
 	public void processEventHots(final Event e) {
@@ -1520,7 +1513,7 @@ public class Parser {
 			}
 
 			if ((isEffectEqual(e, abilityGuid) && isActionApply(e))
-				|| (pendingHealAbility != null && isAbilityEqual(e, pendingHealAbility.getGuid()))) {
+					|| (pendingHealAbility != null && isAbilityEqual(e, pendingHealAbility.getGuid()))) {
 				if (isEffectEqual(e, abilityGuid)) {
 					// explicit gain = 1 stack
 					if (logger.isDebugEnabled() && targetState.hotStacks != 0) {
@@ -1662,7 +1655,7 @@ public class Parser {
 	}
 
 	private void clearHotsTracking() {
-		for (final ActorState as: actorStates.values()) {
+		for (final ActorState as : actorStates.values()) {
 			if (as.hotSince != null) {
 				as.hotStacks = 0;
 				as.hotEffect = null;

@@ -15,6 +15,7 @@ import com.ixale.starparse.domain.ConfigPopoutDefault;
 import com.ixale.starparse.domain.ConfigTimer;
 import com.ixale.starparse.domain.ConfigTimer.Condition;
 import com.ixale.starparse.domain.ops.DreadPalace;
+import com.ixale.starparse.domain.ops.Iokath;
 import com.ixale.starparse.domain.ops.Ravagers;
 import com.ixale.starparse.domain.ops.ScumAndVillainy;
 import com.ixale.starparse.domain.ops.TempleOfSacrifice;
@@ -384,6 +385,10 @@ public class TimerManager {
 		tosTimers.put(new TempleOfSacrifice.RevanPullTimer(), null);
 		tosTimers.put(new TempleOfSacrifice.RevanPushTimer(), null);
 		systemTimers.put("Temple of Sacrifice", tosTimers);
+		// GOTM
+		final Map<BaseTimer, ConfigTimer> gotmTimers = new HashMap<>();
+		gotmTimers.put(new Iokath.TythInversionTimer(), null);
+		systemTimers.put("Gods of the Machine", gotmTimers);
 
 		// Raiding
 		final Map<BaseTimer, ConfigTimer> raidTimers = new HashMap<>();
