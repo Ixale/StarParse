@@ -50,10 +50,10 @@
         <TableColumn editable="false" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" resizable="false" sortable="false" text="A" fx:id="actionCol" />
         <TableColumn editable="false" minWidth="40.0" prefWidth="40.0" resizable="false" text="Target" fx:id="targetNameCol" />
         <TableColumn editable="false" minWidth="40.0" prefWidth="40.0" resizable="false" text="Ability" fx:id="abilityCol" />
-        <TableColumn editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Value" fx:id="valueCol" />
-        <TableColumn editable="false" maxWidth="45.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Abs" fx:id="absorbedCol" />
-        <TableColumn editable="false" maxWidth="45.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Over" fx:id="overhealCol" />
-        <TableColumn editable="false" maxWidth="45.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Threat" fx:id="threatCol" />
+        <TableColumn editable="false" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" resizable="false" text="Value" fx:id="valueCol" />
+        <TableColumn editable="false" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" resizable="false" text="Abs" fx:id="absorbedCol" />
+        <TableColumn editable="false" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" resizable="false" text="Over" fx:id="overhealCol" />
+        <TableColumn editable="false" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" resizable="false" text="Threat" fx:id="threatCol" />
         <TableColumn editable="false" minWidth="40.0" prefWidth="40.0" sortable="false" resizable="false" text="Effects" fx:id="effectsCol" />
       </columns>
     </TableView>

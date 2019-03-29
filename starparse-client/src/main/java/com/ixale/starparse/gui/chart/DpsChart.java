@@ -7,7 +7,7 @@ public class DpsChart extends BaseLineChart {
 	public DpsChart(Context context) {
 		super(context);
 
-		setBoundaries(1000, 500, null);
+		setBoundaries(2000, 1000, null);
 		
 		setAsOpaque("chart-dps");
 

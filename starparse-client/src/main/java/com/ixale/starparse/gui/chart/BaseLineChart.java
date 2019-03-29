@@ -24,6 +24,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.StringConverter;
+import javafx.util.converter.NumberStringConverter;
 
 public abstract class BaseLineChart extends BaseChart<LineChart<Number, Number>> {
 
@@ -79,6 +80,17 @@ public abstract class BaseLineChart extends BaseChart<LineChart<Number, Number>>
 
 		yAxis.setUpperBound(yUpperBoundDefault);
 		yAxis.setTickUnit(yTickUnitDefault);
+		yAxis.setTickLabelFormatter(new StringConverter<Number>() {
+			@Override
+			public String toString(Number object) {
+				return (object == null ? "0" : Math.round(object.intValue() * 1.0 / 1000)) + " k";
+			}
+
+			@Override
+			public Number fromString(String string) {
+				return Integer.valueOf(string.substring(0, string.lastIndexOf(" k")));
+			}
+		});
 	}
 
 	protected void setBoundaries(int yUpperBoundDefault, int yTickUnitDefault, Integer yLimit) {

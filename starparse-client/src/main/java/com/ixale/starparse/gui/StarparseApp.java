@@ -462,18 +462,18 @@ public class StarparseApp extends Application {
 					Long offset = null;
 					while (i-- > 0 && ((offset = TimeUtils.updateClockOffset(config.getTimeSyncHost())) == null)) {
 						try {
-							Thread.sleep(5000);
+							Thread.sleep(60000);
 						} catch (InterruptedException e) {
 						}
 					}
 					if (offset == null) {
-						Platform.runLater(new Runnable() {
-							public void run() {
-								mainPresenter.setFlash(
-									"Unable to contact time server to resolve local clock difference, timers may be off",
-									Type.ERROR);
-							}
-						});
+//						Platform.runLater(new Runnable() {
+//							public void run() {
+//								mainPresenter.setFlash(
+//									"Unable to contact time server to resolve local clock difference, timers may be off",
+//									Type.ERROR);
+//							}
+//						});
 					} else if (offset > 1800000) {
 						Platform.runLater(new Runnable() {
 							public void run() {

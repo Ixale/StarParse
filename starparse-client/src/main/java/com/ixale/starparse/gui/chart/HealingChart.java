@@ -7,7 +7,7 @@ public class HealingChart extends BaseLineChart {
 	public HealingChart(Context context) {
 		super(context);
 
-		setBoundaries(4000, 2000, null);
+		setBoundaries(20000, 10000, null);
 
 		setAsTransparent("chart-healing");
 

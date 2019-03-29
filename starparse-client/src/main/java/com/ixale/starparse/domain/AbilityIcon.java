@@ -288,6 +288,7 @@ public class AbilityIcon {
 		ico.put(875086701658112L, "mentalblock.png");
 		ico.put(960943097905152L, "energydrain.png");
 		ico.put(3200416355450880L, "phasewalkshadow.png");
+		ico.put(3774395784888320L, "phasewalkshadow.png");
 		ico.put(876461091192832L, "pileofrubble.png");
 		ico.put(812809675866112L, "salvation.png");
 		ico.put(812818265800704L, "rescue.png");
@@ -564,6 +565,7 @@ public class AbilityIcon {
 		ico.put(975430022594560L, "sithwarrior.png");
 		ico.put(808282780336128L, "overload.png");
 		ico.put(3200459305123840L, "phasewalkassassin.png");
+		ico.put(3771947653529600L, "phasewalkassassin.png");
 		ico.put(961325349994496L, "polarityCharge.png");
 		ico.put(808287075303424L, "reanimation.png");
 		ico.put(975399957823488L, "chargedgauntlets.png");

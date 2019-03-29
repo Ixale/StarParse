@@ -167,6 +167,8 @@ public enum EntityGuid {
 	ForceBarrierSorcerer(3120899330932736L, NONREDUCED_THREAT), // sorcerer
 	AdrenalineRush(801251918872576l, NONREDUCED_THREAT), // trooper
 	KoltoOverload(2264285283614720L, NONREDUCED_THREAT), // bounty hunter
+	ShadowsShelter(3774395784888320L, NONREDUCED_THREAT), // shadow
+	AssasinsShelter(3771947653529600L, NONREDUCED_THREAT), // assassin
 	HealingResonance81(3405093021941760L, NONREDUCED_THREAT), // relic proc TODO: other 10 versions?
 	HealingResonance84(3417625736511488L, NONREDUCED_THREAT),
 	HealingResonance87(3417548427100160L, NONREDUCED_THREAT),

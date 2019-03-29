@@ -95,10 +95,12 @@ public enum RaidBossName {
 	AivelaAndEsne("AIVELA & ESNE"),
 	Nahut("Nahut"),
 	Izax("IZAX"),
-	Scyva("SCYVA")
-	;
+	Scyva("SCYVA"),
 
-	private String fullName;
+	// WB 5.10
+	MutatedGeonosianQueen("Geonosian Queen");
+
+	private final String fullName;
 
 	RaidBossName(String fullName) {
 		this.fullName = fullName;
@@ -108,6 +110,7 @@ public enum RaidBossName {
 		return fullName;
 	}
 
+	@Override
 	public String toString() {
 		return fullName;
 	}

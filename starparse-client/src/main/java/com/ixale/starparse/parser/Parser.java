@@ -522,6 +522,9 @@ public class Parser {
 						baseMatcher.group("AbsorbType"),
 						baseMatcher.group("AbsorbTypeGuid")));
 				e.setAbsorbed(Integer.parseInt(baseMatcher.group("AbsorbValue")));
+				if (e.getValue() != null && e.getAbsorbed() != null && e.getAbsorbed() > e.getValue()) {
+					e.setAbsorbed(e.getValue());
+				}
 			}
 		}
 
@@ -923,7 +926,7 @@ public class Parser {
 			}
 			// continue normally
 
-		} else if (isAbilityNoThreat(e)) {
+		} else if (isAbilityNoThreat(e) && isSourceThisPlayer(e) && isTargetThisPlayer(e)) {
 			// consider as fully effective
 			e.setEffectiveHeal(e.getValue());
 			return;
@@ -1353,8 +1356,7 @@ public class Parser {
 					// link queued OUTSIDE events to this effect (since this is another absorption, so there is nothing to wait for)
 					linkAbsorptionEvents(absorptionEventsOutside, effect);
 
-					if ((absorptionEffectsClosing.size() + absorptionEffectsRunning.size() > 1)
-							&& !(e.getAbsorbed().equals(e.getValue()))) {
+					if (e.getAbsorbed() + 1 < e.getValue()) {
 						// ... and consume the effect as there are another active
 						// (unless the mitigation was full - high chance the remaining charge will be used in a bit)
 						absorptionEffectsClosing.remove(effect);
@@ -1371,8 +1373,7 @@ public class Parser {
 					// link to the just closed effect
 					absorptions.add(new Absorption(e.getEventId(), effect.getEffectId()));
 
-					if ((absorptionEffectsClosing.size() + absorptionEffectsRunning.size() > 1)
-							&& !(e.getAbsorbed().equals(e.getValue()))) {
+					if (e.getAbsorbed() + 1 < e.getValue()) {
 						// ... and consume the effect as there are another active
 						// (unless the mitigation was full - high chance the remaining charge will be used in a bit)
 						absorptionEffectsClosing.remove(effect);
@@ -1399,13 +1400,13 @@ public class Parser {
 			// exactly one absorption effect active, link it
 			absorptions.add(new Absorption(e.getEventId(), absorptionEffectsRunning.get(0).getEffectId()));
 			// try to be smart - if the mitigation was not full, then its probably consumed
-			if (e.getAbsorbed() < e.getValue() && isEffectAbsorptionBroken(absorptionEffectsRunning.get(0).getEffect().getGuid())) {
+			if (e.getAbsorbed() + 1 < e.getValue()) {
 				absorptionEffectsConsumed.add(absorptionEffectsRunning.get(0));
 			}
 
 		} else {
 			// try to be smart - if the mitigation was not full, then its probably consumed by the first one activated
-			if (e.getAbsorbed() < e.getValue() && isEffectAbsorptionBroken(absorptionEffectsRunning.get(0).getEffect().getGuid())) {
+			if (e.getAbsorbed() + 1 < e.getValue()) {
 				absorptions.add(new Absorption(e.getEventId(), absorptionEffectsRunning.get(0).getEffectId()));
 				absorptionEffectsConsumed.add(absorptionEffectsRunning.get(0));
 			} else {

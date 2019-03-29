@@ -232,7 +232,7 @@ public class CombatDaoImpl extends H2Dao implements CombatDao {
 					+", SUM(CASE WHEN e.mitigation_name IS NULL OR e.mitigation_guid != "+EntityGuid.Immune+" THEN 1 ELSE 0 END) AS ticks"
 
 					+", SUM(CASE WHEN e.absorbed IS NOT NULL THEN e.absorbed ELSE 0 END) AS absorbed"
-					+", SUM(CASE WHEN e.absorbed IS NOT NULL AND ae.source_type = 1 THEN e.absorbed ELSE 0 END) AS absorbed_self"
+					+", SUM(CASE WHEN e.absorbed IS NOT NULL AND (ae.source_type = 1 OR ae.source_type IS NULL) THEN e.absorbed ELSE 0 END) AS absorbed_self"
 
 					+", SUM(e.value) damage"
 

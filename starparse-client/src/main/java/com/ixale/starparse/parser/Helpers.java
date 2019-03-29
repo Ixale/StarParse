@@ -200,15 +200,35 @@ public class Helpers {
 	}
 
 	public static boolean isAbilityNonreducedThreat(final Event e) {
-		return containsGuid(NONREDUCED_THREAT, e.getAbility().getGuid());
+		return containsGuid(NONREDUCED_THREAT, e.getAbility().getGuid()) 
+				|| (e.getAbility().getName() != null && (
+					e.getAbility().getName().contains("Medpac")
+					|| e.getAbility().getName().contains("Healing Resonance")
+				));
 	}
 
 	public static boolean isAbilityNoThreat(final Event e) {
-		return isAbilityEqual(e, FocusedDefense.getGuid()) || isAbilityEqual(e, EnragedDefense.getGuid());
+		if (e.getAbility() == null || e.getAbility().getGuid() == null) {
+			return false;
+		}
+		return e.getAbility().getGuid().equals(FocusedDefense.getGuid())
+				|| e.getAbility().getGuid().equals(EnragedDefense.getGuid())
+				|| e.getAbility().getGuid().equals(813226287693824L) // Sever Force
+				|| e.getAbility().getGuid().equals(808424514256896L) // Creeping Terror
+				|| e.getAbility().getGuid().equals(2157001295527936L) // Force in Balance
+				|| e.getAbility().getGuid().equals(808433104191488L) // Death Field
+				|| e.getAbility().getGuid().equals(964675424485376L) // Force Breach
+				|| e.getAbility().getGuid().equals(808235535695872L) // Discharge
+				|| e.getAbility().getGuid().equals(3414395921104896L) // Serenity Strike
+				|| e.getAbility().getGuid().equals(3410053709168640L); // Leeching Strike
+		// 3400617666019328 Demolish
+		// 3400587601248256 Force Leach
 	}
 
 	public static boolean isAbilityFakeHeal(final Event e) {
-		return isAbilityEqual(e, ForceEmpowerment.getGuid()) || isAbilityEqual(e, UnlimitedPower.getGuid());
+		return isAbilityEqual(e, ForceEmpowerment.getGuid())
+				|| isAbilityEqual(e, UnlimitedPower.getGuid())
+				|| isAbilityEqual(e, 773652459028480L); // PVP rebirth
 	}
 
 	public static boolean isAbilityEqual(final Event e, final Long guid) {

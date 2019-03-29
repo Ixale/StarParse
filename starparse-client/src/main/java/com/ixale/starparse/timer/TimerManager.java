@@ -19,6 +19,7 @@ import com.ixale.starparse.domain.ops.Iokath;
 import com.ixale.starparse.domain.ops.Ravagers;
 import com.ixale.starparse.domain.ops.ScumAndVillainy;
 import com.ixale.starparse.domain.ops.TempleOfSacrifice;
+import com.ixale.starparse.domain.ops.WorldBoss;
 import com.ixale.starparse.gui.Config;
 import com.ixale.starparse.time.TimeUtils;
 
@@ -389,6 +390,12 @@ public class TimerManager {
 		final Map<BaseTimer, ConfigTimer> gotmTimers = new HashMap<>();
 		gotmTimers.put(new Iokath.TythInversionTimer(), null);
 		systemTimers.put("Gods of the Machine", gotmTimers);
+
+		// WB
+		final Map<BaseTimer, ConfigTimer> wbTimers = new HashMap<>();
+		wbTimers.put(new WorldBoss.QueenRoyalSummonsGuardsTimer(), null);
+		wbTimers.put(new WorldBoss.QueenRoyalSummonsCausticTimer(), null);
+		systemTimers.put("World Bosses", wbTimers);
 
 		// Raiding
 		final Map<BaseTimer, ConfigTimer> raidTimers = new HashMap<>();

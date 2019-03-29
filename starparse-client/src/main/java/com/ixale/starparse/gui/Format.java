@@ -32,7 +32,7 @@ public class Format {
 		}
 		if (combat.getBoss() != null) {
 			return combat.getBoss().getName() 
-					+ " (" + combat.getBoss().getSize().toString().substring(0, 1) 
+					+ " (" + combat.getBoss().getSize().toString().substring(0, combat.getBoss().getSize().toString().length() - 1) 
 					+ " " + combat.getBoss().getMode() + ")";
 		}
 		if (combat.getName() != null) {
