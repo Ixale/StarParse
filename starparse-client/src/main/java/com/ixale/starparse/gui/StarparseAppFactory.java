@@ -162,7 +162,7 @@ public class StarparseAppFactory
 		{
 			fxmlStream = getClass().getResourceAsStream(fxmlFile);
 
-			FXMLLoader loader = new FXMLLoader(Class.class.getResource("/fxml/"));
+			FXMLLoader loader = new FXMLLoader(this.getClass().getResource("/fxml/"));
 			loader.load(fxmlStream);
 			return (T) loader.getController();
 		} catch (IOException e)
