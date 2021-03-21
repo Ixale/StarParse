@@ -3,6 +3,7 @@ package com.ixale.starparse.gui;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.ixale.starparse.gui.popout.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
@@ -18,15 +19,6 @@ import com.ixale.starparse.gui.main.HealingTakenPresenter;
 import com.ixale.starparse.gui.main.MainPresenter;
 import com.ixale.starparse.gui.main.OverviewPresenter;
 import com.ixale.starparse.gui.main.RaidPresenter;
-import com.ixale.starparse.gui.popout.ChallengesPopoutPresenter;
-import com.ixale.starparse.gui.popout.HotsPopoutPresenter;
-import com.ixale.starparse.gui.popout.PersonalStatsPopoutPresenter;
-import com.ixale.starparse.gui.popout.RaidDpsPopoutPresenter;
-import com.ixale.starparse.gui.popout.RaidHpsPopoutPresenter;
-import com.ixale.starparse.gui.popout.RaidNotesPopoutPresenter;
-import com.ixale.starparse.gui.popout.RaidTpsPopoutPresenter;
-import com.ixale.starparse.gui.popout.TimersCenterPopoutPresenter;
-import com.ixale.starparse.gui.popout.TimersPopoutPresenter;
 
 import javafx.fxml.FXMLLoader;
 
@@ -98,6 +90,12 @@ public class StarparseAppFactory
 	public PersonalStatsPopoutPresenter personalStatsPopoutPresenter()
 	{
 		return loadPresenter("/fxml/PersonalStatsPopout.fxml");
+	}
+
+	@Bean
+	public DamageTakenPopoutPresenter damageTakenPopoutPresenter()
+	{
+		return loadPresenter("/fxml/DamageTakenPopout.fxml");
 	}
 
 	@Bean

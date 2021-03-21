@@ -14,6 +14,7 @@ import java.util.ResourceBundle;
 
 import javax.inject.Inject;
 
+import com.ixale.starparse.gui.popout.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,17 +34,6 @@ import com.ixale.starparse.gui.dialog.RaidNotesDialogPresenter;
 import com.ixale.starparse.gui.dialog.SettingsDialogPresenter;
 import com.ixale.starparse.gui.dialog.UploadParselyDialogPresenter;
 import com.ixale.starparse.gui.dialog.UploadParselyDialogPresenter.UploadParselyListener;
-import com.ixale.starparse.gui.popout.BasePopoutPresenter;
-import com.ixale.starparse.gui.popout.BaseRaidPopoutPresenter;
-import com.ixale.starparse.gui.popout.ChallengesPopoutPresenter;
-import com.ixale.starparse.gui.popout.HotsPopoutPresenter;
-import com.ixale.starparse.gui.popout.PersonalStatsPopoutPresenter;
-import com.ixale.starparse.gui.popout.RaidDpsPopoutPresenter;
-import com.ixale.starparse.gui.popout.RaidHpsPopoutPresenter;
-import com.ixale.starparse.gui.popout.RaidNotesPopoutPresenter;
-import com.ixale.starparse.gui.popout.RaidTpsPopoutPresenter;
-import com.ixale.starparse.gui.popout.TimersCenterPopoutPresenter;
-import com.ixale.starparse.gui.popout.TimersPopoutPresenter;
 import com.ixale.starparse.gui.timeline.Timeline;
 import com.ixale.starparse.gui.timeline.TimelineListener;
 import com.ixale.starparse.log.LogWatcher;
@@ -142,7 +132,7 @@ public class MainPresenter implements Initializable {
 	@FXML
 	private MenuItem raidGroupsSettingsMenu, timersSettingsMenu;
 	@FXML
-	private CheckMenuItem timersPopoutMenu, timersCenterPopoutMenu, personalStatsPopoutMenu, challengesPopoutMenu,
+	private CheckMenuItem timersPopoutMenu, timersCenterPopoutMenu, personalStatsPopoutMenu, damageTakenPopoutMenu, challengesPopoutMenu,
 		raidDpsPopoutMenu, raidHpsPopoutMenu, raidTpsPopoutMenu, hotsPopoutMenu, raidNotesPopoutMenu, lockOverlaysMenu;
 
 	@Inject
@@ -173,6 +163,8 @@ public class MainPresenter implements Initializable {
 	private TimersCenterPopoutPresenter timersCenterPopoutPresenter;
 	@Inject
 	private PersonalStatsPopoutPresenter personalStatsPopoutPresenter;
+	@Inject
+	private DamageTakenPopoutPresenter damageTakenPopoutPresenter;
 	@Inject
 	private ChallengesPopoutPresenter challengesPopoutPresenter;
 	@Inject
@@ -1201,6 +1193,7 @@ public class MainPresenter implements Initializable {
 		StatsPopout.add(timersPopoutPresenter, timersPopoutMenu, config);
 		StatsPopout.add(timersCenterPopoutPresenter, timersCenterPopoutMenu, config);
 		StatsPopout.add(personalStatsPopoutPresenter, personalStatsPopoutMenu, config);
+		StatsPopout.add(damageTakenPopoutPresenter, damageTakenPopoutMenu, config);
 		StatsPopout.add(challengesPopoutPresenter, challengesPopoutMenu, config);
 		StatsPopout.add(raidDpsPopoutPresenter, raidDpsPopoutMenu, config);
 		StatsPopout.add(raidHpsPopoutPresenter, raidHpsPopoutMenu, config);
