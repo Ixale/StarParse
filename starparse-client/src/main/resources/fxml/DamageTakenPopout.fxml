@@ -29,7 +29,7 @@
         <Rectangle fx:id="popoutBackground" fill="BLACK" height="191.0" opacity="0.7" width="150.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
         <VBox fx:id="statsGrid" alignment="TOP_LEFT" layoutX="0.0" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" opacity="1.0" prefHeight="191.0" prefWidth="150.0" spacing="0.5" AnchorPane.topAnchor="0.0">
           <children>
-            <GridPane fx:id="modeAll" alignment="TOP_LEFT" hgap="0.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="171.0" prefWidth="150.0" styleClass="combat-stats" vgap="2.0" VBox.vgrow="NEVER">
+            <GridPane fx:id="modeAll" alignment="TOP_LEFT" hgap="0.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="171.0" prefWidth="150.0" styleClass="damage-taken" vgap="2.0" VBox.vgrow="NEVER">
               <children>
                 <Text text="I/E" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                 <Text text="K/E" GridPane.columnIndex="0" GridPane.rowIndex="1" />
@@ -40,22 +40,22 @@
                 <Text text="Abs" GridPane.columnIndex="0" GridPane.rowIndex="6" />
                 <Text text="Abg" GridPane.columnIndex="0" GridPane.rowIndex="7" />
 <!--                <Text text="Abs" GridPane.columnIndex="0" GridPane.rowIndex="8" />-->
-                <Label fx:id="iePercent" styleClass="apm" text="46.35" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
-                <Label fx:id="ie" styleClass="apm" text="07:35" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
-                <Label fx:id="kePercent" styleClass="damage2, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
-                <Label fx:id="ke" styleClass="damage2" text="3 654 321" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
-                <Label fx:id="ftPercent" styleClass="healing, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
-                <Label fx:id="ft" styleClass="healing" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
-                <Label fx:id="mrPercent" styleClass="healing-eff, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
-                <Label fx:id="mr" styleClass="healing-eff" text="67 %" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
-                <Label fx:id="missPercent" styleClass="threat, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
-                <Label fx:id="mt" styleClass="threat" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
-                <Label fx:id="shieldPercent" styleClass="damage2, taken, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
-                <Label fx:id="st" styleClass="damage2, taken" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
-                <Label fx:id="absorbedSelfPercent" styleClass="absorbed, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="6" />
-                <Label fx:id="absorbedSelf" styleClass="absorbed" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="6" />
-                <Label fx:id="absorbedOthersPercent" styleClass="healing, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="7" />
-                <Label fx:id="absorbedOthers" styleClass="healing" text="54 %" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="7" />
+                <Label fx:id="iePercent" styleClass="ie, pc" text="46.35" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+                <Label fx:id="ie" styleClass="ie" text="07:35" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="0" />
+                <Label fx:id="kePercent" styleClass="ke, pc" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+                <Label fx:id="ke" styleClass="ke" text="3 654 321" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+                <Label fx:id="ftPercent" styleClass="ft, pc" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+                <Label fx:id="ft" styleClass="ft" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+                <Label fx:id="mrPercent" styleClass="mr, pc" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+                <Label fx:id="mr" styleClass="mr" text="67 %" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+                <Label fx:id="missPercent" styleClass="avd, pc" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+                <Label fx:id="mt" styleClass="avd" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+                <Label fx:id="shieldPercent" styleClass="shd, taken, pc" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+                <Label fx:id="st" styleClass="shd, taken" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+                <Label fx:id="absorbedSelfPercent" styleClass="abs, pc" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="6" />
+                <Label fx:id="absorbedSelf" styleClass="abs" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="6" />
+                <Label fx:id="absorbedOthersPercent" styleClass="abg, pc" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="7" />
+                <Label fx:id="absorbedOthers" styleClass="abg" text="54 %" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="7" />
 <!--                <Label fx:id="aps" styleClass="absorbed, taken, ps" text="3 654" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="8" />-->
 <!--                <Label fx:id="absorbed" styleClass="absorbed, taken" text="3 654" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="8" />-->
               </children>
