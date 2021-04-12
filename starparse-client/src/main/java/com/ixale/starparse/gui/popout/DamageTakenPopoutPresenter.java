@@ -152,12 +152,12 @@ public class DamageTakenPopoutPresenter extends BasePopoutPresenter {
 		absorbedOthersPercent.setText(Format.formatFloat(mitiStats.getAbsorbedOthersPercent()) + " %");
 		absorbedOthers.setText(Format.formatMillions(mitiStats.getAbsorbedOthers()));
 
-		String[] damageTexts1 = getDamageTexts(combat, stats, 1000);
+		String[] damageTexts1 = getDamageTexts(combat, stats, 2000);
 		ieInstant1.setText(damageTexts1[0]);
 		keInstant1.setText(damageTexts1[1]);
 		ftInstant1.setText(damageTexts1[2]);
 		mrInstant1.setText(damageTexts1[3]);
-		String[] damageTexts5 = getDamageTexts(combat, stats, 5000);
+		String[] damageTexts5 = getDamageTexts(combat, stats, 10000);
 		ieInstant5.setText(damageTexts5[0]);
 		keInstant5.setText(damageTexts5[1]);
 		ftInstant5.setText(damageTexts5[2]);

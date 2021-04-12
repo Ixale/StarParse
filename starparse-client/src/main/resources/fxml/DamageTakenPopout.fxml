@@ -32,8 +32,8 @@
             <GridPane fx:id="modeInstant" alignment="TOP_LEFT" hgap="0.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="105.0" prefWidth="150.0" styleClass="damage-taken" vgap="2.0" visible="true" VBox.vgrow="NEVER">
               <children>
                 <Text text="  " GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                <Text text="last 5s" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                <Text text="last 1s" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                <Text text="last 10s" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                <Text text="last 2s" GridPane.columnIndex="2" GridPane.rowIndex="0" />
                 <Text text="I/E" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                 <Text text="K/E" GridPane.columnIndex="0" GridPane.rowIndex="2" />
                 <Text text="F/T" GridPane.columnIndex="0" GridPane.rowIndex="3" />
