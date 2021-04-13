@@ -3,6 +3,7 @@ package com.ixale.starparse.gui;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -346,8 +347,8 @@ public class Config implements Serializable {
 			return null;
 		}
 		try {
-			return new String(new sun.misc.BASE64Decoder().decodeBuffer(this.parselyPasswordEnc));
-		} catch (IOException e) {
+			return new String(Base64.getDecoder().decode(this.parselyPasswordEnc));
+		} catch (Exception e) {
 			return null;
 		}
 	}
@@ -358,7 +359,7 @@ public class Config implements Serializable {
 			this.parselyPasswordEnc = null;
 			return;
 		}
-		this.parselyPasswordEnc = new sun.misc.BASE64Encoder().encode(parselyPassword.getBytes());
+		this.parselyPasswordEnc = new String(Base64.getEncoder().encode(parselyPassword.getBytes()));
 	}
 
 	public String getParselyEndpoint() {

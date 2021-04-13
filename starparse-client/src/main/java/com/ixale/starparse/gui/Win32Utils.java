@@ -13,6 +13,7 @@ import java.util.concurrent.ThreadFactory;
 
 import javax.swing.KeyStroke;
 
+import javafx.stage.Window;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,8 +124,13 @@ public class Win32Utils {
 		}
 
 		try {
-			@SuppressWarnings({"deprecation"})
-			final TKStage tkStage = stage.impl_getPeer();
+			//@SuppressWarnings({"deprecation"})
+			//final TKStage tkStage = stage.impl_getPeer();
+
+			Method getPeer = Window.class.getDeclaredMethod("getPeer");
+			getPeer.setAccessible(true);
+			final TKStage tkStage = (TKStage) getPeer.invoke(stage);
+
 			if (tkStage == null) {
 				// does not exists (yet)
 				return null;
