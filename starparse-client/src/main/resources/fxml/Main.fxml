@@ -186,6 +186,7 @@
             <Menu mnemonicParsing="false" text="Interface">
               <items>
                 <CheckMenuItem fx:id="personalStatsPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Personal Stats" />
+                <CheckMenuItem fx:id="damageTakenPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Damage Taken" />
                 <CheckMenuItem fx:id="timersPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Combat Timers" />
                 <CheckMenuItem fx:id="timersCenterPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Timers Center" visible="false" />
                 <SeparatorMenuItem mnemonicParsing="false" text="" />

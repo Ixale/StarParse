@@ -103,14 +103,14 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 		raidGroupNameField, raidGroupClientPasswordField, raidGroupAdminPasswordField,
 		raidPullSec, raidPullHotkey, raidBreakMin,
 		raidDamageOpacityText, raidHealingOpacityText, raidThreatOpacityText,
-		raidChallengesOpacityText, timersOpacityText, timersFractions, personalOpacityText, lockOverlaysHotkey,
+		raidChallengesOpacityText, timersOpacityText, timersFractions, personalOpacityText, damageTakenOpacityText, lockOverlaysHotkey,
 		guildField, parselyLoginField, parselyPasswordField,
 		timerName, timerSourceName, timerTargetName, timerAbilityName, timerEffectName,
-		timerDuration, timerRepeat, timerSoundOffset, timerCountdownCount;
+		timerDuration, timerRepeat, timerSoundOffset, timerCountdownCount, dtDelay1, dtDelay2;
 
 	@FXML
 	private Slider raidDamageOpacitySlider, raidHealingOpacitySlider, raidThreatOpacitySlider,
-		raidChallengesOpacitySlider, timersOpacitySlider, personalOpacitySlider, timerSoundVolume, timerCountdownVolume;
+		raidChallengesOpacitySlider, timersOpacitySlider, personalOpacitySlider, damageTakenOpacitySlider, timerSoundVolume, timerCountdownVolume;
 
 	@FXML
 	private Button raidGroupJoinButton, raidGroupCreateButton, timersCenterMoveButton, overlaysResetButton,
@@ -118,7 +118,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 	@FXML
 	private CheckBox timeSyncEnabledButton, serverStoreEnabledButton,
-		raidDamageBars, raidHealingBars, raidThreatBars, raidChallengesBars, timersBars, personalBars, timersCenter, popoutSolid,
+		raidDamageBars, raidHealingBars, raidThreatBars, raidChallengesBars, timersBars, personalBars, damageTakenBars, timersCenter, popoutSolid,
 		timerDisplay, timerPlaySound, timersIgnoreRepeated, timerPlayCountdown;
 
 	@FXML
@@ -131,7 +131,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 	@FXML
 	private ChoiceBox<String> timezoneList, serverList,
-		raidHealingMode, personalMode,
+		raidHealingMode, personalMode, damageTakenMode,
 		timerTrigger, timerTriggerTimer, timerBoss, timerCancel;
 
 	@FXML
@@ -190,9 +190,10 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			double raidChallengesOpacity, boolean raidChallengesBars,
 			double timersOpacity, boolean timersBars,
 			double personalOpacity, boolean personalBars, String personalMode,
+			double damageTakenOpacity, boolean damageTakenBars, String damageTakenMode,
 			//
 			boolean timersCenter, Double timersCenterX, Double timersCenterY,
-			Integer fractions,
+			Integer fractions, Integer dtDelay1, Integer dtDelay2,
 			boolean popoutSolid);
 
 		void onOverlaysReset(String characterName);
@@ -980,7 +981,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 	private class OverlaysSettings extends BaseSettings {
 
-		private final List<Mode> raidHealingModes = new ArrayList<>(), personalModes = new ArrayList<>();
+		private final List<Mode> raidHealingModes = new ArrayList<>(), personalModes = new ArrayList<>(), damageTakenModes = new ArrayList<>();
 
 		private final Tooltip timersAnchor = new Tooltip();
 
@@ -1000,6 +1001,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			bindSlider(raidChallengesOpacitySlider, raidChallengesOpacityText);
 			bindSlider(timersOpacitySlider, timersOpacityText);
 			bindSlider(personalOpacitySlider, personalOpacityText);
+			bindSlider(damageTakenOpacitySlider, damageTakenOpacityText);
 
 			bindPreview(raidDamageBars);
 			bindPreview(raidHealingBars);
@@ -1028,38 +1030,9 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 				}
 			});
 
-			defaults.put(timersFractions, "");
-			validators.put(timersFractions, new Validator<TextField>() {
-				@Override
-				public boolean isValid(TextField c) {
-					if (c.getText() == null || c.getText().isEmpty()) {
-						return true;
-					}
-					try {
-						int x = Integer.parseInt(c.getText());
-						return x >= 1 && x <= 99;
-					} catch (NumberFormatException e) {
-						return false;
-					}
-				}
-			});
-			timersFractions.textProperty().addListener(new ChangeListener<String>() {
-				@Override
-				public void changed(ObservableValue<? extends String> obsVal, String oldVal, String newVal) {
-					if (newVal == null) {
-						return;
-					}
-					try {
-						if (!validate(timersFractions)) {
-							return;
-						}
-						fireSettingsUpdated();
-
-					} catch (Exception e) {
-
-					}
-				}
-			});
+			initializeNumericTextField(timersFractions, 1, 99);
+			initializeNumericTextField(dtDelay1, 2, 15);
+			initializeNumericTextField(dtDelay2, 3, 60);
 
 			timersCenterMoveButton.setDisable(true);
 			timersCenterMoveButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -1168,6 +1141,41 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 			defaults.put(lockOverlaysHotkey, "");
 			validators.put(lockOverlaysHotkey, hotkeyValidator);
+		}
+
+		private void initializeNumericTextField(TextField textField, int minValue, int maxValue) {
+			defaults.put(textField, "");
+			validators.put(textField, new Validator<TextField>() {
+				@Override
+				public boolean isValid(TextField c) {
+					if (c.getText() == null || c.getText().isEmpty()) {
+						return true;
+					}
+					try {
+						int x = Integer.parseInt(c.getText());
+						return x >= minValue && x <= maxValue;
+					} catch (NumberFormatException e) {
+						return false;
+					}
+				}
+			});
+			textField.textProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(ObservableValue<? extends String> obsVal, String oldVal, String newVal) {
+					if (newVal == null) {
+						return;
+					}
+					try {
+						if (!validate(textField)) {
+							return;
+						}
+						fireSettingsUpdated();
+
+					} catch (Exception e) {
+
+					}
+				}
+			});
 		}
 
 		private void bindSlider(final Slider slider, final TextField text) {
@@ -1285,6 +1293,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			loadPopoutCurrent("Raid Challenges", raidChallengesOpacitySlider, raidChallengesOpacityText, raidChallengesBars, null, null);
 			loadPopoutCurrent("Timers", timersOpacitySlider, timersOpacityText, timersBars, null, null);
 			loadPopoutCurrent("Personal", personalOpacitySlider, personalOpacityText, personalBars, personalModes, personalMode);
+			loadPopoutCurrent("Damage Taken", damageTakenOpacitySlider, damageTakenOpacityText, damageTakenBars, damageTakenModes, damageTakenMode);
 
 			current.put(timersCenter, config.getCurrentCharacter().getPopout("Timers Center").isEnabled());
 			current.put(timersCenterMoveButton, new Double[]{
@@ -1292,11 +1301,9 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 					config.getCurrentCharacter().getPopout("Timers Center").getPositionY()
 			});
 
-			if (config.getPopoutDefault().getTimersFractions() != null) {
-				current.put(timersFractions, String.valueOf(config.getPopoutDefault().getTimersFractions()));
-			} else {
-				current.put(timersFractions, "");
-			}
+			putIfNotNull(timersFractions, config.getPopoutDefault().getTimersFractions());
+			putIfNotNull(dtDelay1, config.getPopoutDefault().getDtDelay1());
+			putIfNotNull(dtDelay2, config.getPopoutDefault().getDtDelay2());
 
 			current.put(lockOverlaysHotkey, config.getlockOverlaysHotkey() == null ? "" : config.getlockOverlaysHotkey());
 
@@ -1309,6 +1316,14 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 				overlaysResetButton.setVisible(false);
 			}
 			suppressEvents = false;
+		}
+
+		private void putIfNotNull(TextField textField, Integer integer) {
+			if (integer != null) {
+				current.put(textField, String.valueOf(integer));
+			} else {
+				current.put(textField, "");
+			}
 		}
 
 		private void loadPopoutCurrent(String name, Slider opacitySlider, TextField opacityText, CheckBox bars, final List<Mode> modes,
@@ -1388,9 +1403,11 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			savePopoutCurrent("Raid Challenges", raidChallengesOpacitySlider.getValue() / 100, raidChallengesBars.isSelected());
 			savePopoutCurrent("Timers", timersOpacitySlider.getValue() / 100, timersBars.isSelected());
 			savePopoutCurrent("Personal", personalOpacitySlider.getValue() / 100, personalBars.isSelected());
+			savePopoutCurrent("Damage Taken", damageTakenOpacitySlider.getValue() / 100, damageTakenBars.isSelected());
 
 			config.getCurrentCharacter().getPopout("Raid Healing").setMode(getMode(raidHealingMode, raidHealingModes));
 			config.getCurrentCharacter().getPopout("Personal").setMode(getMode(personalMode, personalModes));
+			config.getCurrentCharacter().getPopout("Damage Taken").setMode(getMode(damageTakenMode, damageTakenModes));
 
 			config.getCurrentCharacter().getPopout("Timers Center").setEnabled(timersCenter.isSelected());
 			if (timersCenterMoveButton.getUserData() != null) {
@@ -1407,6 +1424,8 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			}
 
 			config.getPopoutDefault().setTimersFractions(getSafeInt(timersFractions));
+			config.getPopoutDefault().setDtDelay1(getSafeInt(dtDelay1));
+			config.getPopoutDefault().setDtDelay2(getSafeInt(dtDelay2));
 			config.getPopoutDefault().setSolid(popoutSolid.isSelected());
 
 			isDirty = false;
@@ -1459,11 +1478,12 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 					raidChallengesOpacitySlider.getValue() / 100, raidChallengesBars.isSelected(),
 					timersOpacitySlider.getValue() / 100, timersBars.isSelected(),
 					personalOpacitySlider.getValue() / 100, personalBars.isSelected(), getMode(personalMode, personalModes),
+					damageTakenOpacitySlider.getValue() / 100, damageTakenBars.isSelected(), getMode(damageTakenMode, damageTakenModes),
 					//
 					timersCenter.isSelected(),
 					timersCenterMoveButton.getUserData() != null ? ((Double[]) timersCenterMoveButton.getUserData())[0] : null,
 					timersCenterMoveButton.getUserData() != null ? ((Double[]) timersCenterMoveButton.getUserData())[1] : null,
-					getSafeInt(timersFractions),
+					getSafeInt(timersFractions), getSafeInt(dtDelay1), getSafeInt(dtDelay2),
 					popoutSolid.isSelected());
 			}
 			isDirty = true;

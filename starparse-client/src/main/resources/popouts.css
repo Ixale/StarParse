@@ -33,6 +33,10 @@
     -fx-font-weight: bold;
 }
 
+.damage-taken .ps {
+    -fx-font-weight: bold;
+}
+
 .combat-stats .damage {
 	-fx-text-fill: maroon;
 }
@@ -77,4 +81,47 @@
 	-fx-stroke: black;
     -fx-stroke-width: 1px;
     -fx-stroke-type: outside;
+}
+
+.damage-taken .ie {
+	-fx-text-fill: #b22222;
+}
+
+
+.damage-taken .ke {
+	-fx-text-fill: #a55200;
+}
+
+
+.damage-taken .ft {
+	-fx-text-fill: #fada5e;
+}
+
+.damage-taken .white {
+	-fx-text-fill: white;
+}
+
+
+.damage-taken .mr {
+	-fx-text-fill: #ded8c9;
+}
+
+
+.damage-taken .avd {
+	-fx-text-fill: #cc8899;
+}
+
+
+.damage-taken .shd {
+	-fx-text-fill: #009ca6;
+}
+
+
+.damage-taken .abs {
+	-fx-text-fill: #30cccd;
+}
+
+
+.damage-taken .abg {
+	-fx-text-fill: #3f7aff;
 }
