@@ -37,10 +37,15 @@ public class DamageTakenPopoutPresenter extends BasePopoutPresenter {
 	private Label ieInstant1, ieInstant5, keInstant1, keInstant5, ftInstant1, ftInstant5, mrInstant1, mrInstant5;
 
 	@FXML
+	private Label delay1, delay2;
+
+	@FXML
 	private GridPane modeAll, modeInstant;
 
 	@FXML
 	private AnchorPane statsWrapper;
+
+	private Integer dtDelay1 = 2, dtDelay2 = 10;
 
 	protected RaidPresenter raidPresenter;
 
@@ -55,8 +60,8 @@ public class DamageTakenPopoutPresenter extends BasePopoutPresenter {
 		this.offsetY = 790;
 		this.height = 211;
 
-		addMode(new Mode(Mode.DEFAULT, "Damage Taken Total", 211, modeAll));
-		addMode(new Mode(Mode.DEFAULT, "Damage Taken Instant", 122, modeInstant));
+		addMode(new Mode(Mode.DEFAULT, "Total Taken", 211, modeAll));
+		addMode(new Mode(Mode.DEFAULT, "Currently Taken", 122, modeInstant));
 	}
 
 	public static CombatSelection computeSelectionForPastMillis(final Combat combat, final CombatStats stats, int millisDelay) throws Exception {
@@ -152,12 +157,12 @@ public class DamageTakenPopoutPresenter extends BasePopoutPresenter {
 		absorbedOthersPercent.setText(Format.formatFloat(mitiStats.getAbsorbedOthersPercent()) + " %");
 		absorbedOthers.setText(Format.formatMillions(mitiStats.getAbsorbedOthers()));
 
-		String[] damageTexts1 = getDamageTexts(combat, stats, 2000);
+		String[] damageTexts1 = getDamageTexts(combat, stats, dtDelay1 == null ? 2000 : dtDelay1 * 1000);
 		ieInstant1.setText(damageTexts1[0]);
 		keInstant1.setText(damageTexts1[1]);
 		ftInstant1.setText(damageTexts1[2]);
 		mrInstant1.setText(damageTexts1[3]);
-		String[] damageTexts5 = getDamageTexts(combat, stats, 10000);
+		String[] damageTexts5 = getDamageTexts(combat, stats, dtDelay2 == null ? 10000 : dtDelay2 * 1000);
 		ieInstant5.setText(damageTexts5[0]);
 		keInstant5.setText(damageTexts5[1]);
 		ftInstant5.setText(damageTexts5[2]);
@@ -170,6 +175,9 @@ public class DamageTakenPopoutPresenter extends BasePopoutPresenter {
 
 	@Override
 	public void resetCombatStats() {
+		delay1.setText("last "+dtDelay1+"s");
+		delay2.setText("last "+dtDelay2+"s");
+
 		ie.setText("");
 		iePercent.setText("");
 
@@ -233,4 +241,18 @@ public class DamageTakenPopoutPresenter extends BasePopoutPresenter {
 		statsWrapper.setPrefHeight(height - 20);
 		super.setHeight(height);
 	}
+
+    public void setDtDelay1(Integer dtDelay1) {
+		if (dtDelay1 != null) {
+			this.dtDelay1 = dtDelay1;
+			this.delay1.setText("last "+dtDelay1+"s");
+		}
+    }
+
+    public void setDtDelay2(Integer dtDelay2) {
+		if (dtDelay2 != null) {
+			this.dtDelay2 = dtDelay2;
+			this.delay2.setText("last "+dtDelay2+"s");
+		}
+    }
 }

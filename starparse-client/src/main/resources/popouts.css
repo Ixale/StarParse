@@ -97,6 +97,10 @@
 	-fx-text-fill: #fada5e;
 }
 
+.damage-taken .white {
+	-fx-text-fill: white;
+}
+
 
 .damage-taken .mr {
 	-fx-text-fill: #ded8c9;

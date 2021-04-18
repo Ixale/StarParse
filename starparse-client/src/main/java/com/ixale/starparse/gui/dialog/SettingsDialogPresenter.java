@@ -106,7 +106,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 		raidChallengesOpacityText, timersOpacityText, timersFractions, personalOpacityText, damageTakenOpacityText, lockOverlaysHotkey,
 		guildField, parselyLoginField, parselyPasswordField,
 		timerName, timerSourceName, timerTargetName, timerAbilityName, timerEffectName,
-		timerDuration, timerRepeat, timerSoundOffset, timerCountdownCount;
+		timerDuration, timerRepeat, timerSoundOffset, timerCountdownCount, dtDelay1, dtDelay2;
 
 	@FXML
 	private Slider raidDamageOpacitySlider, raidHealingOpacitySlider, raidThreatOpacitySlider,
@@ -193,7 +193,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			double damageTakenOpacity, boolean damageTakenBars, String damageTakenMode,
 			//
 			boolean timersCenter, Double timersCenterX, Double timersCenterY,
-			Integer fractions,
+			Integer fractions, Integer dtDelay1, Integer dtDelay2,
 			boolean popoutSolid);
 
 		void onOverlaysReset(String characterName);
@@ -1030,38 +1030,9 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 				}
 			});
 
-			defaults.put(timersFractions, "");
-			validators.put(timersFractions, new Validator<TextField>() {
-				@Override
-				public boolean isValid(TextField c) {
-					if (c.getText() == null || c.getText().isEmpty()) {
-						return true;
-					}
-					try {
-						int x = Integer.parseInt(c.getText());
-						return x >= 1 && x <= 99;
-					} catch (NumberFormatException e) {
-						return false;
-					}
-				}
-			});
-			timersFractions.textProperty().addListener(new ChangeListener<String>() {
-				@Override
-				public void changed(ObservableValue<? extends String> obsVal, String oldVal, String newVal) {
-					if (newVal == null) {
-						return;
-					}
-					try {
-						if (!validate(timersFractions)) {
-							return;
-						}
-						fireSettingsUpdated();
-
-					} catch (Exception e) {
-
-					}
-				}
-			});
+			initializeNumericTextField(timersFractions, 1, 99);
+			initializeNumericTextField(dtDelay1, 2, 15);
+			initializeNumericTextField(dtDelay2, 3, 60);
 
 			timersCenterMoveButton.setDisable(true);
 			timersCenterMoveButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -1170,6 +1141,41 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 			defaults.put(lockOverlaysHotkey, "");
 			validators.put(lockOverlaysHotkey, hotkeyValidator);
+		}
+
+		private void initializeNumericTextField(TextField textField, int minValue, int maxValue) {
+			defaults.put(textField, "");
+			validators.put(textField, new Validator<TextField>() {
+				@Override
+				public boolean isValid(TextField c) {
+					if (c.getText() == null || c.getText().isEmpty()) {
+						return true;
+					}
+					try {
+						int x = Integer.parseInt(c.getText());
+						return x >= minValue && x <= maxValue;
+					} catch (NumberFormatException e) {
+						return false;
+					}
+				}
+			});
+			textField.textProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(ObservableValue<? extends String> obsVal, String oldVal, String newVal) {
+					if (newVal == null) {
+						return;
+					}
+					try {
+						if (!validate(textField)) {
+							return;
+						}
+						fireSettingsUpdated();
+
+					} catch (Exception e) {
+
+					}
+				}
+			});
 		}
 
 		private void bindSlider(final Slider slider, final TextField text) {
@@ -1295,11 +1301,9 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 					config.getCurrentCharacter().getPopout("Timers Center").getPositionY()
 			});
 
-			if (config.getPopoutDefault().getTimersFractions() != null) {
-				current.put(timersFractions, String.valueOf(config.getPopoutDefault().getTimersFractions()));
-			} else {
-				current.put(timersFractions, "");
-			}
+			putIfNotNull(timersFractions, config.getPopoutDefault().getTimersFractions());
+			putIfNotNull(dtDelay1, config.getPopoutDefault().getDtDelay1());
+			putIfNotNull(dtDelay2, config.getPopoutDefault().getDtDelay2());
 
 			current.put(lockOverlaysHotkey, config.getlockOverlaysHotkey() == null ? "" : config.getlockOverlaysHotkey());
 
@@ -1312,6 +1316,14 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 				overlaysResetButton.setVisible(false);
 			}
 			suppressEvents = false;
+		}
+
+		private void putIfNotNull(TextField textField, Integer integer) {
+			if (integer != null) {
+				current.put(textField, String.valueOf(integer));
+			} else {
+				current.put(textField, "");
+			}
 		}
 
 		private void loadPopoutCurrent(String name, Slider opacitySlider, TextField opacityText, CheckBox bars, final List<Mode> modes,
@@ -1412,6 +1424,8 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			}
 
 			config.getPopoutDefault().setTimersFractions(getSafeInt(timersFractions));
+			config.getPopoutDefault().setDtDelay1(getSafeInt(dtDelay1));
+			config.getPopoutDefault().setDtDelay2(getSafeInt(dtDelay2));
 			config.getPopoutDefault().setSolid(popoutSolid.isSelected());
 
 			isDirty = false;
@@ -1469,7 +1483,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 					timersCenter.isSelected(),
 					timersCenterMoveButton.getUserData() != null ? ((Double[]) timersCenterMoveButton.getUserData())[0] : null,
 					timersCenterMoveButton.getUserData() != null ? ((Double[]) timersCenterMoveButton.getUserData())[1] : null,
-					getSafeInt(timersFractions),
+					getSafeInt(timersFractions), getSafeInt(dtDelay1), getSafeInt(dtDelay2),
 					popoutSolid.isSelected());
 			}
 			isDirty = true;

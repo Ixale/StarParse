@@ -346,7 +346,7 @@ public class MainPresenter implements Initializable {
 			final double personalOpacity, final boolean personalBars, final String personalMode,
 			final double damageTakenOpacity, final boolean damageTakenBars, final String damageTakenMode,
 			final boolean timersCenter, final Double timersCenterX, final Double timersCenterY,
-			final Integer fractions,
+			final Integer fractions,  final Integer dtDelay1, final Integer dtDelay2,
 			final boolean popoutSolid) {
 			// popout settings
 			for (final StatsPopout sp: popouts) {
@@ -396,6 +396,8 @@ public class MainPresenter implements Initializable {
 						sp.presenter.setOpacity(damageTakenOpacity);
 						sp.presenter.setBars(damageTakenBars);
 						sp.presenter.setMode(damageTakenMode);
+						((DamageTakenPopoutPresenter) sp.presenter).setDtDelay1(dtDelay1);
+						((DamageTakenPopoutPresenter) sp.presenter).setDtDelay2(dtDelay2);
 
 					} else if (sp.presenter instanceof RaidNotesPopoutPresenter) {
 						sp.presenter.setOpacity(personalOpacity); // TODO
@@ -1209,6 +1211,8 @@ public class MainPresenter implements Initializable {
 
 		timersPopoutPresenter.setTimersCenterControl(timersCenterPopoutPresenter);
 		timersPopoutPresenter.setFractions(config.getPopoutDefault().getTimersFractions());
+		damageTakenPopoutPresenter.setDtDelay1(config.getPopoutDefault().getDtDelay1());
+		damageTakenPopoutPresenter.setDtDelay2(config.getPopoutDefault().getDtDelay2());
 
 		raidPresenter.addRaidUpdateListener(raidDataListener);
 		raidPresenter.setRaidManager(raidManager);
@@ -1249,7 +1253,7 @@ public class MainPresenter implements Initializable {
 				final double personalOpacity, final boolean personalBars, final String personalMode,
 				final double damageTakenOpacity, final boolean damageTakenBars, final String damageTakenMode,
 				final boolean timersCenter, final Double timersCenterX, final Double timersCenterY,
-				final Integer fractions,
+				final Integer fractions, final Integer dtDelay1, final Integer dtDelay2,
 				final boolean popoutSolid) {
 				StatsPopout.setSettings(backgroundColor, textColor, damageColor, healingColor, threatColor, friendlyColor,
 					raidDamageOpacity, raidDamageBars,
@@ -1260,7 +1264,7 @@ public class MainPresenter implements Initializable {
 					personalOpacity, personalBars, personalMode,
 					damageTakenOpacity, damageTakenBars, damageTakenMode,
 					timersCenter, timersCenterX, timersCenterY,
-					fractions,
+					fractions, dtDelay1, dtDelay2,
 					popoutSolid);
 			}
 
