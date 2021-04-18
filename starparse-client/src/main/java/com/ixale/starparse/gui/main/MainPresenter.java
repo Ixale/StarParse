@@ -344,6 +344,7 @@ public class MainPresenter implements Initializable {
 			final double raidChallengesOpacity, final boolean raidChallengesBars,
 			final double timersOpacity, final boolean timersBars,
 			final double personalOpacity, final boolean personalBars, final String personalMode,
+			final double damageTakenOpacity, final boolean damageTakenBars, final String damageTakenMode,
 			final boolean timersCenter, final Double timersCenterX, final Double timersCenterY,
 			final Integer fractions,
 			final boolean popoutSolid) {
@@ -390,6 +391,11 @@ public class MainPresenter implements Initializable {
 						sp.presenter.setOpacity(personalOpacity);
 						sp.presenter.setBars(personalBars);
 						sp.presenter.setMode(personalMode);
+
+					}else if (sp.presenter instanceof DamageTakenPopoutPresenter) {
+						sp.presenter.setOpacity(damageTakenOpacity);
+						sp.presenter.setBars(damageTakenBars);
+						sp.presenter.setMode(damageTakenMode);
 
 					} else if (sp.presenter instanceof RaidNotesPopoutPresenter) {
 						sp.presenter.setOpacity(personalOpacity); // TODO
@@ -1241,6 +1247,7 @@ public class MainPresenter implements Initializable {
 				final double raidChallengesOpacity, final boolean raidChallengesBars,
 				final double timersOpacity, final boolean timersBars,
 				final double personalOpacity, final boolean personalBars, final String personalMode,
+				final double damageTakenOpacity, final boolean damageTakenBars, final String damageTakenMode,
 				final boolean timersCenter, final Double timersCenterX, final Double timersCenterY,
 				final Integer fractions,
 				final boolean popoutSolid) {
@@ -1251,6 +1258,7 @@ public class MainPresenter implements Initializable {
 					raidChallengesOpacity, raidChallengesBars,
 					timersOpacity, timersBars,
 					personalOpacity, personalBars, personalMode,
+					damageTakenOpacity, damageTakenBars, damageTakenMode,
 					timersCenter, timersCenterX, timersCenterY,
 					fractions,
 					popoutSolid);

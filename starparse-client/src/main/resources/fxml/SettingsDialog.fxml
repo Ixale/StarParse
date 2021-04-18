@@ -15,7 +15,7 @@
 <?import javafx.scene.text.*?>
 <?scenebuilder-stylesheet ../styles.css?>
 
-<TabPane fx:id="dialogRoot" maxHeight="-Infinity" minHeight="-Infinity" minWidth="520.0" prefHeight="330.0" styleClass="modal-text" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ixale.starparse.gui.dialog.SettingsDialogPresenter">
+<TabPane fx:id="dialogRoot" maxHeight="-Infinity" minHeight="-Infinity" minWidth="520.0" prefHeight="350.0" styleClass="modal-text" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ixale.starparse.gui.dialog.SettingsDialogPresenter">
   <tabs>
     <Tab fx:id="contentGeneral" text="General">
       <content>
@@ -260,6 +260,11 @@
                 <TextField fx:id="personalOpacityText" alignment="CENTER_RIGHT" disable="false" editable="true" maxWidth="-Infinity" prefWidth="30.0" text="70" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
                 <CheckBox fx:id="personalBars" selected="true" text="Bars" GridPane.columnIndex="2" GridPane.rowIndex="5" />
                 <ChoiceBox fx:id="personalMode" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+                <Label text="Damage Taken" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                <Slider fx:id="damageTakenOpacitySlider" blockIncrement="10.0" majorTickUnit="1.0" maxWidth="-Infinity" min="1.0" minHeight="-1.0" minWidth="-Infinity" minorTickCount="0" orientation="HORIZONTAL" prefWidth="60.0" showTickLabels="false" showTickMarks="false" snapToTicks="true" value="70.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                <TextField fx:id="damageTakenOpacityText" alignment="CENTER_RIGHT" disable="false" editable="true" maxWidth="-Infinity" prefWidth="30.0" text="70" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="6" />
+                <CheckBox fx:id="damageTakenBars" selected="true" text="Bars" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                <ChoiceBox fx:id="damageTakenMode" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="125.0" GridPane.columnIndex="3" GridPane.rowIndex="6" />
               </children>
               <columnConstraints>
                 <ColumnConstraints fillWidth="false" hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" percentWidth="-1.0" prefWidth="70.0" />
