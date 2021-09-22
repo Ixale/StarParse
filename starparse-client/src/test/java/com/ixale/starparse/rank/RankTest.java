@@ -42,7 +42,7 @@ public class RankTest {
 	@Test
 	public void testDownload() throws Exception {
 		Raid raid = new WorldBoss();
-		RaidBoss boss = raid.getBosses().get(4);
+		RaidBoss boss = raid.getBosses().get(1);
 
 		assertEquals(boss.getRaidBossName(), RaidBossName.ColossalMonolith);
 		assertEquals(boss.getMode(), Mode.HM);
@@ -69,7 +69,7 @@ public class RankTest {
 		final RankClass rc = service.getRank(r, r.getMinTick() + 1, 2485);
 		assertNotNull(rc);
 		assertNull(rc.getReason());
-		assertTrue(rc.getPercent() > 0 && rc.getPercent() < 100);
+		assertTrue(rc.getPercent() >= 0 && rc.getPercent() <= 100);
 	}
 
 	@Test
@@ -99,7 +99,7 @@ public class RankTest {
 	@Test
 	public void testFull() throws Exception {
 		Raid raid = new WorldBoss();
-		RaidBoss boss = raid.getBosses().get(1);
+		RaidBoss boss = raid.getBosses().get(4);
 
 		assertEquals(boss.getRaidBossName(), RaidBossName.ColossalMonolith);
 		assertEquals(boss.getMode(), Mode.SM);
@@ -109,7 +109,7 @@ public class RankTest {
 		RankClass rc = service.getRank(boss, RankType.DPS, CharacterDiscipline.Darkness, 360001, 2485);
 		assertNotNull(rc);
 		assertNull(rc.getReason());
-		assertTrue(rc.getPercent() > 0 && rc.getPercent() < 100);
+		assertTrue(rc.getPercent() >= 0 && rc.getPercent() <= 100);
 		assertEquals(RankType.DPS, rc.getType());
 
 		try {
@@ -128,7 +128,7 @@ public class RankTest {
 		rc = service.getRank(boss, RankType.EHPS, CharacterDiscipline.CombatMedic, 360001, 2485);
 		assertNotNull(rc);
 		assertNull(rc.getReason());
-		assertTrue(rc.getPercent() > 0 && rc.getPercent() < 100);
+		assertTrue(rc.getPercent() >= 0 && rc.getPercent() <= 100);
 		assertEquals(RankType.EHPS, rc.getType());
 	}
 }

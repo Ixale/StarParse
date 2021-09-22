@@ -20,6 +20,7 @@ import com.ixale.starparse.domain.RaidBossName;
 import com.ixale.starparse.domain.Actor.Type;
 import com.ixale.starparse.domain.ops.DreadFortress;
 import com.ixale.starparse.domain.ops.DreadPalace;
+import com.ixale.starparse.domain.ops.Dxun;
 import com.ixale.starparse.domain.ops.EternalChampionship;
 import com.ixale.starparse.domain.ops.EternityVault;
 import com.ixale.starparse.domain.ops.ExplosiveConflict;
@@ -292,7 +293,8 @@ public class Helpers {
 			new WorldBoss(),
 			new TrainingDummy(),
 			new EternalChampionship(),
-			new Iokath()
+			new Iokath(),
+			new Dxun()
 	};
 
 	private static final Map<Long, RaidBoss> bossesByGuids = new HashMap<>();

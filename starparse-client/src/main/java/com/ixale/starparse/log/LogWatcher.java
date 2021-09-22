@@ -150,8 +150,8 @@ public class LogWatcher extends Thread
 
 								} catch (Exception e) {
 									if (lastFiredLine != null && (lastFiredLine.contains("2280674878816256")
-										|| lastFiredLine.contains("Manka-Katz"))
-										|| lastFiredLine.contains("Aktiviert den Tobus-Hetzer")) {
+										|| lastFiredLine.contains("Manka-Katz")
+										|| lastFiredLine.contains("Aktiviert den Tobus-Hetzer"))) {
 										// FIXME: German client fails to log Manka Cat or ... something ... , just move on and give it bit more room
 										errorCount = -20;
 

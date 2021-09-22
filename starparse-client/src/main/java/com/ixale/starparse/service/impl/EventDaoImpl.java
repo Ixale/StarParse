@@ -38,7 +38,7 @@ public class EventDaoImpl extends H2Dao implements EventDao {
 		// events
 		for (int j = 0; j < events.size(); j += batchSize) {
 
-			final List<Event> batchList = events.subList(j, j + batchSize > events.size() ? events.size() : j + batchSize);
+			final List<Event> batchList = events.subList(j, Math.min(j + batchSize, events.size()));
 
 			getJdbcTemplate().batchUpdate(SQL_EVENT_INSERT,
 				new BatchPreparedStatementSetter() {

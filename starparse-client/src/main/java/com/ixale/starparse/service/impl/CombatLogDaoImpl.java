@@ -26,11 +26,6 @@ public class CombatLogDaoImpl extends H2Dao implements CombatLogDao {
 				+ " file_name = ?, time_from = ?, character_name = ?"
 				+ " WHERE log_id = ?";
 
-	/**
-	 * 
-	 * @param CombatLog
-	 * @throws Exception
-	 */
 	public void storeCombatLog(final CombatLog log) throws Exception {
 
 		// already exists?
@@ -60,7 +55,7 @@ public class CombatLogDaoImpl extends H2Dao implements CombatLogDao {
 		return getJdbcTemplate().query(
 				"SELECT log_id, file_name, time_from, character_name"
 				+ " FROM logs"
-				+ " ORDER BY log_id ASC", 
+				+ " ORDER BY log_id ASC",
 				new RowMapper<CombatLog>() {
 					@Override
 					public CombatLog mapRow(ResultSet rs, int rowNum)

@@ -44,66 +44,129 @@ public class Parser {
 
 	// combat_2014-01-26_21_17_31_474300
 	private final static Pattern filePattern = Pattern
-			.compile("^combat_(?<Year>\\d{4})\\-(?<Month>\\d{2})\\-(?<Day>\\d{2})_(?<HH>\\d{2})_\\d{2}_\\d{2}_\\d{6}\\.txt$");
+			.compile("^combat_(?<Year>\\d{4})-(?<Month>\\d{2})-(?<Day>\\d{2})_(?<HH>\\d{2})_\\d{2}_\\d{2}_\\d{6}\\.txt$");
 	private Matcher fileMatcher;
 
+	private Pattern basePattern, combatPattern; // version dependent
+
+	private final static Pattern v7ZonePattern = Pattern.compile("^"
+			+ "\\[(?<Vector>\\{(?<X>[0-9.-]+),(?<Z>[0-9.-]+),(?<Y>[0-9.-]+)})]"
+			+ " \\[(?<HH>\\d{2}):(?<MM>\\d{2}):(?<SS>\\d{2})\\.(?<MS>\\d{3})]"
+			+ " \\[(?<Source>@(?<SourcePlayerName>[^#]*)#(?<SourcePlayerId>\\d*))]"
+			+ " \\[(?<AdvancedClass>[^/]*)/(?<Discipline>[^]]*)]"
+			+ " \\[(?<ServerId>[^]]*)]"
+			+ " \\[(?<InstanceName>[^]]*)]"
+			+ " \\((?<Version>v(?<Major>\\d*).(?<Minor>\\d*).(?<Revision>[0-9a-z]*))\\)");
+
+	private final static Pattern v7IgnoredPattern = Pattern.compile("^"
+			+ "\\[]"
+			+ " \\[(?<HH>\\d{2}):(?<MM>\\d{2}):(?<SS>\\d{2})\\.(?<MS>\\d{3})]"
+			+ " \\[] .*");
+
 	// combat log line pattern
-	private final static Pattern basePattern = Pattern.compile(
-			"^\\[(?<TimeStamp>"
+	private final static Pattern legacyBasePattern = Pattern.compile("^"
+			+ "\\[(?<TimeStamp>"
 			+ "(?<HH>\\d{2}):(?<MM>\\d{2}):(?<SS>\\d{2})\\.(?<MS>\\d{3})"
-			+ ")\\]"
+			+ ")]"
 			+ " \\[(?<Source>"
-			+ "|@(?<SourcePlayerName>[^\\]:]*)(:(?<SourceCompanionName>[^{]*) \\{(?<SourceCompanionGuid>\\d*)\\})?"
-			+ "|(?<SourceNpcName>[^{]*) \\{(?<SourceNpcGuid>\\d*)\\}(|:(?<SourceNpcInstance>\\d*))"
-			+ ")\\]"
+			+ "|@(?<SourcePlayerName>[^]:]*)(:(?<SourceCompanionName>[^{]*) \\{(?<SourceCompanionGuid>\\d*)})?"
+			+ "|(?<SourceNpcName>[^{]*) \\{(?<SourceNpcGuid>\\d*)}(|:(?<SourceNpcInstance>\\d*))"
+			+ ")]"
 			+ " \\[(?<Target>"
-			+ "|@(?<TargetPlayerName>[^\\]:]*)(|:(?<TargetCompanionName>[^{]*) \\{(?<TargetCompanionGuid>\\d*)\\})"
-			+ "|(?<TargetNpcName>[^{]*) \\{(?<TargetNpcGuid>\\d*)\\}(|:(?<TargetNpcInstance>\\d*))"
-			+ ")\\]"
+			+ "|@(?<TargetPlayerName>[^]:]*)(|:(?<TargetCompanionName>[^{]*) \\{(?<TargetCompanionGuid>\\d*)})"
+			+ "|(?<TargetNpcName>[^{]*) \\{(?<TargetNpcGuid>\\d*)}(|:(?<TargetNpcInstance>\\d*))"
+			+ ")]"
 			+ " \\[(?<Ability>"
-			+ "|(?<AbilityName>[^{]*) \\{(?<AbilityGuid>\\d*)\\}"
-			+ ")\\]"
+			+ "|(?<AbilityName>[^{]*) \\{(?<AbilityGuid>\\d*)}"
+			+ ")]"
 			+ " \\[("
-			+ "(?<ActionName>[^{]*) \\{(?<ActionGuid>\\d*)\\}: (?<EffectName>[^{]*) \\{(?<EffectGuid>\\d*)\\}"
-			+ ")\\]"
+			+ "(?<ActionName>[^{]*) \\{(?<ActionGuid>\\d*)}: (?<EffectName>[^{]*) \\{(?<EffectGuid>\\d*)}"
+			+ ")]"
 			+ " \\("
-			+ "(?<Value>\\-?\\d+)?(?<IsCrit>\\*)? ?"
-			+ "( (?<DamageType>[^ \\-]+) \\{(?<DamageTypeGuid>\\d+)\\})?"
-			+ "(\\((?<ReflectType>[^ ]+) \\{(?<ReflectTypeGuid>\\d+)\\}\\))?"
-			+ "(?<IsMitigation> -((?<MitigationType>[^ ]+) \\{(?<MitigationTypeGuid>\\d+)\\})?)?"
-			+ "( \\((?<AbsorbValue>\\d+) (?<AbsorbType>[^ ]+) \\{(?<AbsorbTypeGuid>\\d+)\\}\\))?"
+			+ "(?<Value>-?\\d+)?(?<IsCrit>\\*)? ?"
+			+ "( (?<DamageType>[^ \\-]+) \\{(?<DamageTypeGuid>\\d+)})?"
+			+ "(\\((?<ReflectType>[^ ]+) \\{(?<ReflectTypeGuid>\\d+)}\\))?"
+			+ "(?<IsMitigation> -((?<MitigationType>[^ ]+) \\{(?<MitigationTypeGuid>\\d+)})?)?"
+			+ "( \\((?<AbsorbValue>\\d+) (?<AbsorbType>[^ ]+) \\{(?<AbsorbTypeGuid>\\d+)}\\))?"
+			+ "\\)"
+			+ "($| <(?<Threat>[^>]*?)>)");
+
+	// combat log line pattern // v7+
+	private final static Pattern v7BasePattern = Pattern.compile("^"
+			+ "\\[(?<Vector>\\{(?<X>[0-9.-]+),(?<Z>[0-9.-]+),(?<Y>[0-9.-]+)})]"
+			+ " \\[(?<HH>\\d{2}):(?<MM>\\d{2}):(?<SS>\\d{2})\\.(?<MS>\\d{3})]"
+			+ " \\[(?<Source>"
+			+ "|@(?<SourcePlayerName>[^#/]*)(?<SourcePlayerId>#\\d+)?(/(?<SourceCompanionName>[^{]*) \\{(?<SourceCompanionGuid>\\d*)}(:(?<SourceCompanionId>\\d+))?)?"
+			+ "|(?<SourceNpcName>[^{]*) \\{(?<SourceNpcGuid>\\d*)}(|:(?<SourceNpcInstance>\\d*))"
+			+ ")]"
+			+ " \\[(?<Target>"
+			+ "|@(?<TargetPlayerName>[^#/]*)(?<TargetPlayerId>#\\d+)?(/(?<TargetCompanionName>[^{]*) \\{(?<TargetCompanionGuid>\\d*)}(:(?<TargetCompanionId>\\d+))?)?"
+			+ "|(?<TargetNpcName>[^{]*) \\{(?<TargetNpcGuid>\\d*)}(|:(?<TargetNpcInstance>\\d*))"
+			+ ")]"
+			+ " \\[(?<Ability>"
+			+ "|(?<AbilityName>[^{]*) \\{(?<AbilityGuid>\\d*)}"
+			+ ")]"
+			+ " \\[("
+			+ "(?<ActionName>[^{]*) \\{(?<ActionGuid>\\d*)}: (?<EffectName>[^{]*) \\{(?<EffectGuid>\\d*)}"
+			+ ")]"
+			+ " \\("
+			+ "(?<Value>-?\\d+)?(?<IsCrit>\\*)? ?"
+			+ "( (?<DamageType>[^ \\-]+) \\{(?<DamageTypeGuid>\\d+)})?"
+			+ "(\\((?<ReflectType>[^ ]+) \\{(?<ReflectTypeGuid>\\d+)}\\))?"
+			+ "(?<IsMitigation> -((?<MitigationType>[^ ]+) \\{(?<MitigationTypeGuid>\\d+)})?)?"
+			+ "( \\((?<AbsorbValue>\\d+) (?<AbsorbType>[^ ]+) \\{(?<AbsorbTypeGuid>\\d+)}\\))?"
 			+ "\\)"
 			+ "($| <(?<Threat>[^>]*?)>)");
 
 	// combat log line pattern for enter/exit combat since 5.4
-	private final static Pattern combat54Pattern = Pattern.compile(
-			"^\\[(?<TimeStamp>"
+	private final static Pattern legacyCombatPattern = Pattern.compile("^"
+			+ "(\\[(?<Vector>\\{(?<X>[0-9.-]+),(?<Z>[0-9.-]+),(?<Y>[0-9.-]+)})] )?" // v7.0.0
+			+ "\\[(?<TimeStamp>"
 			+ "(?<HH>\\d{2}):(?<MM>\\d{2}):(?<SS>\\d{2})\\.(?<MS>\\d{3})"
-			+ ")\\]"
+			+ ")]"
 			+ " \\[(?<Source>"
-			+ "|@(?<SourcePlayerName>[^\\]:]*)(:(?<SourceCompanionName>[^{]*) \\{(?<SourceCompanionGuid>\\d*)\\})?"
-			+ "|(?<SourceNpcName>[^{]*) \\{(?<SourceNpcGuid>\\d*)\\}(|:(?<SourceNpcInstance>\\d*))"
-			+ ")\\]"
+			+ "|@(?<SourcePlayerName>[^#/]*)(?<SourcePlayerId>#\\d+)?(/(?<SourceCompanionName>[^{]*) \\{(?<SourceCompanionGuid>\\d*)}(:(?<SourceCompanionId>\\d+))?)?"
+			+ "|(?<SourceNpcName>[^{]*) \\{(?<SourceNpcGuid>\\d*)}(|:(?<SourceNpcInstance>\\d*))"
+			+ ")]"
 			+ " \\[(?<Target>"
-			+ "|@(?<TargetPlayerName>[^\\]:]*)(|:(?<TargetCompanionName>[^{]*) \\{(?<TargetCompanionGuid>\\d*)\\})"
-			+ "|(?<TargetNpcName>[^{]*) \\{(?<TargetNpcGuid>\\d*)\\}(|:(?<TargetNpcInstance>\\d*))"
-			+ ")\\]"
+			+ "|@(?<TargetPlayerName>[^#/]*)(?<TargetPlayerId>#\\d+)?(/(?<TargetCompanionName>[^{]*) \\{(?<TargetCompanionGuid>\\d*)}(:(?<TargetCompanionId>\\d+))?)?"
+			+ "|(?<TargetNpcName>[^{]*) \\{(?<TargetNpcGuid>\\d*)}(|:(?<TargetNpcInstance>\\d*))"
+			+ ")]"
 			+ " \\[(?<Ability>"
-			+ "|(?<AbilityName>[^{]*) \\{(?<AbilityGuid>\\d*)\\}"
-			+ ")\\]"
+			+ "|(?<AbilityName>[^{]*) \\{(?<AbilityGuid>\\d*)}"
+			+ ")]"
 			+ " \\[("
-			+ "(?<ActionName>[^{]*) \\{(?<ActionGuid>\\d*)\\}: (?<EffectName>[^{]*) \\{(?<EffectGuid>(836045448945489|836045448945490))\\}"
-			+ ")\\]"
+			+ "(?<ActionName>[^{]*) \\{(?<ActionGuid>\\d*)}: (?<EffectName>[^{]*) \\{(?<EffectGuid>(836045448945489|836045448945490))}"
+			+ ")]"
+			+ " \\((?<Value>.*)\\)"
+			+ "($| <(?<Threat>[^>]*?)>)");
+
+	// combat log line pattern // v7+
+	private final static Pattern v7CombatPattern = Pattern.compile("^"
+			+ "\\[(?<Vector>\\{(?<X>[0-9.-]+),(?<Z>[0-9.-]+),(?<Y>[0-9.-]+)})]" // v7.0.0
+			+ " \\[(?<HH>\\d{2}):(?<MM>\\d{2}):(?<SS>\\d{2})\\.(?<MS>\\d{3})]"
+			+ " \\[(?<Source>"
+			+ "|@(?<SourcePlayerName>[^#/]*)(?<SourcePlayerId>#\\d+)?(/(?<SourceCompanionName>[^{]*) \\{(?<SourceCompanionGuid>\\d*)})?"
+			+ "|(?<SourceNpcName>[^{]*) \\{(?<SourceNpcGuid>\\d*)}(|:(?<SourceNpcInstance>\\d*))"
+			+ ")]"
+			+ " \\[(?<Target>"
+			+ "|@(?<TargetPlayerName>[^#/]*)(?<TargetPlayerId>#\\d+)?(/(?<TargetCompanionName>[^{]*) \\{(?<TargetCompanionGuid>\\d*)})?"
+			+ "|(?<TargetNpcName>[^{]*) \\{(?<TargetNpcGuid>\\d*)}(|:(?<TargetNpcInstance>\\d*))"
+			+ ")]"
+			+ " \\[(?<Ability>"
+			+ "|(?<AbilityName>[^{]*) \\{(?<AbilityGuid>\\d*)}"
+			+ ")]"
+			+ " \\[("
+			+ "(?<ActionName>[^{]*) \\{(?<ActionGuid>\\d*)}: (?<EffectName>[^{]*) \\{(?<EffectGuid>(836045448945489|836045448945490))}"
+			+ ")]"
 			+ " \\((?<Value>.*)\\)"
 			+ "($| <(?<Threat>[^>]*?)>)");
 
 	// combat log line pattern for GSF only (fallback)
-	private final static Pattern gsfPattern = Pattern.compile(
-			"^\\[(?<TimeStamp>"
-			+ "(?<HH>\\d{2}):(?<MM>\\d{2}):(?<SS>\\d{2})\\.(?<MS>\\d{3})"
-			+ ")\\]"
-			+ " \\[(?<SourceGsfName>|\\d{10,})\\]"
-			+ " \\[(?<TargetGsfName>|\\d{10,})\\] .*");
+	private final static Pattern gsfPattern = Pattern.compile("^"
+			+ "\\[(?<HH>\\d{2}):(?<MM>\\d{2}):(?<SS>\\d{2})\\.(?<MS>\\d{3})]"
+			+ " \\[(?<SourceGsfName>|\\d{10,})]"
+			+ " \\[(?<TargetGsfName>|\\d{10,})] .*");
 
 	// healing threat ratios
 	private static final double THREAT_HEAL = .5,
@@ -112,15 +175,11 @@ public class Parser {
 			THREAT_GUARD = .75;
 
 	private static final long COMBAT_DELAY_WINDOW = 4 * 1000, // window to 1) include any lagged damage or healing 2) detect combat drop abilities 3)
-			// reconnect "shattered" combats
 			COMBAT_REVIVE_WINDOW = 60 * 1000, // window to use revive after death
 			COMBAT_RETURN_WINDOW = 30 * 1000, // window to re-enter the combat after revival or combat drop
-
 			EFFECT_OVERLAP_TOLERANCE = 500, // start A ... (start B ... end A ~ within 0.5s) ... end B
-
 			ABSORPTION_OUTSIDE_DELAY_WINDOW = 4 * 1000, // window to include lagged absorption after the effect has ended
 			ABSORPTION_INSIDE_DELAY_WINDOW = 500, // effect A ... effect B ... (end A ... absorption A ~ within 0.5s) ... end B ...
-
 			PHASE_DAMAGE_WINDOW = 7 * 1000, // if no damage even occurs within 5s, create close the "damage phase"
 			PHASE_DAMAGE_MININUM = 5 * 1000,
 			HEALING_THREAT_TOLERANCE = 5;
@@ -129,13 +188,13 @@ public class Parser {
 	private int lastHour;
 
 	// parsed
-	private final ArrayList<Event> events = new ArrayList<Event>();
-	private final ArrayList<Combat> combats = new ArrayList<Combat>();
-	private final ArrayList<Effect> effects = new ArrayList<Effect>();
-	private final ArrayList<Absorption> absorptions = new ArrayList<Absorption>();
-	private final ArrayList<Phase> phases = new ArrayList<Phase>();
+	private final ArrayList<Event> events = new ArrayList<>();
+	private final ArrayList<Combat> combats = new ArrayList<>();
+	private final ArrayList<Effect> effects = new ArrayList<>();
+	private final ArrayList<Absorption> absorptions = new ArrayList<>();
+	private final ArrayList<Phase> phases = new ArrayList<>();
 
-	private Context context;
+	private final Context context;
 
 	// combat log
 	private int combatLogId;
@@ -146,13 +205,13 @@ public class Parser {
 
 	// effects
 	private int effectId;
-	private final ArrayList<Effect> currentEffects = new ArrayList<Effect>();
+	private final ArrayList<Effect> currentEffects = new ArrayList<>();
 
 	private EffectKey effectKey;
 	private List<Effect> effectInstances;
-	private final HashMap<EffectKey, List<Effect>> runningEffects = new HashMap<EffectKey, List<Effect>>();
-	private final HashMap<EffectKey, Integer> stackedEffects = new HashMap<EffectKey, Integer>();
-	private final ArrayList<Long> activatedAbilities = new ArrayList<Long>();
+	private final HashMap<EffectKey, List<Effect>> runningEffects = new HashMap<>();
+	private final HashMap<EffectKey, Integer> stackedEffects = new HashMap<>();
+	private final ArrayList<Long> activatedAbilities = new ArrayList<>();
 
 	// absorptions
 	private final List<Effect> absorptionEffectsRunning = new ArrayList<>();
@@ -164,7 +223,6 @@ public class Parser {
 	// phases
 	private int phaseId;
 	private Phase currentBossPhase;
-	private String newBossPhaseName;
 	private Event firstDamageEvent, lastDamageEvent, lastCombatDropEvent;
 
 	// combat
@@ -181,7 +239,7 @@ public class Parser {
 	// to support mara/jugg and sent/guard distinction (used for player only)
 	private boolean isDualWield = false;
 
-	public class ActorState {
+	public static class ActorState {
 
 		// effective guard state (0, 1, 2)
 		public int guarded = 0;
@@ -195,7 +253,7 @@ public class Parser {
 		public Long hotLast = null;
 	}
 
-	private final HashMap<Actor, ActorState> actorStates = new HashMap<Actor, ActorState>();
+	private final HashMap<Actor, ActorState> actorStates = new HashMap<>();
 	private Entity pendingHealAbility = null;
 	private int hotCount = 0, hotTotal = 0, hotAverage = 0;
 
@@ -332,11 +390,6 @@ public class Parser {
 		}
 	}
 
-	/**
-	 *
-	 * @param line
-	 * @throws Exception
-	 */
 	public void parseLogLine(final String line) throws ParserException {
 
 		if (line == null) {
@@ -349,14 +402,45 @@ public class Parser {
 		}
 
 		// match the combat log line
-		Matcher baseMatcher = basePattern.matcher(line);
+		Matcher baseMatcher;
+		if (context.getVersion() == null) {
+			baseMatcher = v7ZonePattern.matcher(line);
+			if (baseMatcher.matches()) {
+				context.setVersion(baseMatcher.group("Version"));
+				setCharacterName(baseMatcher.group("SourcePlayerName"), new Event(0, combatLogId, getTimestamp(baseMatcher)));
+			} else {
+				context.setVersion("legacy");
+			}
+
+			if (context.getVersion().startsWith("v7")) {
+				basePattern = v7BasePattern;
+				combatPattern = v7CombatPattern;
+			} else {
+				basePattern = legacyBasePattern;
+				combatPattern = legacyCombatPattern;
+			}
+			if (baseMatcher.matches()) {
+				logger.info("Version detected as " + context.getVersion());
+				return;
+			}
+		}
+
+		baseMatcher = basePattern.matcher(line);
 
 		if (!baseMatcher.matches()) {
-			// fallback to 5.4 combat enter/exit
-			baseMatcher = combat54Pattern.matcher(line);
+			// fallback to combat enter/exit
+			baseMatcher = combatPattern.matcher(line);
 			if (!baseMatcher.matches()) {
+				if (v7ZonePattern.matcher(line).matches()) {
+					// zone switch, ignore for now
+					return;
+				}
 				if (gsfPattern.matcher(line).matches()) {
 					// GSF combat line, ignore for now
+					return;
+				}
+				if (v7IgnoredPattern.matcher(line).matches()) {
+					// intentionally ignored
 					return;
 				}
 				throw new ParserException("Invalid line");
@@ -376,28 +460,7 @@ public class Parser {
 				&& baseMatcher.group("SourcePlayerName") != null && !baseMatcher.group("SourcePlayerName").isEmpty()
 				&& baseMatcher.group("SourcePlayerName").equals(baseMatcher.group("TargetPlayerName"))) {
 			// found, set
-			combatLog.setCharacterName(baseMatcher.group("SourcePlayerName"));
-
-			if (logger.isDebugEnabled()) {
-				logger.debug("Player name detected as [" + combatLog.getCharacterName() + "] at " + e.getTs());
-			}
-
-			// fix if already existed in the past (should be super-rare)
-			if (context.getActors().containsKey(combatLog.getCharacterName())) {
-				context.getActors().put(combatLog.getCharacterName(), new Actor(combatLog.getCharacterName(), Actor.Type.SELF));
-				for (int i = 0; i < events.size(); i++) {
-					if (events.get(i).getSource().getName().equals(combatLog.getCharacterName())) {
-						events.get(i).setSource(context.getActors().get(combatLog.getCharacterName()));
-					}
-					if (events.get(i).getTarget().getName().equals(combatLog.getCharacterName())) {
-						events.get(i).setTarget(context.getActors().get(combatLog.getCharacterName()));
-					}
-				}
-
-				if (logger.isDebugEnabled()) {
-					logger.debug("Fixed player for previous events: " + events.size());
-				}
-			}
+			setCharacterName(baseMatcher.group("SourcePlayerName"), e);
 		}
 
 		if (baseMatcher.group("Value") != null && "836045448945489".equals(baseMatcher.group("EffectGuid"))) {
@@ -405,7 +468,7 @@ public class Parser {
 			Raid.Size s = null;
 			Raid.Mode m = null;
 			final String diff = baseMatcher.group("Value");
-			if (diff.contains("16 ") || diff.contains("16 ")) {
+			if (diff.contains("16 ") || diff.contains("16 ")) {
 				s = Size.Sixteen;
 			} else if (diff.contains("8 ") || diff.contains("8 ")) {
 				s = Size.Eight;
@@ -425,8 +488,8 @@ public class Parser {
 				}
 			}
 
-		} else if ("836045448945490".equals(baseMatcher.group("EffectGuid"))) {
-			// TBD
+//		} else if ("836045448945490".equals(baseMatcher.group("EffectGuid"))) {
+//			// TBD
 		}
 
 		// source
@@ -590,11 +653,6 @@ public class Parser {
 		events.add(e);
 	}
 
-	/**
-	 *
-	 * @param m
-	 * @return
-	 */
 	private Long getTimestamp(Matcher m) {
 
 		c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(m.group("HH")));
@@ -611,16 +669,6 @@ public class Parser {
 		return c.getTimeInMillis();
 	}
 
-	/**
-	 *
-	 * @param playerName
-	 * @param companionName
-	 * @param companionGuid
-	 * @param npcName
-	 * @param npcGuid
-	 * @param npcInstanceId
-	 * @return
-	 */
 	private Actor getActor(String playerName,
 			String companionName, String companionGuid,
 			String npcName, String npcGuid, String npcInstanceId) {
@@ -676,12 +724,6 @@ public class Parser {
 		throw new IllegalArgumentException("Invalid actor");
 	}
 
-	/**
-	 *
-	 * @param name
-	 * @param guid
-	 * @return
-	 */
 	private Entity getEntity(String name, String guid) {
 		return context.getEntity(name, Long.parseLong(guid));
 	}
@@ -724,11 +766,6 @@ public class Parser {
 		}
 	}
 
-	/**
-	 *
-	 * @param e
-	 * @throws Exception
-	 */
 	public void processEventCombat(final Event e) {
 
 		// resolve combat
@@ -815,6 +852,7 @@ public class Parser {
 
 		// resolve combat phase
 		if (combat != null && combat.getBoss() != null) {
+			final String newBossPhaseName;
 			if ((newBossPhaseName = combat.getBoss().getRaid().getNewPhaseName(e, combat,
 					currentBossPhase != null ? currentBossPhase.getName() : null)) != null) {
 				// new phase detected
@@ -862,9 +900,9 @@ public class Parser {
 				if (combat.getDiscipline() != null) {
 					// self
 					getActorState(e.getSource()).role = combat.getDiscipline().getRole();
-//					if (logger.isDebugEnabled()) {
-//						logger.debug("Discipline detected as [" + combat.getDiscipline() + "] at " + e.getTs());
-//					}
+					if (logger.isDebugEnabled()) {
+						logger.debug("Discipline detected as [" + combat.getDiscipline() + "] at " + e.getTs());
+					}
 					if (!CharacterRole.HEALER.equals(combat.getDiscipline().getRole())) {
 						// make sure its reset
 						clearHotsTracking();
@@ -883,8 +921,8 @@ public class Parser {
 			// close running phase - bounds explicitly set as <from, to>
 			closePhase(currentBossPhase, combat.getEventIdTo(), ( // extend after the combat boundary if there was a delayed damage event
 					lastDamageEvent != null && lastDamageEvent.getTimestamp() > combat.getTimeTo()
-					? lastDamageEvent.getTimestamp()
-					: combat.getTimeTo())
+							? lastDamageEvent.getTimestamp()
+							: combat.getTimeTo())
 					- combat.getTimeFrom());
 			currentBossPhase = null;
 		}
@@ -905,9 +943,9 @@ public class Parser {
 			return;
 		}
 		closePhase(new Phase(++phaseId, "Damage", Phase.Type.DAMAGE,
-				combat.getCombatId(),
-				eventFrom.getEventId(),
-				eventFrom.getTimestamp() - combat.getTimeFrom()),
+						combat.getCombatId(),
+						eventFrom.getEventId(),
+						eventFrom.getTimestamp() - combat.getTimeFrom()),
 				eventTo.getEventId(), eventTo.getTimestamp() - combat.getTimeFrom());
 	}
 
@@ -917,7 +955,7 @@ public class Parser {
 		phases.add(phase);
 	}
 
-	public void processEventHealing(final Event e) throws ParserException {
+	public void processEventHealing(final Event e) {
 
 		if (e.getThreat() != null) {
 			if (isAbilityFakeHeal(e)) {
@@ -1007,7 +1045,7 @@ public class Parser {
 			effectiveHeal = getEffectiveHeal(e.getThreat(),
 					false,
 					isGuarded,
-					isTank);
+					false);
 
 			if (effectiveHeal < (e.getValue() + HEALING_THREAT_TOLERANCE)) {
 				if (CharacterRole.HEALER.equals(actorStates.get(e.getSource()).role)) {
@@ -1050,7 +1088,7 @@ public class Parser {
 			effectiveHeal = getEffectiveHeal(e.getThreat(),
 					false,
 					false,
-					isTank);
+					false);
 			if (effectiveHeal <= (e.getValue() + HEALING_THREAT_TOLERANCE)) {
 				actorStates.get(e.getSource()).guarded = 0;
 				if (logger.isDebugEnabled()) {
@@ -1209,7 +1247,7 @@ public class Parser {
 
 				} else {
 					// brand new
-					runningEffects.put(effectKey, new ArrayList<Effect>());
+					runningEffects.put(effectKey, new ArrayList<>());
 					effectInstances = runningEffects.get(effectKey);
 				}
 
@@ -1324,7 +1362,7 @@ public class Parser {
 
 		if (!absorptionEffectsClosing.isEmpty()) {
 			// resolve already closed effects (in the order of their end)
-			for (Effect effect : absorptionEffectsClosing.toArray(new Effect[absorptionEffectsClosing.size()])) {
+			for (Effect effect : absorptionEffectsClosing.toArray(new Effect[0])) {
 
 				if (!absorptionEventsInside.isEmpty()) {
 					// link pending INSIDE events to this effects as it was the first one ending
@@ -1451,12 +1489,31 @@ public class Parser {
 		}
 	}
 
-	/**
-	 * Triggered if: - no discipline yet (brand new log) - outside of combat
-	 * (possible discipline swap) - confirmed healer discipline (current combat)
-	 *
-	 * @param e
-	 */
+	public void setCharacterName(final String name, final Event e) {
+		combatLog.setCharacterName(name);
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("Player name detected as [" + combatLog.getCharacterName() + "] at " + e.getTs());
+		}
+
+		// fix if already existed in the past (should be super-rare)
+		if (context.getActors().containsKey(combatLog.getCharacterName())) {
+			context.getActors().put(combatLog.getCharacterName(), new Actor(combatLog.getCharacterName(), Actor.Type.SELF));
+			for (final Event event : events) {
+				if (event.getSource().getName().equals(combatLog.getCharacterName())) {
+					event.setSource(context.getActors().get(combatLog.getCharacterName()));
+				}
+				if (event.getTarget().getName().equals(combatLog.getCharacterName())) {
+					event.setTarget(context.getActors().get(combatLog.getCharacterName()));
+				}
+			}
+
+			if (logger.isDebugEnabled()) {
+				logger.debug("Fixed player for previous events: " + events.size());
+			}
+		}
+	}
+
 	public void processEventHots(final Event e) {
 
 		final CharacterDiscipline currentDiscipline = (combat == null ? null : combat.getDiscipline());
@@ -1503,7 +1560,7 @@ public class Parser {
 		}
 	}
 
-	private void processEventHotsWithRefresh(final Event e, final long abilityGuid, final long refresherGuid, final int defaultDuration) {
+	private void processEventHotsWithRefresh(final Event e, final long abilityGuid, final long refresherGuid, @SuppressWarnings("SameParameterValue") final int defaultDuration) {
 		final ActorState targetState = getActorState(e.getTarget());
 
 		if (isAbilityEqual(e, abilityGuid)) {
@@ -1566,7 +1623,7 @@ public class Parser {
 		}
 	}
 
-	private void processEventHotsSimple(final Event e, final long abilityGuid, final Integer duration) {
+	private void processEventHotsSimple(final Event e, final long abilityGuid, @SuppressWarnings("SameParameterValue") final Integer duration) {
 		final ActorState targetState = getActorState(e.getTarget());
 
 		if (isAbilityEqual(e, abilityGuid)) {
@@ -1594,6 +1651,7 @@ public class Parser {
 				return;
 			}
 
+			//noinspection UnnecessaryReturnStatement
 			return;
 		}
 	}
@@ -1664,5 +1722,10 @@ public class Parser {
 				as.hotDuration = null;
 			}
 		}
+	}
+
+	// junit
+	Context getContext() {
+		return context;
 	}
 }

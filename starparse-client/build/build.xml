@@ -322,7 +322,8 @@
 			<fx:resources refid="appRes"/>
 
 			<fx:platform>
-				<fx:jvmarg value="-Xmx256m"/>
+				<fx:jvmarg value="-Xmx400m"/>
+				<fx:jvmarg value="-XX:+UseG1GC"/>
 			</fx:platform>
 		</fx:deploy>
 		

@@ -98,7 +98,14 @@ public enum RaidBossName {
 	Scyva("SCYVA"),
 
 	// WB 5.10
-	MutatedGeonosianQueen("Geonosian Queen");
+	MutatedGeonosianQueen("Geonosian Queen"),
+
+	// Dxun 6.0
+	Red("The Pack Leader"),
+	BreachCI004("Breach CI-004"),
+	TrandoshanSquad("Trandoshan Squad"),
+	TheHuntmaster("The Huntmaster"),
+	ApexVanguard("Apex Vanguard");
 
 	private final String fullName;
 

@@ -21,6 +21,8 @@ import com.ixale.starparse.domain.stats.CombatEventStats;
 @Service("context")
 public class Context {
 
+	private String version;
+
 	private final Map<Object, Actor> actors = new HashMap<>();
 	private final Map<Long, Entity> entities = new HashMap<>();
 	private final Map<Long, AttackType> attacks = new HashMap<>();
@@ -29,6 +31,14 @@ public class Context {
 	private Long tickFrom, tickTo;
 
 	final private LinkedHashMap<EffectKey, ArrayList<Long[]>> effects = new LinkedHashMap<>();
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(final String version) {
+		this.version = version;
+	}
 
 	public Actor getActor(final String name, final Type type, final Long guid, final Long instanceId) {
 		if (instanceId == null) {
@@ -122,7 +132,7 @@ public class Context {
 
 	public void addCombatEvent(final int combatId, final Event.Type type, final long timestamp) {
 		if (!combatEvents.containsKey(combatId)) {
-			combatEvents.put(combatId, new ArrayList<CombatEventStats>());
+			combatEvents.put(combatId, new ArrayList<>());
 		}
 		combatEvents.get(combatId).add(new CombatEventStats(type, timestamp));
 	}
@@ -148,5 +158,6 @@ public class Context {
 		tickFrom = tickTo = null;
 		effects.clear();
 		combatEvents.clear();
+		version = null;
 	}
 }

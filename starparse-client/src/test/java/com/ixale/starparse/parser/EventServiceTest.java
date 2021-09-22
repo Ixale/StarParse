@@ -102,7 +102,7 @@ public class EventServiceTest {
 		// verify combat 1
 		c = combats.get(1);
 		assertEquals("2014-01-27 01:10:34.526", sdf.format(c.getTimeFrom()));
-		assertEquals("Dread Master Calphayus (HM 8m)", c.getBoss().toString());
+		assertEquals("Dread Master Calphayus (SM 8m)", c.getBoss().toString());
 		assertEquals(442874, c.getTimeTo() - c.getTimeFrom());
 
 		stats = eventService.getCombatStats(c, null);
@@ -117,7 +117,7 @@ public class EventServiceTest {
 		assertEquals(317, stats.getDtps());
 		assertEquals(342032, stats.getHealTaken());
 		assertEquals(772, stats.getHpsTaken());
-		assertEquals(296, stats.getEhpsTaken());
+		assertEquals(295, stats.getEhpsTaken());
 		assertEquals(1143416, stats.getThreat());
 		assertEquals(2582, stats.getTps());
 		assertEquals(1143416, stats.getThreatPositive());
@@ -141,7 +141,7 @@ public class EventServiceTest {
 		assertEquals(627, stats.getDtps());
 		assertEquals(303582, stats.getHealTaken());
 		assertEquals(770, stats.getHpsTaken());
-		assertEquals(519, stats.getEhpsTaken());
+		assertEquals(509, stats.getEhpsTaken());
 		assertEquals(14938, stats.getThreat());
 		assertEquals(38, stats.getTps());
 		assertEquals(845628, stats.getThreatPositive());
@@ -156,7 +156,7 @@ public class EventServiceTest {
 		// verify combat 30
 		c = combats.get(30);
 		assertEquals("2014-01-27 02:51:10.836", sdf.format(c.getTimeFrom()));
-		assertEquals("Dread Master Brontes (HM 8m)", c.getBoss().toString());
+		assertEquals("Dread Master Brontes (SM 8m)", c.getBoss().toString());
 		assertEquals(444166, c.getTimeTo() - c.getTimeFrom());
 
 		stats = eventService.getCombatStats(c, null);
