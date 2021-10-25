@@ -6,3 +6,9 @@
 /starparse-client/starparse.log
 /starparse-client/starparse.xml
 /starparse-client/icons
+.idea/
+starparse-client/starparse-client.iml
+starparse-shared/starparse-shared.iml
+starparse.iml
+starparse.log
+starparse.xml
