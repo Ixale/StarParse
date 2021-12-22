@@ -14,6 +14,7 @@ import java.util.ResourceBundle;
 
 import javax.inject.Inject;
 
+import com.ixale.starparse.gui.popout.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,17 +34,6 @@ import com.ixale.starparse.gui.dialog.RaidNotesDialogPresenter;
 import com.ixale.starparse.gui.dialog.SettingsDialogPresenter;
 import com.ixale.starparse.gui.dialog.UploadParselyDialogPresenter;
 import com.ixale.starparse.gui.dialog.UploadParselyDialogPresenter.UploadParselyListener;
-import com.ixale.starparse.gui.popout.BasePopoutPresenter;
-import com.ixale.starparse.gui.popout.BaseRaidPopoutPresenter;
-import com.ixale.starparse.gui.popout.ChallengesPopoutPresenter;
-import com.ixale.starparse.gui.popout.HotsPopoutPresenter;
-import com.ixale.starparse.gui.popout.PersonalStatsPopoutPresenter;
-import com.ixale.starparse.gui.popout.RaidDpsPopoutPresenter;
-import com.ixale.starparse.gui.popout.RaidHpsPopoutPresenter;
-import com.ixale.starparse.gui.popout.RaidNotesPopoutPresenter;
-import com.ixale.starparse.gui.popout.RaidTpsPopoutPresenter;
-import com.ixale.starparse.gui.popout.TimersCenterPopoutPresenter;
-import com.ixale.starparse.gui.popout.TimersPopoutPresenter;
 import com.ixale.starparse.gui.timeline.Timeline;
 import com.ixale.starparse.gui.timeline.TimelineListener;
 import com.ixale.starparse.log.LogWatcher;
@@ -142,7 +132,7 @@ public class MainPresenter implements Initializable {
 	@FXML
 	private MenuItem raidGroupsSettingsMenu, timersSettingsMenu;
 	@FXML
-	private CheckMenuItem timersPopoutMenu, timersCenterPopoutMenu, personalStatsPopoutMenu, challengesPopoutMenu,
+	private CheckMenuItem timersPopoutMenu, timersCenterPopoutMenu, personalStatsPopoutMenu, damageTakenPopoutMenu, challengesPopoutMenu,
 		raidDpsPopoutMenu, raidHpsPopoutMenu, raidTpsPopoutMenu, hotsPopoutMenu, raidNotesPopoutMenu, lockOverlaysMenu;
 
 	@Inject
@@ -173,6 +163,8 @@ public class MainPresenter implements Initializable {
 	private TimersCenterPopoutPresenter timersCenterPopoutPresenter;
 	@Inject
 	private PersonalStatsPopoutPresenter personalStatsPopoutPresenter;
+	@Inject
+	private DamageTakenPopoutPresenter damageTakenPopoutPresenter;
 	@Inject
 	private ChallengesPopoutPresenter challengesPopoutPresenter;
 	@Inject
@@ -352,8 +344,9 @@ public class MainPresenter implements Initializable {
 			final double raidChallengesOpacity, final boolean raidChallengesBars,
 			final double timersOpacity, final boolean timersBars,
 			final double personalOpacity, final boolean personalBars, final String personalMode,
+			final double damageTakenOpacity, final boolean damageTakenBars, final String damageTakenMode,
 			final boolean timersCenter, final Double timersCenterX, final Double timersCenterY,
-			final Integer fractions,
+			final Integer fractions,  final Integer dtDelay1, final Integer dtDelay2,
 			final boolean popoutSolid) {
 			// popout settings
 			for (final StatsPopout sp: popouts) {
@@ -398,6 +391,13 @@ public class MainPresenter implements Initializable {
 						sp.presenter.setOpacity(personalOpacity);
 						sp.presenter.setBars(personalBars);
 						sp.presenter.setMode(personalMode);
+
+					}else if (sp.presenter instanceof DamageTakenPopoutPresenter) {
+						sp.presenter.setOpacity(damageTakenOpacity);
+						sp.presenter.setBars(damageTakenBars);
+						sp.presenter.setMode(damageTakenMode);
+						((DamageTakenPopoutPresenter) sp.presenter).setDtDelay1(dtDelay1);
+						((DamageTakenPopoutPresenter) sp.presenter).setDtDelay2(dtDelay2);
 
 					} else if (sp.presenter instanceof RaidNotesPopoutPresenter) {
 						sp.presenter.setOpacity(personalOpacity); // TODO
@@ -1201,6 +1201,7 @@ public class MainPresenter implements Initializable {
 		StatsPopout.add(timersPopoutPresenter, timersPopoutMenu, config);
 		StatsPopout.add(timersCenterPopoutPresenter, timersCenterPopoutMenu, config);
 		StatsPopout.add(personalStatsPopoutPresenter, personalStatsPopoutMenu, config);
+		StatsPopout.add(damageTakenPopoutPresenter, damageTakenPopoutMenu, config);
 		StatsPopout.add(challengesPopoutPresenter, challengesPopoutMenu, config);
 		StatsPopout.add(raidDpsPopoutPresenter, raidDpsPopoutMenu, config);
 		StatsPopout.add(raidHpsPopoutPresenter, raidHpsPopoutMenu, config);
@@ -1210,6 +1211,8 @@ public class MainPresenter implements Initializable {
 
 		timersPopoutPresenter.setTimersCenterControl(timersCenterPopoutPresenter);
 		timersPopoutPresenter.setFractions(config.getPopoutDefault().getTimersFractions());
+		damageTakenPopoutPresenter.setDtDelay1(config.getPopoutDefault().getDtDelay1());
+		damageTakenPopoutPresenter.setDtDelay2(config.getPopoutDefault().getDtDelay2());
 
 		raidPresenter.addRaidUpdateListener(raidDataListener);
 		raidPresenter.setRaidManager(raidManager);
@@ -1248,8 +1251,9 @@ public class MainPresenter implements Initializable {
 				final double raidChallengesOpacity, final boolean raidChallengesBars,
 				final double timersOpacity, final boolean timersBars,
 				final double personalOpacity, final boolean personalBars, final String personalMode,
+				final double damageTakenOpacity, final boolean damageTakenBars, final String damageTakenMode,
 				final boolean timersCenter, final Double timersCenterX, final Double timersCenterY,
-				final Integer fractions,
+				final Integer fractions, final Integer dtDelay1, final Integer dtDelay2,
 				final boolean popoutSolid) {
 				StatsPopout.setSettings(backgroundColor, textColor, damageColor, healingColor, threatColor, friendlyColor,
 					raidDamageOpacity, raidDamageBars,
@@ -1258,8 +1262,9 @@ public class MainPresenter implements Initializable {
 					raidChallengesOpacity, raidChallengesBars,
 					timersOpacity, timersBars,
 					personalOpacity, personalBars, personalMode,
+					damageTakenOpacity, damageTakenBars, damageTakenMode,
 					timersCenter, timersCenterX, timersCenterY,
-					fractions,
+					fractions, dtDelay1, dtDelay2,
 					popoutSolid);
 			}
 

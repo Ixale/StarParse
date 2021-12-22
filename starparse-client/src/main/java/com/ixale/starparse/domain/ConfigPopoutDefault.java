@@ -24,7 +24,7 @@ public class ConfigPopoutDefault implements Serializable {
 
 	private Boolean mouseTransparent, timersCenter, solid;
 
-	private Integer timersFractions;
+	private Integer timersFractions, dtDelay1, dtDelay2;
 
 	private Color get(String c, Color d) {
 		if (c == null) {
@@ -115,5 +115,21 @@ public class ConfigPopoutDefault implements Serializable {
 
 	public void setSolid(Boolean solid) {
 		this.solid = solid;
+	}
+
+	public Integer getDtDelay1() {
+		return dtDelay1;
+	}
+
+	public void setDtDelay1(Integer dtDelay1) {
+		this.dtDelay1 = dtDelay1;
+	}
+
+	public Integer getDtDelay2() {
+		return dtDelay2;
+	}
+
+	public void setDtDelay2(Integer dtDelay2) {
+		this.dtDelay2 = dtDelay2;
 	}
 }
