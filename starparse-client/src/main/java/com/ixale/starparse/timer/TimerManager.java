@@ -496,7 +496,7 @@ public class TimerManager {
 
 	public static class RaidPullTimer extends BaseTimer {
 		public RaidPullTimer() {
-			super("Pull", "Raid Pull", 10 * 1000, null, null, null, Scope.ANY);
+			super("Pull", "Raid Pull", 10 * 1000, null, null, Scope.ANY);
 			setColor(0);
 		}
 
@@ -513,7 +513,7 @@ public class TimerManager {
 
 	public static class RaidBreakTimer extends BaseTimer {
 		public RaidBreakTimer() {
-			super("Break", "Raid Break", 300 * 1000, null, null, null, Scope.ANY);
+			super("Break", "Raid Break", 300 * 1000, null, null, Scope.ANY);
 			setColor(1);
 		}
 	}
