@@ -81,27 +81,21 @@ public class Iokath extends Raid {
 
 	@Override
 	public String getNewPhaseName(final Event e, final Combat c, final String currentPhaseName) {
-
-		if (c.getBoss() == null) {
-			return null;
-		}
-
+		if (c.getBoss() == null) return null;
+		
 		switch (c.getBoss().getRaidBossName()) {
 			case Tyth:
 				return getNewPhaseNameForTyth(e, c, currentPhaseName);
+			case Nahut:
+				return getNewPhaseNameForNahut(e, c, currentPhaseName);
 			default:
 				return null;
 		}
 	}
 
 	private String getNewPhaseNameForTyth(final Event e, final Combat c, final String currentPhaseName) {
-
-		switch (c.getBoss().getMode()) {
-			case SM:
-				// only HM/NiM
-				return null;
-		}
-
+		if (c.getBoss().getMode() == Mode.SM) return null;	// only HM/NiM
+		
 		// dummy phases
 		if (currentPhaseName == null) {
 			phaseTimers.clear();
@@ -133,11 +127,29 @@ public class Iokath extends Raid {
 
 		return null;
 	}
+	
+	private String getNewPhaseNameForNahut(final Event e, final Combat c, final String currentPhaseName) {
+		
+		// ------------------ Timers ------------------
+		
+		if (Helpers.isAbilityEqual(e, 4137075708264448L)) {		// Energized Slice
+			TimerManager.stopTimer(NahutSliceTimer.class);
+			TimerManager.startTimer(NahutSliceTimer.class, e.getTimestamp());
+		}
+		
+		return null;
+	}
 
 	public static class TythInversionTimer extends BaseTimer {
-
 		public TythInversionTimer() {
 			super("Inversion", "Tyth Inversion", 37500);
+			setColor(0);
+		}
+	}
+	
+	public static class NahutSliceTimer extends BaseTimer {
+		public NahutSliceTimer() {
+			super("Slice", "Nahut Slice", 12000, 2);
 			setColor(0);
 		}
 	}
