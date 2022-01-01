@@ -17,7 +17,11 @@ public enum RaidChallengeName {
 	TanksShield("Shield"),
 	KephessWalker("Walker"),
 
-	StyrakManifestation("Manifestation");
+	StyrakManifestation("Manifestation"),
+	
+	UltimateHunter("Ultimate Hunter"),
+	Shelleigh("Shelleigh"),
+	Voltinator("Voltinator");
 
 	private String fullName;
 
