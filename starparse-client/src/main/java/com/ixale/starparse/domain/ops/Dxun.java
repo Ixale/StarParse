@@ -53,7 +53,9 @@ public class Dxun extends Raid {
 			APEX_VG_PHASE_DAMAGE = "Damage",
 			APEX_VG_PHASE_VOLTINATOR = "Voltinator";
 	
-	private static final ArrayList<Long> APEX_AG_FLAIR_BUILDS = new ArrayList<Long>();
+	private boolean isMasterMode = false;
+	private boolean gotFirstRocket = false;
+	private ArrayList<Long> APEX_AG_FLAIR_BUILDS = new ArrayList<Long>();
 	
 	public Dxun() {
 		super("The Nature of Progress");
@@ -105,8 +107,12 @@ public class Dxun extends Raid {
 		if (c.getBoss() == null) return null;
 		
 		if (Helpers.isTargetThisPlayer(e) && Helpers.isAbilityEqual(e, 4250840802000896L)) {		// Breach Flare (self)
-			TimerManager.stopTimer(BreachFlareTimer.class);
-			TimerManager.startTimer(BreachFlareTimer.class, e.getTimestamp());
+			if (!(phaseTimers.containsKey("Flare")) || (e.getTimestamp() - phaseTimers.get("Flare") > 4000)) {		// no flare yet or longer than 4 seconds ago
+				phaseTimers.put("Flare", e.getTimestamp());
+				
+				TimerManager.stopTimer(BreachFlareTimer.class);
+				TimerManager.startTimer(BreachFlareTimer.class, e.getTimestamp());
+			}
 		}
 		
 		switch (c.getBoss().getRaidBossName()) {
@@ -168,17 +174,17 @@ public class Dxun extends Raid {
 		// ------------------ Warden ------------------
 		
 		if (BREACH_PHASE_RUN.equals(currentPhaseName) && Helpers.isTargetOrSourceWithin(e, 4245686841245696L)) { 	// Warden
-			phaseTimers.put(BREACH_PHASE_WARDEN, e.getTimestamp() + 15000);	// add 15 sec warden action
+			phaseTimers.put(BREACH_PHASE_WARDEN, e.getTimestamp() + 15000);		// add 15 sec warden action
 			return BREACH_PHASE_WARDEN;
 		}
 		
 		if (BREACH_PHASE_WARDEN.equals(currentPhaseName)) {
 			if (Helpers.isTargetOrSourceWithin(e, 4245686841245696L)) { 	// Warden
-				phaseTimers.put(BREACH_PHASE_WARDEN, e.getTimestamp() + 15000);	// add 15 sec warden action
+				phaseTimers.put(BREACH_PHASE_WARDEN, e.getTimestamp() + 15000);		// add 15 sec warden action
 				return null;
 			}
 			
-			if (phaseTimers.get(BREACH_PHASE_WARDEN) <= e.getTimestamp()) {	// no warden action 
+			if (phaseTimers.get(BREACH_PHASE_WARDEN) <= e.getTimestamp()) {		// no warden action 
 				phaseTimers.remove(BREACH_PHASE_WARDEN);
 				return BREACH_PHASE_RUN;
 			}
@@ -187,17 +193,17 @@ public class Dxun extends Raid {
 		// ------------------ Reaper ------------------
 		
 		if (BREACH_PHASE_RUN.equals(currentPhaseName) && Helpers.isTargetOrSourceWithin(e, 4333471677808640L)) { 	// Reaper
-			phaseTimers.put(BREACH_PHASE_REAPER, e.getTimestamp() + 15000);	// add 15 sec warden action
+			phaseTimers.put(BREACH_PHASE_REAPER, e.getTimestamp() + 15000);		// add 15 sec warden action
 			return BREACH_PHASE_REAPER;
 		}
 		
 		if (BREACH_PHASE_REAPER.equals(currentPhaseName)) {
 			if (Helpers.isTargetOrSourceWithin(e, 4333471677808640L)) { 	// Reaper
-				phaseTimers.put(BREACH_PHASE_REAPER, e.getTimestamp() + 15000);	// add 15 sec reaper action
+				phaseTimers.put(BREACH_PHASE_REAPER, e.getTimestamp() + 15000);		// add 15 sec reaper action
 				return null;
 			}
 			
-			if (phaseTimers.get(BREACH_PHASE_REAPER) <= e.getTimestamp()) {	// no reaper action 
+			if (phaseTimers.get(BREACH_PHASE_REAPER) <= e.getTimestamp()) {		// no reaper action 
 				phaseTimers.remove(BREACH_PHASE_REAPER);
 				return BREACH_PHASE_RUN;
 			}
@@ -277,6 +283,7 @@ public class Dxun extends Raid {
 	}
 	
 	private String getNewPhaseNameForApex(final Event e, final Combat c, final String currentPhaseName) {
+		boolean isApply = Helpers.isActionApply(e);
 		
 		// ------------------ Timers ------------------
 		
@@ -301,18 +308,32 @@ public class Dxun extends Raid {
 			if (TimerManager.getTimer(ApexContagionTimer.class) == null) TimerManager.startTimer(ApexContagionTimer.class, e.getTimestamp());
 		}
 		
-		if (Helpers.isAbilityEqual(e, 4305240857772032L) || (Helpers.isActionApply(e) && Helpers.isEffectEqual(e, 4305240857772294L))) {		// Acid Blast (SM/VM Damage or MM Effect)
+		if (isApply && Helpers.isEffectEqual(e, 4305240857772294L)) {		// Acid Blast Effect (MM)
+			isMasterMode = true;
+			
+			TimerManager.stopTimer(ApexAcidBlastTimer.class);
+			TimerManager.startTimer(ApexAcidBlastTimer.class, e.getTimestamp());
+		} else if (!(isMasterMode) && Helpers.isAbilityEqual(e, 4305240857772032L)) {		// Acid Blast Damage (SM/VM)
 			TimerManager.stopTimer(ApexAcidBlastTimer.class);
 			TimerManager.startTimer(ApexAcidBlastTimer.class, e.getTimestamp());
 		}
 		
-		if (Helpers.isAbilityEqual(e, 4308741256118272L)) {		// Rockets
+		if (Helpers.isEffectEqual(e, 4308741256118272L)) {		// Rocket
+			if (gotFirstRocket) gotFirstRocket = false;		// already got rocket
+			else {
+				gotFirstRocket = true;
+				TimerManager.stopTimer(ApexRocketsTimer.class);
+				TimerManager.startTimer(ApexRocketsTimer.class, e.getTimestamp());
+			}
+		}
+		
+		if (isApply && Helpers.isEffectEqual(e, 4308741256118272L)) {		// Rocket Effect
 			TimerManager.stopTimer(ApexRocketsTimer.class);
 			TimerManager.startTimer(ApexRocketsTimer.class, e.getTimestamp());
 		}
 		
 		if (Helpers.isEffectEqual(e, 4308938824613888L)) {		// Mass Target Lock
-			if (Helpers.isActionApply(e)) TimerManager.startTimer(ApexMassTargetLockTimer.class, e.getTimestamp());		// start on effect gain
+			if (isApply) TimerManager.startTimer(ApexMassTargetLockTimer.class, e.getTimestamp());		// start on effect gain
 			else TimerManager.stopTimer(ApexMassTargetLockTimer.class);		// stop on effect lost
 		}
 			
@@ -320,6 +341,7 @@ public class Dxun extends Raid {
 		
 		if (currentPhaseName == null) {
 			phaseTimers.clear();
+			isMasterMode = false;
 			return APEX_VG_PHASE_OPENING;
 		}
 				
@@ -330,7 +352,6 @@ public class Dxun extends Raid {
 			
 			TimerManager.stopTimer(ApexRocketsTimer.class);
 			TimerManager.stopTimer(ApexAcidBlastTimer.class);
-			
 			return APEX_VG_PHASE_BATTERY;
 		}
 		
@@ -391,7 +412,7 @@ public class Dxun extends Raid {
 	
 	public static class ApexFlareBuildTimer extends BaseTimer {
 		public ApexFlareBuildTimer() {
-			super("Flare Build", "Apex Flare Build (on 3 flares)", 40500);
+			super("Flare Build", "Apex Flare Build (on 3 flares)", 45000);
 			setColor(1);
 		}
 	}
