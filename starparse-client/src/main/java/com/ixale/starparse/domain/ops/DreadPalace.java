@@ -270,6 +270,8 @@ public class DreadPalace extends Raid {
 		switch (c.getBoss().getRaidBossName()) {
 			case Bestia:
 				return getNewPhaseNameForBestia(e, c, currentPhaseName);
+			case Tyrans:
+				return getNewPhaseNameForTyrans(e, c, currentPhaseName);
 			case Raptus:
 				return getNewPhaseNameForRaptus(e, currentPhaseName);
 			case Council:
@@ -281,6 +283,22 @@ public class DreadPalace extends Raid {
 
 	private String getNewPhaseNameForBestia(final Event e, final Combat c, final String currentPhaseName) {
 
+		// ------------------ Timers ------------------
+		
+		if (Helpers.isAbilityEqual(e, 3294098182111232L)) {		// Swelling Despair
+			TimerManager.stopTimer(BestiaDespairTimer.class);
+			TimerManager.startTimer(BestiaDespairTimer.class, e.getTimestamp());
+		}
+		
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
+		
+		if (Helpers.isAbilityEqual(e, 3302993059381248L)) {		// Pulverize
+			TimerManager.stopTimer(BestiaPulverizeTimer.class);
+			TimerManager.startTimer(BestiaPulverizeTimer.class, e.getTimestamp());
+		}
+		
+		// ------------------ Phases ------------------
+				
 		if (BESTIA_PHASE_BESTIA.equals(currentPhaseName) && phaseTimers.get(BESTIA_PHASE_BURN) <= e.getTimestamp()) {
 
 			TimerManager.stopTimer(BestiaLastMonsterTimer.class); // should be done anyway
@@ -314,9 +332,29 @@ public class DreadPalace extends Raid {
 
 		return null;
 	}
+	
+	private String getNewPhaseNameForTyrans(final Event e, final Combat c, final String currentPhaseName) {
+		
+		// ------------------ Timers ------------------
+		
+		if (Helpers.isAbilityEqual(e, 3279619847356416L)) {		// Thundering Blast
+			TimerManager.stopTimer(TyransThunderingBlastTimer.class);
+			TimerManager.startTimer(TyransThunderingBlastTimer.class, e.getTimestamp());
+		}
+		
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
+		
+		if (TimerManager.getTimer(TyransThunderingBlastTimer.class) != null && Helpers.isActionApply(e) && Helpers.isEffectEqual(e, 3318510776221696L)) {		// Inferno
+			TimerManager.stopTimer(TyransThunderingBlastTimer.class);
+			TimerManager.startTimer(TyransThunderingBlastTimer.class, e.getTimestamp() - 6000);	// start new timer after inferno effect
+		}
+		
+		return null;
+	}
 
 	private String getNewPhaseNameForRaptus(final Event e, final String currentPhaseName) {
-
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
+		
 		if (!RAPTUS_PHASE_DPS.equals(currentPhaseName)
 			&& (Helpers.isTargetEqual(e, RAPTUS_CURSED_CAPTIVE_HM) || Helpers.isSourceEqual(e, RAPTUS_CURSED_CAPTIVE_HM)
 				|| Helpers.isTargetEqual(e, RAPTUS_CURSED_CAPTIVE_NiM) || Helpers.isSourceEqual(e, RAPTUS_CURSED_CAPTIVE_NiM))
@@ -358,6 +396,22 @@ public class DreadPalace extends Raid {
 
 	private String getNewPhaseNameForCouncil(final Event e, final Combat c, final String currentPhaseName) {
 
+		// ------------------ Timers ------------------
+		
+		if (Helpers.isAbilityEqual(e, 3301257892593664L)) {		// Bestia Kick
+			TimerManager.stopTimer(CouncilBestiaKickTimer.class);
+			TimerManager.startTimer(CouncilBestiaKickTimer.class, e.getTimestamp());
+		}
+		
+		if (Helpers.isAbilityEqual(e, 3317217991065600L)) {		// Calphayus Crystal Projection
+			TimerManager.stopTimer(CouncilCalphayusCrystalsTimer.class);
+			TimerManager.startTimer(CouncilCalphayusCrystalsTimer.class, e.getTimestamp());
+		}
+		
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
+		
+		// ------------------ Phases ------------------
+		
 		if (COUNCIL_PHASE_FOURTH.equals(currentPhaseName)) {
 			// nothing else
 			return null;
@@ -440,7 +494,28 @@ public class DreadPalace extends Raid {
 			super("Soft Enrage", "Bestia Soft Enrage", BESTIA_TIMER_SOFT_ENRAGE);
 		}
 	}
+	
+	public static class BestiaPulverizeTimer extends BaseTimer {
+		public BestiaPulverizeTimer() {
+			super("Pulverize", "Bestia Pulverize", 12000);
+			setColor(0);
+		}
+	}
+	
+	public static class BestiaDespairTimer extends BaseTimer {
+		public BestiaDespairTimer() {
+			super("Despair", "Bestia Despair", 25000);
+			setColor(0);
+		}
+	}
 
+	public static class TyransThunderingBlastTimer extends BaseTimer {
+		public TyransThunderingBlastTimer() {
+			super("Thundering Blast", "Tyrans Thundering Blast", 8000);
+			setColor(0);
+		}
+	}
+	
 	public static class CouncilTyransDmP1Timer extends BaseTimer {
 		public CouncilTyransDmP1Timer() {
 			this(29 * 1000);
@@ -479,6 +554,20 @@ public class DreadPalace extends Raid {
 		public CouncilBrontesTpTimer() {
 			super("Brontes TP", "Council Brontes TP", 12 * 1000 + 250, 20 * 1000 + 500);
 			setColor(1);
+		}
+	}
+	
+	public static class CouncilBestiaKickTimer extends BaseTimer {
+		public CouncilBestiaKickTimer() {
+			super("Kick", "Council Bestia Kick", 20000);
+			setColor(0);
+		}
+	}
+	
+	public static class CouncilCalphayusCrystalsTimer extends BaseTimer {
+		public CouncilCalphayusCrystalsTimer() {
+			super("Crystals", "Council Calphayus Crystals", 10000);
+			setColor(0);
 		}
 	}
 

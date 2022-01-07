@@ -15,10 +15,12 @@ import com.ixale.starparse.domain.ConfigPopoutDefault;
 import com.ixale.starparse.domain.ConfigTimer;
 import com.ixale.starparse.domain.ConfigTimer.Condition;
 import com.ixale.starparse.domain.ops.DreadPalace;
+import com.ixale.starparse.domain.ops.Dxun;
 import com.ixale.starparse.domain.ops.Iokath;
 import com.ixale.starparse.domain.ops.Ravagers;
 import com.ixale.starparse.domain.ops.ScumAndVillainy;
 import com.ixale.starparse.domain.ops.TempleOfSacrifice;
+import com.ixale.starparse.domain.ops.TerrorFromBeyond;
 import com.ixale.starparse.domain.ops.WorldBoss;
 import com.ixale.starparse.gui.Config;
 import com.ixale.starparse.time.TimeUtils;
@@ -359,22 +361,36 @@ public class TimerManager {
 		final Map<BaseTimer, ConfigTimer> savTimers = new HashMap<>();
 		savTimers.put(new ScumAndVillainy.StyrakKnockbackTimer(), null);
 		systemTimers.put("Scum & Villainy", savTimers);
+		
+		// TFB
+		final Map<BaseTimer, ConfigTimer> tfbTimers = new HashMap<>();
+		tfbTimers.put(new TerrorFromBeyond.TFBSlamTimer(), null);
+		tfbTimers.put(new TerrorFromBeyond.TFBFirstSlamTimer(), null);
+		systemTimers.put("Terror From Beyond", tfbTimers);
+		
 		// DP
 		final Map<BaseTimer, ConfigTimer> dpTimers = new HashMap<>();
 		dpTimers.put(new DreadPalace.BestiaBossActivatesTimer(), null);
 		dpTimers.put(new DreadPalace.BestiaLastMonsterTimer(), null);
 		dpTimers.put(new DreadPalace.BestiaSoftEnrageTimer(), null);
+		dpTimers.put(new DreadPalace.BestiaPulverizeTimer(), null);
+		dpTimers.put(new DreadPalace.BestiaDespairTimer(), null);
+		dpTimers.put(new DreadPalace.TyransThunderingBlastTimer(), null);
 		dpTimers.put(new DreadPalace.CouncilTyransDmP1Timer(), null);
 		dpTimers.put(new DreadPalace.CouncilTyransTpP1Timer(), null);
 		dpTimers.put(new DreadPalace.CouncilBrontesTpTimer(), null);
 		dpTimers.put(new DreadPalace.CouncilTyransDmP3Timer(), null);
+		dpTimers.put(new DreadPalace.CouncilBestiaKickTimer(), null);
+		dpTimers.put(new DreadPalace.CouncilCalphayusCrystalsTimer(), null);
 		systemTimers.put("Dread Palace", dpTimers);
+		
 		// RAV
 		final Map<BaseTimer, ConfigTimer> ravTimers = new HashMap<>();
 		ravTimers.put(new Ravagers.TorqueRageTimer(), null);
 		ravTimers.put(new Ravagers.TorqueEnrageTimer(), null);
 		ravTimers.put(new Ravagers.RuugarEnrageTimer(), null);
 		systemTimers.put("Ravagers", ravTimers);
+		
 		// TOS
 		final Map<BaseTimer, ConfigTimer> tosTimers = new HashMap<>();
 		tosTimers.put(new TempleOfSacrifice.SwordSquadronShieldTimer(), null);
@@ -386,13 +402,27 @@ public class TimerManager {
 		tosTimers.put(new TempleOfSacrifice.RevanPullTimer(), null);
 		tosTimers.put(new TempleOfSacrifice.RevanPushTimer(), null);
 		systemTimers.put("Temple of Sacrifice", tosTimers);
+		
 		// GOTM
 		final Map<BaseTimer, ConfigTimer> gotmTimers = new HashMap<>();
 		gotmTimers.put(new Iokath.TythInversionTimer(), null);
+		gotmTimers.put(new Iokath.NahutSliceTimer(), null);
 		systemTimers.put("Gods of the Machine", gotmTimers);
-
+		
+		// DXUN
+		final Map<BaseTimer, ConfigTimer> dxunTimers = new HashMap<>();
+		dxunTimers.put(new Dxun.BreachFlareTimer(), null);
+		dxunTimers.put(new Dxun.ApexFlareTimer(), null);
+		dxunTimers.put(new Dxun.ApexFlareBuildTimer(), null);
+		dxunTimers.put(new Dxun.ApexContagionTimer(), null);
+		dxunTimers.put(new Dxun.ApexAcidBlastTimer(), null);
+		dxunTimers.put(new Dxun.ApexRocketsTimer(), null);
+		dxunTimers.put(new Dxun.ApexMassTargetLockTimer(), null);
+		systemTimers.put("The Nature of Progress", dxunTimers);
+				
 		// WB
 		final Map<BaseTimer, ConfigTimer> wbTimers = new HashMap<>();
+		wbTimers.put(new WorldBoss.MonolithBiteWoundsTimer(), null);
 		wbTimers.put(new WorldBoss.QueenRoyalSummonsGuardsTimer(), null);
 		wbTimers.put(new WorldBoss.QueenRoyalSummonsCausticTimer(), null);
 		systemTimers.put("World Bosses", wbTimers);

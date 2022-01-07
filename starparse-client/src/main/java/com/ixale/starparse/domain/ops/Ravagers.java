@@ -11,6 +11,7 @@ import com.ixale.starparse.domain.Raid;
 import com.ixale.starparse.domain.RaidBoss;
 import com.ixale.starparse.domain.RaidBossName;
 import com.ixale.starparse.domain.RaidChallengeName;
+import com.ixale.starparse.parser.Helpers;
 import com.ixale.starparse.timer.BaseTimer;
 import com.ixale.starparse.timer.TimerManager;
 
@@ -104,6 +105,8 @@ public class Ravagers extends Raid {
 		if (c.getBoss() == null) {
 			return null;
 		}
+		
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
 
 		switch (c.getBoss().getRaidBossName()) {
 			case Torque:

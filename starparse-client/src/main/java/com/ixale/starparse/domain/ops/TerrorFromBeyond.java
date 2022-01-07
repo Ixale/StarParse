@@ -7,8 +7,12 @@ import com.ixale.starparse.domain.RaidBoss;
 import com.ixale.starparse.domain.RaidBoss.BossUpgradeCallback;
 import com.ixale.starparse.domain.RaidBossName;
 import com.ixale.starparse.parser.Helpers;
+import com.ixale.starparse.timer.BaseTimer;
+import com.ixale.starparse.timer.TimerManager;
 
 public class TerrorFromBeyond extends Raid {
+	private static final String TFB_PHASE_TENTACLES = "Tentacles",
+			TFB_PHASE_BEYOND = "Beyond";
 
 	public TerrorFromBeyond() {
 		super("Terror From Beyond");
@@ -96,16 +100,57 @@ public class TerrorFromBeyond extends Raid {
 	}
 
 	private String getNewPhaseNameForTFB(final Event e, final String currentPhaseName) {
-
-		if (!"Beyond".equals(currentPhaseName) && (Helpers.isAbilityEqual(e, 3009973210578944L))) {
-			// Pulled into the Beyond
-			return "Beyond";
+		
+		// ------------------ Timers ------------------
+		
+		if (Helpers.isEffectEqual(e, 3025864589574402L) || Helpers.isEffectEqual(e, 3025873179508994L)) {		// Near Tentacle (8m / 16m)
+			if (!phaseTimers.containsKey("FirstSlam") || e.getTimestamp() - phaseTimers.get("FirstSlam") > 12000) {	// no nearby yet or longer than 12 seconds ago
+				phaseTimers.put("FirstSlam", e.getTimestamp());
+				
+				TimerManager.stopTimer(TFBFirstSlamTimer.class);
+				TimerManager.startTimer(TFBFirstSlamTimer.class, e.getTimestamp());
+			}
 		}
+		
+		if (Helpers.isAbilityEqual(e, 3025877474476032L) || Helpers.isAbilityEqual(e, 3025886064410624L)) {		// Tentacle Slam (8m / 16m)
+			if (!phaseTimers.containsKey("Slam") || e.getTimestamp() - phaseTimers.get("Slam") > 8000) {	// no slam yet or longer than 8 seconds ago
+				phaseTimers.put("Slam", e.getTimestamp());
+					
+				TimerManager.stopTimer(TFBSlamTimer.class);
+				TimerManager.startTimer(TFBSlamTimer.class, e.getTimestamp());
+			}
+		}
+			
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
+		
+		// ------------------ Tentacles ------------------
 
 		if (currentPhaseName == null) {
-			return "Tentacles";
+			return TFB_PHASE_TENTACLES;
 		}
-
+				
+		// ------------------ Beyond ------------------
+		
+		if (!TFB_PHASE_BEYOND.equals(currentPhaseName) && (Helpers.isAbilityEqual(e, 3009973210578944L))) {
+			// Pulled into the Beyond
+			TimerManager.stopTimer(TFBSlamTimer.class);
+			return TFB_PHASE_BEYOND;
+		}
+		
 		return null;
+	}
+	
+	public static class TFBSlamTimer extends BaseTimer {
+		public TFBSlamTimer() {
+			super("Slam", "Terror Slam", 10000);
+			setColor(0);
+		}
+	}
+	
+	public static class TFBFirstSlamTimer extends BaseTimer {
+		public TFBFirstSlamTimer() {
+			super("Slam", "Terror First Slam (trigger on nearby)", 14000);
+			setColor(0);
+		}
 	}
 }
