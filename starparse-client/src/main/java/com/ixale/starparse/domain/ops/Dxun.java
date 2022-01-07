@@ -10,6 +10,7 @@ import com.ixale.starparse.domain.Raid;
 import com.ixale.starparse.domain.RaidBoss;
 import com.ixale.starparse.domain.RaidBossName;
 import com.ixale.starparse.domain.RaidChallengeName;
+import com.ixale.starparse.domain.RaidBoss.BossUpgradeCallback;
 import com.ixale.starparse.parser.Helpers;
 import com.ixale.starparse.timer.BaseTimer;
 import com.ixale.starparse.timer.TimerManager;
@@ -53,8 +54,6 @@ public class Dxun extends Raid {
 			APEX_VG_PHASE_DAMAGE = "Damage",
 			APEX_VG_PHASE_VOLTINATOR = "Voltinator";
 	
-	private boolean isMasterMode = false;
-	private boolean gotFirstRocket = false;
 	private ArrayList<Long> APEX_AG_FLAIR_BUILDS = new ArrayList<Long>();
 	
 	public Dxun() {
@@ -97,7 +96,22 @@ public class Dxun extends Raid {
 				new long[]{APEX_VG_SM_8M_16M},		// SM 16m
 				new long[]{APEX_VG_HM_8M_16M}, 		// HM 8m
 				new long[]{APEX_VG_HM_8M_16M}, 		// HM 16m
-				null);
+				new BossUpgradeCallback() {
+					
+					@Override
+					public RaidBoss upgradeByAbility(long guid, long effectGuid, Integer value, RaidBoss nimBoss) {
+						if (effectGuid == 4305240857772294L) {
+							// Acid Blast Effect (only nim)
+							return nimBoss;
+						}
+						return null;
+					}
+					
+					@Override
+					public RaidBoss upgradeByNpc(long guid, RaidBoss boss) {
+						return null;
+					}
+				});
 		
 		addChallenge(RaidBossName.ApexVanguard, new ApexVoltinatorChallenge());
 	}
@@ -132,6 +146,7 @@ public class Dxun extends Raid {
 	}
 	
 	private String getNewPhaseNameForRed(final Event e, final String currentPhaseName) {
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
 		
 		// ------------------ Red ------------------
 		
@@ -163,6 +178,7 @@ public class Dxun extends Raid {
 	}
 	
 	private String getNewPhaseNameForBreach(final Event e, final String currentPhaseName) {
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
 		
 		// ------------------ Run ------------------
 		
@@ -217,6 +233,7 @@ public class Dxun extends Raid {
 	}
 	
 	private String getNewPhaseNameForTrandoshanSquad(final Event e, final Combat c, final String currentPhaseName) {
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
 		
 		// ------------------ Phase One ------------------
 		
@@ -235,6 +252,7 @@ public class Dxun extends Raid {
 	}
 	
 	private String getNewPhaseNameForHuntmaster(final Event e, final String currentPhaseName) {
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
 		
 		// ------------------ Opening ------------------
 		
@@ -293,7 +311,7 @@ public class Dxun extends Raid {
 		}
 		
 		if (Helpers.isAbilityEqual(e, 4382760722497536L)) {		// Insert/Extract Battery
-			if (APEX_AG_FLAIR_BUILDS.size() == 3 && APEX_AG_FLAIR_BUILDS.get(0) - APEX_AG_FLAIR_BUILDS.get(1) <= 2000) {		// two uses, first two uses with max 2 sec delay
+			if (APEX_AG_FLAIR_BUILDS.size() == 3 && APEX_AG_FLAIR_BUILDS.get(0) - APEX_AG_FLAIR_BUILDS.get(1) <= 2000) {		// three uses, first two uses with max 2 sec delay
 				TimerManager.startTimer(ApexFlareBuildTimer.class, APEX_AG_FLAIR_BUILDS.get(0));
 			}
 			
@@ -304,24 +322,24 @@ public class Dxun extends Raid {
 			APEX_AG_FLAIR_BUILDS.add(e.getTimestamp());
 		}
 		
-		if (Helpers.isEffectEqual(e, 4352726016196922L)) {		// Contagion
-			if (TimerManager.getTimer(ApexContagionTimer.class) == null) TimerManager.startTimer(ApexContagionTimer.class, e.getTimestamp());
-		}
-		
-		if (isApply && Helpers.isEffectEqual(e, 4305240857772294L)) {		// Acid Blast Effect (MM)
-			isMasterMode = true;
-			
-			TimerManager.stopTimer(ApexAcidBlastTimer.class);
-			TimerManager.startTimer(ApexAcidBlastTimer.class, e.getTimestamp());
-		} else if (!(isMasterMode) && Helpers.isAbilityEqual(e, 4305240857772032L)) {		// Acid Blast Damage (SM/VM)
-			TimerManager.stopTimer(ApexAcidBlastTimer.class);
-			TimerManager.startTimer(ApexAcidBlastTimer.class, e.getTimestamp());
+		if (!phaseTimers.containsKey("Acid") || e.getTimestamp() - phaseTimers.get("Acid") > 26000) {		// no acid blast yet or longer than 26 seconds ago
+			if (isApply && Helpers.isEffectEqual(e, 4305240857772294L)) {		// Acid Blast Effect (MM)
+				phaseTimers.put("Acid", e.getTimestamp());
+				
+				TimerManager.stopTimer(ApexAcidBlastTimer.class);
+				TimerManager.startTimer(ApexAcidBlastTimer.class, e.getTimestamp());
+			} else if (c.getBoss().getMode() != Mode.NiM && Helpers.isAbilityEqual(e, 4305240857772032L)) {		// Acid Blast Damage (SM/VM)
+				phaseTimers.put("Acid", e.getTimestamp());
+				
+				TimerManager.stopTimer(ApexAcidBlastTimer.class);
+				TimerManager.startTimer(ApexAcidBlastTimer.class, e.getTimestamp());
+			}
 		}
 		
 		if (Helpers.isEffectEqual(e, 4308741256118272L)) {		// Rocket
-			if (gotFirstRocket) gotFirstRocket = false;		// already got rocket
-			else {
-				gotFirstRocket = true;
+			if (!phaseTimers.containsKey("Rockets") || e.getTimestamp() - phaseTimers.get("Rockets") > 4000) {		// no rocket yet or longer than 4 seconds ago
+				phaseTimers.put("Rockets", e.getTimestamp());
+				
 				TimerManager.stopTimer(ApexRocketsTimer.class);
 				TimerManager.startTimer(ApexRocketsTimer.class, e.getTimestamp());
 			}
@@ -330,6 +348,12 @@ public class Dxun extends Raid {
 		if (isApply && Helpers.isEffectEqual(e, 4308741256118272L)) {		// Rocket Effect
 			TimerManager.stopTimer(ApexRocketsTimer.class);
 			TimerManager.startTimer(ApexRocketsTimer.class, e.getTimestamp());
+		}
+		
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
+		
+		if (Helpers.isEffectEqual(e, 4352726016196922L)) {		// Contagion
+			if (TimerManager.getTimer(ApexContagionTimer.class) == null) TimerManager.startTimer(ApexContagionTimer.class, e.getTimestamp());
 		}
 		
 		if (Helpers.isEffectEqual(e, 4308938824613888L)) {		// Mass Target Lock
@@ -341,7 +365,6 @@ public class Dxun extends Raid {
 		
 		if (currentPhaseName == null) {
 			phaseTimers.clear();
-			isMasterMode = false;
 			return APEX_VG_PHASE_OPENING;
 		}
 				
@@ -426,14 +449,14 @@ public class Dxun extends Raid {
 	
 	public static class ApexAcidBlastTimer extends BaseTimer {
 		public ApexAcidBlastTimer() {
-			super("Acid", "Apex Acid Blast", 30000, 2);
+			super("Acid", "Apex Acid Blast", 30000);
 			setColor(2);
 		}
 	}
 	
 	public static class ApexRocketsTimer extends BaseTimer {
 		public ApexRocketsTimer() {
-			super("Rockets", "Apex Rockets", 24000, 2);
+			super("Rockets", "Apex Rockets", 24000);
 			setColor(0);
 		}
 	}

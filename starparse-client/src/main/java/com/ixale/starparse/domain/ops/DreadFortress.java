@@ -146,6 +146,9 @@ public class DreadFortress extends Raid {
 		if (c.getBoss() == null) {
 			return null;
 		}
+		
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
+		
 		switch (c.getBoss().getRaidBossName()) {
 			case Brontes:
 				return getNewPhaseNameForBrontes(e, currentPhaseName);
@@ -155,7 +158,7 @@ public class DreadFortress extends Raid {
 	}
 
 	private String getNewPhaseNameForBrontes(final Event e, final String currentPhaseName) {
-
+		
 		if (!PHASE_BRONTES_BURN.equals(currentPhaseName)) {
 			if (PHASE_BRONTES_FINGERS.equals(currentPhaseName)
 				&& Helpers.isEffectDamage(e)

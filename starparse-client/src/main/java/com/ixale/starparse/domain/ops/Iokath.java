@@ -94,6 +94,7 @@ public class Iokath extends Raid {
 	}
 
 	private String getNewPhaseNameForTyth(final Event e, final Combat c, final String currentPhaseName) {
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
 		if (c.getBoss().getMode() == Mode.SM) return null;	// only HM/NiM
 		
 		// dummy phases
@@ -149,7 +150,7 @@ public class Iokath extends Raid {
 	
 	public static class NahutSliceTimer extends BaseTimer {
 		public NahutSliceTimer() {
-			super("Slice", "Nahut Slice", 12000, 2);
+			super("Slice", "Nahut Slice", 12000);
 			setColor(0);
 		}
 	}

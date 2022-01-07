@@ -95,6 +95,8 @@ public class WorldBoss extends Raid {
 	}
 
 	private String getNewPhaseNameForQueen(final Event e, final Combat c, final String currentPhaseName) {
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
+		
 		if (currentPhaseName == null) {
 			phaseTimers.clear();
 			phaseTimers.put(QUEEN_PHASE_GUARDS_1, c.getTimeFrom() + 2500 + 48000 + 3000);

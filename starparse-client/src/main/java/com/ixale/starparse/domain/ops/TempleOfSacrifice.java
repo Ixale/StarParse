@@ -13,6 +13,7 @@ import com.ixale.starparse.domain.Raid;
 import com.ixale.starparse.domain.RaidBoss;
 import com.ixale.starparse.domain.RaidBossName;
 import com.ixale.starparse.domain.RaidChallengeName;
+import com.ixale.starparse.parser.Helpers;
 import com.ixale.starparse.timer.BaseTimer;
 import com.ixale.starparse.timer.TimerManager;
 
@@ -189,6 +190,8 @@ public class TempleOfSacrifice extends Raid {
 		if (c.getBoss() == null) {
 			return null;
 		}
+		
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
 
 		switch (c.getBoss().getRaidBossName()) {
 			case SwordSquadron:
@@ -203,7 +206,7 @@ public class TempleOfSacrifice extends Raid {
 	}
 
 	private String getNewPhaseNameForSwordSquadron(final Event e, final Combat c, final String currentPhaseName) {
-
+		
 		for (int i = 1; i <= 10; i++) {
 			if (((i == 1 && SQUADRON_PHASE_OPENING.equals(currentPhaseName))
 				|| (SQUADRON_PHASE_SHIELD + " " + (i - 1)).equals(currentPhaseName)) && phaseTimers.get(SQUADRON_PHASE_SHIELD + i) <= e.getTimestamp()) {

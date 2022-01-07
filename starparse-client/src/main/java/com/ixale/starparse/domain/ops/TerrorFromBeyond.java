@@ -104,13 +104,24 @@ public class TerrorFromBeyond extends Raid {
 		// ------------------ Timers ------------------
 		
 		if (Helpers.isEffectEqual(e, 3025864589574402L) || Helpers.isEffectEqual(e, 3025873179508994L)) {		// Near Tentacle (8m / 16m)
-			TimerManager.startTimer(TFBFirstSlamTimer.class, e.getTimestamp());
+			if (!phaseTimers.containsKey("FirstSlam") || e.getTimestamp() - phaseTimers.get("FirstSlam") > 12000) {	// no nearby yet or longer than 12 seconds ago
+				phaseTimers.put("FirstSlam", e.getTimestamp());
+				
+				TimerManager.stopTimer(TFBFirstSlamTimer.class);
+				TimerManager.startTimer(TFBFirstSlamTimer.class, e.getTimestamp());
+			}
 		}
 		
 		if (Helpers.isAbilityEqual(e, 3025877474476032L) || Helpers.isAbilityEqual(e, 3025886064410624L)) {		// Tentacle Slam (8m / 16m)
-			TimerManager.stopTimer(TFBSlamTimer.class);
-			TimerManager.startTimer(TFBSlamTimer.class, e.getTimestamp());
+			if (!phaseTimers.containsKey("Slam") || e.getTimestamp() - phaseTimers.get("Slam") > 8000) {	// no slam yet or longer than 8 seconds ago
+				phaseTimers.put("Slam", e.getTimestamp());
+					
+				TimerManager.stopTimer(TFBSlamTimer.class);
+				TimerManager.startTimer(TFBSlamTimer.class, e.getTimestamp());
+			}
 		}
+			
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
 		
 		// ------------------ Tentacles ------------------
 

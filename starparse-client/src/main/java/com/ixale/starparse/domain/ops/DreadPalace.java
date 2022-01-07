@@ -285,14 +285,16 @@ public class DreadPalace extends Raid {
 
 		// ------------------ Timers ------------------
 		
-		if (Helpers.isAbilityEqual(e, 3302993059381248L)) {		// Pulverize
-			TimerManager.stopTimer(BestiaPulverizeTimer.class);
-			TimerManager.startTimer(BestiaPulverizeTimer.class, e.getTimestamp());
-		}
-		
 		if (Helpers.isAbilityEqual(e, 3294098182111232L)) {		// Swelling Despair
 			TimerManager.stopTimer(BestiaDespairTimer.class);
 			TimerManager.startTimer(BestiaDespairTimer.class, e.getTimestamp());
+		}
+		
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
+		
+		if (Helpers.isAbilityEqual(e, 3302993059381248L)) {		// Pulverize
+			TimerManager.stopTimer(BestiaPulverizeTimer.class);
+			TimerManager.startTimer(BestiaPulverizeTimer.class, e.getTimestamp());
 		}
 		
 		// ------------------ Phases ------------------
@@ -340,6 +342,8 @@ public class DreadPalace extends Raid {
 			TimerManager.startTimer(TyransThunderingBlastTimer.class, e.getTimestamp());
 		}
 		
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
+		
 		if (TimerManager.getTimer(TyransThunderingBlastTimer.class) != null && Helpers.isActionApply(e) && Helpers.isEffectEqual(e, 3318510776221696L)) {		// Inferno
 			TimerManager.stopTimer(TyransThunderingBlastTimer.class);
 			TimerManager.startTimer(TyransThunderingBlastTimer.class, e.getTimestamp() - 6000);	// start new timer after inferno effect
@@ -349,7 +353,8 @@ public class DreadPalace extends Raid {
 	}
 
 	private String getNewPhaseNameForRaptus(final Event e, final String currentPhaseName) {
-
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
+		
 		if (!RAPTUS_PHASE_DPS.equals(currentPhaseName)
 			&& (Helpers.isTargetEqual(e, RAPTUS_CURSED_CAPTIVE_HM) || Helpers.isSourceEqual(e, RAPTUS_CURSED_CAPTIVE_HM)
 				|| Helpers.isTargetEqual(e, RAPTUS_CURSED_CAPTIVE_NiM) || Helpers.isSourceEqual(e, RAPTUS_CURSED_CAPTIVE_NiM))
@@ -402,6 +407,8 @@ public class DreadPalace extends Raid {
 			TimerManager.stopTimer(CouncilCalphayusCrystalsTimer.class);
 			TimerManager.startTimer(CouncilCalphayusCrystalsTimer.class, e.getTimestamp());
 		}
+		
+		if (Helpers.isTargetOtherPlayer(e)) return null;	// returns if target is other player
 		
 		// ------------------ Phases ------------------
 		
@@ -504,7 +511,7 @@ public class DreadPalace extends Raid {
 
 	public static class TyransThunderingBlastTimer extends BaseTimer {
 		public TyransThunderingBlastTimer() {
-			super("Thundering Blast", "Tyrans Thundering Blast", 8000, 4);
+			super("Thundering Blast", "Tyrans Thundering Blast", 8000);
 			setColor(0);
 		}
 	}
