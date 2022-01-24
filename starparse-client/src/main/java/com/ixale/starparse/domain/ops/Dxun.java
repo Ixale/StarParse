@@ -2,6 +2,7 @@ package com.ixale.starparse.domain.ops;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import com.ixale.starparse.domain.Combat;
 import com.ixale.starparse.domain.CombatChallenge;
@@ -54,7 +55,7 @@ public class Dxun extends Raid {
 			APEX_VG_PHASE_DAMAGE = "Damage",
 			APEX_VG_PHASE_VOLTINATOR = "Voltinator";
 	
-	private ArrayList<Long> APEX_AG_FLAIR_BUILDS = new ArrayList<Long>();
+	private HashMap<String, ArrayList<Long>> flareBuilds = new HashMap<String, ArrayList<Long>>();
 	
 	public Dxun() {
 		super("The Nature of Progress");
@@ -301,6 +302,7 @@ public class Dxun extends Raid {
 	}
 	
 	private String getNewPhaseNameForApex(final Event e, final Combat c, final String currentPhaseName) {
+		String sourceName = e.getSource().getName();
 		boolean isApply = Helpers.isActionApply(e);
 		
 		// ------------------ Timers ------------------
@@ -311,15 +313,21 @@ public class Dxun extends Raid {
 		}
 		
 		if (Helpers.isAbilityEqual(e, 4382760722497536L)) {		// Insert/Extract Battery
-			if (APEX_AG_FLAIR_BUILDS.size() == 3 && APEX_AG_FLAIR_BUILDS.get(0) - APEX_AG_FLAIR_BUILDS.get(1) <= 2000) {		// three uses, first two uses with max 2 sec delay
-				TimerManager.startTimer(ApexFlareBuildTimer.class, APEX_AG_FLAIR_BUILDS.get(0));
+			if (!(flareBuilds.containsKey(sourceName))) flareBuilds.put(sourceName, new ArrayList<Long>());
+			
+			ArrayList<Long> flares = flareBuilds.get(sourceName);
+			
+			if (flares.size() == 3 && flares.get(0) - flares.get(1) <= 2000 && flares.get(1) - flares.get(2) <= 2000) {		// three uses from same person, uses with max 2 sec delay
+				TimerManager.startTimer(ApexFlareBuildTimer.class, flares.get(0));
 			}
 			
-			APEX_AG_FLAIR_BUILDS.clear();
+			flares.clear();
 		}
 		
 		if (Helpers.isAbilityEqual(e, 4326784413728768L)) {		// Use Battery
-			APEX_AG_FLAIR_BUILDS.add(e.getTimestamp());
+			if (!(flareBuilds.containsKey(sourceName))) flareBuilds.put(sourceName, new ArrayList<Long>());
+			
+			flareBuilds.get(sourceName).add(e.getTimestamp());
 		}
 		
 		if (!phaseTimers.containsKey("Acid") || e.getTimestamp() - phaseTimers.get("Acid") > 26000) {		// no acid blast yet or longer than 26 seconds ago
