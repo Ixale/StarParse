@@ -1,32 +1,33 @@
 .popout {
-	-fx-background-color: transparent; /* #00000033; */
-	-fx-font: .95em "System";
+    -fx-background-color: transparent; /* #00000033; */
+    -fx-font: .95em "System";
 }
+
 .solid {
-	-fx-background-color: black;
+    -fx-background-color: black;
 }
 
 .popout-title {
-	-fx-padding: 2px 0;
-	-fx-font-weight: bold;
-	-fx-cursor: move;
+    -fx-padding: 2px 0;
+    -fx-font-weight: bold;
+    -fx-cursor: move;
 }
 
 .button {
-	-fx-border-width: 0;
-	-fx-padding: 1px 3px 0 3px;
-	-fx-font: bold .85em "System"; /* multiplication of .popout and title */
+    -fx-border-width: 0;
+    -fx-padding: 1px 3px 0 3px;
+    -fx-font: bold .85em "System"; /* multiplication of .popout and title */
 
-	-fx-background-color: transparent;
-	-fx-cursor: hand;
-	-fx-opacity: 0;
-	-fx-text-fill: white;
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-opacity: 0;
+    -fx-text-fill: white;
 }
 
 .combat-stats {
     -fx-background-color: transparent;
-	-fx-border-width: 0;
-	-fx-padding: 5px;
+    -fx-border-width: 0;
+    -fx-padding: 5px;
 }
 
 .combat-stats .ps {
@@ -34,47 +35,60 @@
 }
 
 .combat-stats .damage {
-	-fx-text-fill: maroon;
+    -fx-text-fill: maroon;
 }
 
 .combat-stats .damage2 {
-	-fx-text-fill: derive(red, +50%);
+    -fx-text-fill: derive(red, +50%);
 }
 
 .combat-stats .bigger {
-	-fx-font: bold 1.65em "System";
+    -fx-font: bold 1.65em "System";
 }
 
 .combat-stats .healing {
-	-fx-text-fill: DarkSeaGreen;
+    -fx-text-fill: DarkSeaGreen;
 }
 
 .combat-stats .healing-eff {
-	-fx-text-fill: LimeGreen;
+    -fx-text-fill: LimeGreen;
 }
 
 .combat-stats .threat {
-	-fx-text-fill: Goldenrod;
+    -fx-text-fill: Goldenrod;
 }
 
 .combat-stats .absorbed {
-	-fx-text-fill: #30cccd;
+    -fx-text-fill: #30cccd;
 }
 
 .combat-stats .crit {
-	-fx-text-fill: pink;
+    -fx-text-fill: pink;
 }
 
 .combat-stats .apm .text {
-	-fx-fill: white;
+    -fx-fill: white;
 }
 
 .time {
-	-fx-font: 1.55em "System";
+    -fx-font: 1.55em "System";
 }
 
 .outlined .text {
-	-fx-stroke: black;
+    -fx-stroke: black;
     -fx-stroke-width: 1px;
     -fx-stroke-type: outside;
+}
+
+.scroll-pane {
+    -fx-border-width: 0;
+    -fx-background-color: transparent;
+}
+
+.scroll-pane:focused {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
 }

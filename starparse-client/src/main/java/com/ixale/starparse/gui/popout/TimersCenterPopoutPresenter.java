@@ -142,10 +142,11 @@ public class TimersCenterPopoutPresenter extends BasePopoutPresenter {
 	}
 
 	public void removeTimer(BaseTimer timer) {
-		if (!timers.containsKey(timer)) {
+		final AnchorPane pane = timers.get(timer);
+		if (pane == null) {
 			return;
 		}
-		timersGrid.getChildren().remove(timers.get(timer));
+		timersGrid.getChildren().remove(pane);
 		timers.remove(timer);
 
 		if (timers.isEmpty()) {

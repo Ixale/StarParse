@@ -7,7 +7,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<?scenebuilder-stylesheet ../styles.css?>
 
 <VBox id="overviewRoot" fx:id="root" disable="false" minHeight="-1.0" prefHeight="465.0" prefWidth="555.0" spacing="0.0" styleClass="content" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.ixale.starparse.gui.main.OverviewPresenter">
   <children>
@@ -16,8 +15,8 @@
         <CheckBox focusTraversable="false" mnemonicParsing="false" onAction="#toggleDpsChart" selected="true" text="DPS Chart" />
         <CheckBox focusTraversable="false" mnemonicParsing="false" onAction="#toggleHpsChart" text="HPS Chart" />
         <CheckBox focusTraversable="false" mnemonicParsing="false" onAction="#toggleDtpsChart" text="DTPS Chart" />
-        <CheckBox focusTraversable="false" mnemonicParsing="false" onAction="#toggleMineEffects" selected="true" text="Mine Effects" />
-        <CheckBox focusTraversable="false" mnemonicParsing="false" onAction="#toggleGroupEffects" text="Group Effects" />
+        <CheckBox focusTraversable="false" mnemonicParsing="false" onAction="#toggleMineEffects" selected="true" text="Mine Effects" fx:id="mineEffects"/>
+        <CheckBox focusTraversable="false" mnemonicParsing="false" onAction="#toggleGroupEffects" text="Group Effects" fx:id="groupEffects" />
       </children>
       <padding>
         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

@@ -1,12 +1,5 @@
 package com.ixale.starparse.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.ixale.starparse.domain.Absorption;
 import com.ixale.starparse.domain.Actor;
 import com.ixale.starparse.domain.Combat;
@@ -24,6 +17,7 @@ import com.ixale.starparse.domain.stats.DamageDealtStats;
 import com.ixale.starparse.domain.stats.DamageTakenStats;
 import com.ixale.starparse.domain.stats.HealingDoneStats;
 import com.ixale.starparse.domain.stats.HealingTakenStats;
+import com.ixale.starparse.parser.Parser;
 import com.ixale.starparse.service.EventService;
 import com.ixale.starparse.service.EventServiceListener;
 import com.ixale.starparse.service.dao.AbsorptionDao;
@@ -32,6 +26,13 @@ import com.ixale.starparse.service.dao.CombatLogDao;
 import com.ixale.starparse.service.dao.EffectDao;
 import com.ixale.starparse.service.dao.EventDao;
 import com.ixale.starparse.service.dao.PhaseDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service("eventService")
 public class EventServiceImpl implements EventService {
@@ -45,7 +46,7 @@ public class EventServiceImpl implements EventService {
 
 	private Context context;
 
-	final private ArrayList<EventServiceListener> listeners = new ArrayList<EventServiceListener>();
+	final private ArrayList<EventServiceListener> listeners = new ArrayList<>();
 
 	private Integer lastCombatId = null;
 	private Integer lastLogId = null;
@@ -95,7 +96,7 @@ public class EventServiceImpl implements EventService {
 		combatLogDao.storeCombatLog(combatLog);
 
 		if (lastLogId == null || !lastLogId.equals(combatLog.getLogId())) {
-			for (EventServiceListener l: listeners) {
+			for (EventServiceListener l : listeners) {
 				l.onNewFile();
 			}
 			lastLogId = combatLog.getLogId();
@@ -104,10 +105,11 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	public void flushEvents(final List<Event> events,
-		final List<Combat> combats, final Combat currentCombat,
-		final List<Effect> effects, final List<Effect> currentEffects,
-		final List<Phase> phases, final Phase currentPhase,
-		final List<Absorption> absorptions) throws Exception {
+			final List<Combat> combats, final Combat currentCombat,
+			final List<Effect> effects, final List<Effect> currentEffects,
+			final List<Phase> phases, final Phase currentPhase,
+			final List<Absorption> absorptions,
+			final Map<Actor, Parser.ActorState> actorStates) throws Exception {
 
 		// store everything
 		eventDao.storeEvents(events);
@@ -117,26 +119,30 @@ public class EventServiceImpl implements EventService {
 		phaseDao.storePhases(phases, currentPhase);
 
 		// fire events
+		if (combats.size() > 0) {
+			for (final Combat combat : combats) {
+				if (lastCombatId == null || lastCombatId < combat.getCombatId()) {
+					for (EventServiceListener l : listeners) {
+						l.onNewCombat(combat);
+					}
+				}
+				lastCombatId = combat.getCombatId();
+			}
+		}
 		if (currentCombat != null) {
-			if (lastCombatId == null || !lastCombatId.equals(currentCombat.getCombatId())) {
-				for (EventServiceListener l: listeners) {
-					l.onNewCombat();
+			if (lastCombatId == null || lastCombatId < currentCombat.getCombatId()) {
+				for (EventServiceListener l : listeners) {
+					l.onNewCombat(currentCombat);
 				}
 				lastCombatId = currentCombat.getCombatId();
 			}
-
-		} else if (combats.size() > 0) {
-			for (EventServiceListener l: listeners) {
-				if (lastCombatId == null || !lastCombatId.equals(combats.get(combats.size() - 1).getCombatId())) {
-					l.onNewCombat();
-				}
-			}
-			lastCombatId = combats.get(combats.size() - 1).getCombatId();
 		}
 
 		if (events != null && !events.isEmpty()) {
-			for (EventServiceListener l: listeners) {
-				l.onNewEvents();
+			for (EventServiceListener l : listeners) {
+				l.onNewEvents(
+						currentCombat != null ? currentCombat : (combats.isEmpty() ? null : combats.get(combats.size() - 1)),
+						actorStates);
 			}
 		}
 
@@ -161,22 +167,17 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public Combat getLastCombat() throws Exception {
-		return combatDao.getLastCombat();
-	}
-
-	@Override
 	public Combat findCombat(int combatId) throws Exception {
 		return combatDao.findCombat(combatId);
 	}
 
 	@Override
-	public CombatStats getCombatStats(final Combat combat, final CombatSelection combatSel) throws Exception {
-		return combatDao.getCombatStats(combat, combatSel);
+	public CombatStats getCombatStats(final Combat combat, final CombatSelection combatSel, final String playerName) throws Exception {
+		return combatDao.getCombatStats(combat, combatSel, playerName);
 	}
 
 	@Override
-	public CombatStats getCombatStats(final List<Combat> combats, final CombatSelection combatSel) throws Exception {
+	public CombatStats getCombatStats(final List<Combat> combats, final CombatSelection combatSel, final String playerName) throws Exception {
 		int tick = 0;
 		int actions = 0;
 		int damage = 0;
@@ -192,11 +193,11 @@ public class EventServiceImpl implements EventService {
 		int threat = 0;
 		int threatPositive = 0;
 
-		for (final Combat combat: combats) {
+		for (final Combat combat : combats) {
 			if (combat == null) {
 				continue;
 			}
-			final CombatStats cs = combatDao.getCombatStats(combat, combatSel);
+			final CombatStats cs = combatDao.getCombatStats(combat, combatSel, playerName);
 			tick += cs.getTick();
 			actions += cs.getActions();
 			damage += cs.getDamage();
@@ -217,9 +218,9 @@ public class EventServiceImpl implements EventService {
 		}
 
 		return new CombatStats(tick, actions, damage, heal, effectiveHeal,
-			damageTaken, damageTakenTotal, absorbed, absorbedTotal,
-			healTaken, effectiveHealTaken, effectiveHealTakenTotal,
-			threat, threatPositive);
+				damageTaken, damageTakenTotal, absorbed, absorbedTotal,
+				healTaken, effectiveHealTaken, effectiveHealTakenTotal,
+				threat, threatPositive, null /* might be multiple */);
 	}
 
 	@Override
@@ -229,14 +230,14 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	public List<Event> getCombatEvents(final Combat combat, final Set<Event.Type> filterFlags,
-		final Actor filterSource, final Actor filterTarget, final String filterSearch,
-		final CombatSelection combatSel) throws Exception {
-		return combatDao.getCombatEvents(combat, filterFlags, filterSource, filterTarget, filterSearch, combatSel);
+			final Actor filterSource, final Actor filterTarget, final String filterSearch,
+			final CombatSelection combatSel, final String playerName) throws Exception {
+		return combatDao.getCombatEvents(combat, filterFlags, filterSource, filterTarget, filterSearch, combatSel, playerName);
 	}
 
 	@Override
-	public List<CombatTickStats> getCombatTicks(final Combat combat, final CombatSelection combatSel) throws Exception {
-		return combatDao.getCombatTicks(combat, combatSel);
+	public List<CombatTickStats> getCombatTicks(final Combat combat, final CombatSelection combatSel, final String playerName) throws Exception {
+		return combatDao.getCombatTicks(combat, combatSel, playerName);
 	}
 
 	@Override
@@ -250,47 +251,47 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public List<DamageDealtStats> getDamageDealtStatsSimple(final Combat combat, final CombatSelection combatSel) throws Exception {
-		return combatDao.getDamageDealtStatsSimple(combat, combatSel);
+	public List<DamageDealtStats> getDamageDealtStatsSimple(final Combat combat, final CombatSelection combatSel, final String playerName) throws Exception {
+		return combatDao.getDamageDealtStatsSimple(combat, combatSel, playerName);
 	}
 
 	@Override
 	public List<DamageDealtStats> getDamageDealtStats(final Combat combat, boolean byTargetType, boolean byTargetInstance, boolean byAbility,
-		final CombatSelection combatSel) throws Exception {
-		return combatDao.getDamageDealtStats(combat, byTargetType, byTargetInstance, byAbility, combatSel);
+			final CombatSelection combatSel, final String playerName) throws Exception {
+		return combatDao.getDamageDealtStats(combat, byTargetType, byTargetInstance, byAbility, combatSel, playerName);
 	}
 
 	@Override
-	public List<HealingDoneStats> getHealingDoneStats(Combat combat, boolean byTarget, boolean byAbility, final CombatSelection combatSel)
-		throws Exception {
-		return combatDao.getHealingDoneStats(combat, byTarget, byAbility, combatSel);
+	public List<HealingDoneStats> getHealingDoneStats(Combat combat, boolean byTarget, boolean byAbility, final CombatSelection combatSel, final String playerName)
+			throws Exception {
+		return combatDao.getHealingDoneStats(combat, byTarget, byAbility, combatSel, playerName);
 	}
 
 	@Override
-	public CombatMitigationStats getCombatMitigationStats(Combat combat, final CombatSelection combatSel) throws Exception {
-		return combatDao.getCombatMitigationStats(combat, combatSel);
+	public CombatMitigationStats getCombatMitigationStats(Combat combat, final CombatSelection combatSel, final String playerName) throws Exception {
+		return combatDao.getCombatMitigationStats(combat, combatSel, playerName);
 	}
 
 	@Override
 	public List<DamageTakenStats> getDamageTakenStats(Combat combat, boolean bySourceType, boolean bySourceInstance, boolean byAbility,
-		final CombatSelection combatSel) throws Exception {
-		return combatDao.getDamageTakenStats(combat, bySourceType, bySourceInstance, byAbility, combatSel);
+			final CombatSelection combatSel, final String playerName) throws Exception {
+		return combatDao.getDamageTakenStats(combat, bySourceType, bySourceInstance, byAbility, combatSel, playerName);
 	}
 
 	@Override
-	public List<HealingTakenStats> getHealingTakenStats(final Combat combat, boolean bySource, boolean byAbility, final CombatSelection combatSel)
-		throws Exception {
-		return combatDao.getHealingTakenStats(combat, bySource, byAbility, combatSel);
+	public List<HealingTakenStats> getHealingTakenStats(final Combat combat, boolean bySource, boolean byAbility, final CombatSelection combatSel, final String playerName)
+			throws Exception {
+		return combatDao.getHealingTakenStats(combat, bySource, byAbility, combatSel, playerName);
 	}
 
 	@Override
-	public List<AbsorptionStats> getAbsorptionStats(Combat combat, CombatSelection combatSel) throws Exception {
-		return combatDao.getAbsorptionStats(combat, combatSel);
+	public List<AbsorptionStats> getAbsorptionStats(Combat combat, CombatSelection combatSel, final String playerName) throws Exception {
+		return combatDao.getAbsorptionStats(combat, combatSel, playerName);
 	}
 
 	@Override
-	public List<ChallengeStats> getCombatChallengeStats(final Combat combat, final CombatSelection combatSel) throws Exception {
-		return combatDao.getCombatChallengeStats(combat, combatSel);
+	public List<ChallengeStats> getCombatChallengeStats(final Combat combat, final CombatSelection combatSel, final String playerName) throws Exception {
+		return combatDao.getCombatChallengeStats(combat, combatSel, playerName);
 	}
 
 	@Override

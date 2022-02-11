@@ -1,26 +1,5 @@
 package com.ixale.starparse.gui.main;
 
-import java.io.File;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.ixale.starparse.domain.Combat;
 import com.ixale.starparse.domain.CombatSelection;
 import com.ixale.starparse.domain.Event;
@@ -32,7 +11,6 @@ import com.ixale.starparse.domain.stats.ChallengeStats;
 import com.ixale.starparse.domain.stats.CombatEventStats;
 import com.ixale.starparse.domain.stats.CombatStats;
 import com.ixale.starparse.gui.Config;
-import com.ixale.starparse.gui.FlashMessage;
 import com.ixale.starparse.gui.FlashMessage.Type;
 import com.ixale.starparse.gui.Format;
 import com.ixale.starparse.gui.dialog.RaidNotesDialogPresenter;
@@ -55,14 +33,12 @@ import com.ixale.starparse.timer.TimerManager;
 import com.ixale.starparse.timer.TimerManager.RaidBreakTimer;
 import com.ixale.starparse.timer.TimerManager.RaidPullTimer;
 import com.ixale.starparse.ws.RaidClient.RequestIncomingCallback;
-import com.ixale.starparse.ws.RaidClient.RequestOutgoingCallback;
 import com.ixale.starparse.ws.RaidCombatMessage;
 import com.ixale.starparse.ws.RaidRequestMessage;
-import com.ixale.starparse.ws.RaidResponseMessage;
-
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -75,15 +51,34 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.inject.Inject;
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 public class RaidPresenter extends BaseCombatLogPresenter {
 
 	private static final Logger logger = LoggerFactory.getLogger(RaidPresenter.class);
 
 	private static final int MAX_UPDATE_AGE = 15 * 60 * 1000;
+	private static final String TOTALS_LABEL = "Total";
 
 	@FXML
 	private Label raidTitle, raidPlayers, raidDeathsTitle, damageTaken, healingTaken;
@@ -94,26 +89,28 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 	private TableColumn<RaidItem, String> nameCol;
 	@FXML
 	private TableColumn<RaidItem, Integer> damageCol, dpsCol, raidThreatCol, tpsCol, damageTakenCol, dtpsCol, apsCol,
-		healingCol, hpsCol, ehpsCol, pctEffCol, shieldingCol, spsCol, raidTimeCol, rankCol;
+			healingCol, hpsCol, ehpsCol, pctEffCol, shieldingCol, spsCol, raidTimeCol, rankCol;
 
 	@FXML
 	private HBox raidBar, raidDeaths, combatLogFilter;
 	@FXML
 	private Button pullButton, breakButton, raidNotesButton;
 
-	private final List<String> players = new ArrayList<String>();
+	private final List<String> players = new ArrayList<>();
 
 	private String raidGroupName, characterName, combatLogName;
 	private boolean isAdmin = false;
 
 	// context
-	private final Map<Long, Integer> combatBeginnings = new LinkedHashMap<Long, Integer>();
+	private final Map<Long, Integer> combatBeginnings = new LinkedHashMap<>();
 	private Combat currentCombat = null;
 	private Combat lastCombat = null;
 	private final Map<RaidRequest, Label> raidDeathLabels = new HashMap<>();
 	private List<Event> currentEvents;
+	private String currentEventsPlayerName;
 
-	private final HashMap<String, List<AbsorptionStats>> absorptions = new HashMap<String, List<AbsorptionStats>>();
+	private final HashMap<String, List<AbsorptionStats>> absorptions = new HashMap<>();
+	private RaidItem totalsItem;
 
 	@Inject
 	private RaidNotesDialogPresenter raidNotesDialogPresenter;
@@ -136,7 +133,17 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 		void onRaidDataFinalize();
 	}
 
-	private final HashSet<RaidDataListener> listeners = new HashSet<RaidDataListener>();
+	private static class CombatTotals {
+		int tick = 0, actions = 0, damage = 0;
+		int heal = 0, effectiveHeal = 0;
+		int damageTaken = 0, damageTakenTotal = 0;
+		int absorbed = 0, absorbedTotal = 0;
+		int healTaken = 0, effectiveHealTaken = 0, effectiveHealTakenTotal = 0;
+		int threat = 0, threatPositive = 0;
+		int shielding = 0, sps = 0;
+	}
+
+	private final HashSet<RaidDataListener> listeners = new HashSet<>();
 
 	public void addRaidUpdateListener(final RaidDataListener listener) {
 		listeners.add(listener);
@@ -157,7 +164,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 				if (raidNotesPopoutPresenter.updateNoteIfNeeded(note, false)) {
 					// broadcast
 					final RaidRequest request = new RaidRequest(RaidRequest.Type.RAID_NOTES, null,
-						new RaidRequest.Params(TimeUtils.getCurrentTime(), note));
+							new RaidRequest.Params(TimeUtils.getCurrentTime(), note));
 
 					handleAnnouncement(raidNotesButton, request);
 				}
@@ -183,45 +190,45 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 	}
 
 	private void initializeRaidTable() {
-		nameCol.setCellValueFactory(new PropertyValueFactory<RaidItem, String>("name"));
-		raidTimeCol.setCellValueFactory(new PropertyValueFactory<RaidItem, Integer>("time"));
+		nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+		raidTimeCol.setCellValueFactory(new PropertyValueFactory<>("time"));
 
-		damageCol.setCellValueFactory(new PropertyValueFactory<RaidItem, Integer>("damage"));
-		dpsCol.setCellValueFactory(new PropertyValueFactory<RaidItem, Integer>("dps"));
-		raidThreatCol.setCellValueFactory(new PropertyValueFactory<RaidItem, Integer>("threat"));
-		tpsCol.setCellValueFactory(new PropertyValueFactory<RaidItem, Integer>("tps"));
-		damageTakenCol.setCellValueFactory(new PropertyValueFactory<RaidItem, Integer>("damageTaken"));
-		dtpsCol.setCellValueFactory(new PropertyValueFactory<RaidItem, Integer>("dtps"));
-		apsCol.setCellValueFactory(new PropertyValueFactory<RaidItem, Integer>("aps"));
-		healingCol.setCellValueFactory(new PropertyValueFactory<RaidItem, Integer>("healing"));
-		hpsCol.setCellValueFactory(new PropertyValueFactory<RaidItem, Integer>("hps"));
-		ehpsCol.setCellValueFactory(new PropertyValueFactory<RaidItem, Integer>("ehps"));
-		pctEffCol.setCellValueFactory(new PropertyValueFactory<RaidItem, Integer>("pctEffective"));
-		shieldingCol.setCellValueFactory(new PropertyValueFactory<RaidItem, Integer>("shielding"));
-		spsCol.setCellValueFactory(new PropertyValueFactory<RaidItem, Integer>("sps"));
-		rankCol.setCellValueFactory(new PropertyValueFactory<RaidItem, Integer>("rank"));
+		damageCol.setCellValueFactory(new PropertyValueFactory<>("damage"));
+		dpsCol.setCellValueFactory(new PropertyValueFactory<>("dps"));
+		raidThreatCol.setCellValueFactory(new PropertyValueFactory<>("threat"));
+		tpsCol.setCellValueFactory(new PropertyValueFactory<>("tps"));
+		damageTakenCol.setCellValueFactory(new PropertyValueFactory<>("damageTaken"));
+		dtpsCol.setCellValueFactory(new PropertyValueFactory<>("dtps"));
+		apsCol.setCellValueFactory(new PropertyValueFactory<>("aps"));
+		healingCol.setCellValueFactory(new PropertyValueFactory<>("healing"));
+		hpsCol.setCellValueFactory(new PropertyValueFactory<>("hps"));
+		ehpsCol.setCellValueFactory(new PropertyValueFactory<>("ehps"));
+		pctEffCol.setCellValueFactory(new PropertyValueFactory<>("pctEffective"));
+		shieldingCol.setCellValueFactory(new PropertyValueFactory<>("shielding"));
+		spsCol.setCellValueFactory(new PropertyValueFactory<>("sps"));
+		rankCol.setCellValueFactory(new PropertyValueFactory<>("rank"));
 
-		nameCol.setCellFactory(new CharacterCellFactory<RaidItem>());
+		nameCol.setCellFactory(new CharacterCellFactory<>(() -> context));
 		raidTimeCol.setCellFactory(new RaidTimeCellFactory());
 
-		damageCol.setCellFactory(new NumberCellFactory<RaidItem>(false, "maroon", true));
-		dpsCol.setCellFactory(new NumberCellFactory<RaidItem>(false, "maroon"));
+		damageCol.setCellFactory(new NumberCellFactory<>(false, "damage-dealt", true));
+		dpsCol.setCellFactory(new NumberCellFactory<>(false, "damage-dealt"));
 
-		raidThreatCol.setCellFactory(new NumberCellFactory<RaidItem>(false, "goldenrod", true));
-		tpsCol.setCellFactory(new NumberCellFactory<RaidItem>(false, "goldenrod"));
+		raidThreatCol.setCellFactory(new NumberCellFactory<>(false, "threat", true));
+		tpsCol.setCellFactory(new NumberCellFactory<>(false, "threat"));
 
-		damageTakenCol.setCellFactory(new NumberCellFactory<RaidItem>(false, "maroon", true));
-		dtpsCol.setCellFactory(new NumberCellFactory<RaidItem>(false, "maroon"));
-		apsCol.setCellFactory(new NumberCellFactory<RaidItem>(false, "0x30cccd"));
+		damageTakenCol.setCellFactory(new NumberCellFactory<>(false, "damage-dealt", true));
+		dtpsCol.setCellFactory(new NumberCellFactory<>(false, "damage-dealt"));
+		apsCol.setCellFactory(new NumberCellFactory<>(false, "absorbed"));
 
-		healingCol.setCellFactory(new NumberCellFactory<RaidItem>(false, "DarkSeaGreen", true));
-		hpsCol.setCellFactory(new NumberCellFactory<RaidItem>(false, "DarkSeaGreen"));
-		ehpsCol.setCellFactory(new NumberCellFactory<RaidItem>(false, "limegreen"));
-		pctEffCol.setCellFactory(new NumberCellFactory<RaidItem>(false, "limegreen"));
+		healingCol.setCellFactory(new NumberCellFactory<>(false, "healing-done", true));
+		hpsCol.setCellFactory(new NumberCellFactory<>(false, "healing-done"));
+		ehpsCol.setCellFactory(new NumberCellFactory<>(false, "healing-eff-done"));
+		pctEffCol.setCellFactory(new NumberCellFactory<>(false, "healing-eff-done"));
 
-		shieldingCol.setCellFactory(new NumberCellFactory<RaidItem>(false, "0x30cccd", true));
-		spsCol.setCellFactory(new NumberCellFactory<RaidItem>(false, "0x30cccd"));
-		rankCol.setCellFactory(new RankCellFactory<RaidItem>());
+		shieldingCol.setCellFactory(new NumberCellFactory<>(false, "absorbed", true));
+		spsCol.setCellFactory(new NumberCellFactory<>(false, "absorbed"));
+		rankCol.setCellFactory(new RankCellFactory<>());
 
 		raidTable.setRowFactory(new Callback<TableView<RaidItem>, TableRow<RaidItem>>() {
 			@Override
@@ -232,28 +239,27 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 				final TableRow<RaidItem> row = new TableRow<RaidItem>() {
 					@Override
 					public void updateItem(RaidItem item, boolean empty) {
+						if (item != null && TOTALS_LABEL.equals(item.getName())) {
+							if (!getStyleClass().contains("totals-row")) {
+								getStyleClass().add("totals-row");
+							}
+						} else {
+							getStyleClass().remove("totals-row");
+						}
 						super.updateItem(item, empty);
 					}
 				};
 
-				row.setOnMouseEntered(new EventHandler<MouseEvent>() {
-					@Override
-					public void handle(MouseEvent event) {
-						if (row.getItem() == null) {
-							return;
-						}
-						t.setText(getTooltipText(row.getItem()));
-						if (t.getText() != null) {
-							BaseItem.showTooltip(row, t, event);
-						}
+				row.setOnMouseEntered(event -> {
+					if (row.getItem() == null || TOTALS_LABEL.equals(row.getItem().getName())) {
+						return;
+					}
+					t.setText(getTooltipText(row.getItem()));
+					if (t.getText() != null) {
+						BaseItem.showTooltip(row, t, event);
 					}
 				});
-				row.setOnMouseExited(new EventHandler<MouseEvent>() {
-					@Override
-					public void handle(MouseEvent event) {
-						t.hide();
-					}
-				});
+				row.setOnMouseExited(event -> t.hide());
 
 				return row;
 			}
@@ -264,6 +270,58 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 		damageCol.setSortType(SortType.DESCENDING);
 
 		raidTable.getSortOrder().add(damageCol);
+
+		raidTable.setSortPolicy(tv -> {
+			// https://stackoverflow.com/questions/50109815/javafx-tableview-sort-by-custom-rule-then-by-column-selection
+			final ObservableList<RaidItem> itemsList = raidTable.getItems();
+			if (itemsList == null || itemsList.isEmpty()) {
+				return true;
+			}
+			final List<TableColumn<RaidItem, ?>> sortOrder = new ArrayList<>(raidTable.getSortOrder());
+			if (!sortOrder.isEmpty()) {
+				FXCollections.sort(itemsList, new RaidItemsComparator(sortOrder));
+			}
+			return true;
+		});
+	}
+
+	private static class RaidItemsComparator implements Comparator<RaidItem> {
+		private final List<TableColumn<RaidItem, ?>> allColumns;
+
+		public RaidItemsComparator(final List<TableColumn<RaidItem, ?>> allColumns) {
+			this.allColumns = allColumns;
+		}
+
+		@Override
+		public int compare(final RaidItem o1, final RaidItem o2) {
+			if (o1 != null && TOTALS_LABEL.equals(o1.getName())) {
+				return 1;
+			}
+			if (o2 != null && TOTALS_LABEL.equals(o2.getName())) {
+				return -1;
+			}
+			for (final TableColumn<RaidItem, ?> tc : allColumns) {
+				if (!isSortable(tc)) {
+					continue;
+				}
+				final Object value1 = tc.getCellData(o1);
+				final Object value2 = tc.getCellData(o2);
+
+				@SuppressWarnings("unchecked") final Comparator<Object> c = (Comparator<Object>) tc.getComparator();
+				final int result = SortType.ASCENDING.equals(tc.getSortType())
+						? c.compare(value1, value2)
+						: c.compare(value2, value1);
+
+				if (result != 0) {
+					return result;
+				}
+			}
+			return 0;
+		}
+
+		private boolean isSortable(final TableColumn<RaidItem, ?> tc) {
+			return tc.getSortType() != null && tc.isSortable();
+		}
 	}
 
 	@Override
@@ -290,7 +348,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 		// try to fetch latest data
 		final Collection<RaidCombatMessage> messages = getCombatUpdates(combatLogName, currentCombat);
 		if (messages != null) {
-			for (final RaidCombatMessage message: messages) {
+			for (final RaidCombatMessage message : messages) {
 				createOrReplaceTableRow(message);
 			}
 			finalizeTable();
@@ -311,11 +369,9 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 		// normalize
 		final String combatLogName = fullCombatLogName == null ? null : new File(fullCombatLogName).getName();
 
-		if (this.combatLogName != null && (combatLogName == null || !this.combatLogName.equals(combatLogName))) {
-			if (this.combatLogName != null) {
-				// ensure the old data are flushed
-				raidService.storeCombatStats(this.combatLogName);
-			}
+		if (this.combatLogName != null && !this.combatLogName.equals(combatLogName)) {
+			// ensure the old data are flushed
+			raidService.storeCombatStats(this.combatLogName);
 			// reset all
 			lastCombat = null;
 			// characterName = null; // keep as it may not change
@@ -346,8 +402,8 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 		assert characterName != null;
 
 		if (this.lastCombat != null
-			&& lastCombat != null
-			&& this.lastCombat.getCombatId() == lastCombat.getCombatId()) {
+				&& lastCombat != null
+				&& this.lastCombat.getCombatId() == lastCombat.getCombatId()) {
 			// just updating, bump
 			this.lastCombat = lastCombat;
 			return;
@@ -394,7 +450,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 
 	public void addPlayer(final String... characterNames) {
 		possibleDoubleJoin = null;
-		for (String n: characterNames) {
+		for (String n : characterNames) {
 			if (players.contains(n)) {
 				// should not happen, but well
 				possibleDoubleJoin = n;
@@ -406,8 +462,8 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 	}
 
 	public void removePlayer(final String... characterNames) {
-		for (String n: characterNames) {
-			if (possibleDoubleJoin != null && n.equals(possibleDoubleJoin)) {
+		for (String n : characterNames) {
+			if (n.equals(possibleDoubleJoin)) {
 				// ignore remove
 				possibleDoubleJoin = null;
 				continue;
@@ -439,7 +495,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 			}
 			raidPlayers.setText(sb.toString());
 			if (!raidBar.isVisible()) {
-				raidBar.setPrefHeight(26);
+				raidBar.setPrefHeight(30);
 				raidBar.setVisible(true);
 			}
 		}
@@ -474,7 +530,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 
 		boolean isRefreshNeeded = false;
 		Integer combatId = null;
-		loop: for (final RaidCombatMessage message: messages) {
+		for (final RaidCombatMessage message : messages) {
 			if (message.getCombatTimeTo() == null) {
 				// running combat ...
 				if (message.getTimestamp() + MAX_UPDATE_AGE < lastCombat.getTimeFrom()) {
@@ -482,7 +538,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 					if (logger.isDebugEnabled()) {
 						logger.debug("Ignoring too old combat update [" + lastCombat + "]: " + message);
 					}
-					continue loop;
+					continue;
 					// NOTREACHED
 				}
 				if (lastCombat.getTimeTo() != null && (message.getCombatTimeFrom() > lastCombat.getTimeTo())) {
@@ -490,7 +546,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 					if (logger.isDebugEnabled()) {
 						logger.debug("Ignoring too new combat update [" + lastCombat + "]: " + message);
 					}
-					continue loop;
+					continue;
 					// NOTREACHED
 				}
 				// ... after the last one started
@@ -501,7 +557,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Ignoring too new combat closure [" + lastCombat + "]: " + message);
 				}
-				continue loop;
+				continue;
 				// NOTREACHED
 
 			} else if (message.getCombatTimeTo() > lastCombat.getTimeFrom()) {
@@ -510,7 +566,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 
 			} else {
 				// try to find other combat which started before the message's combat beginning
-				for (Long from: combatBeginnings.keySet()) {
+				for (Long from : combatBeginnings.keySet()) {
 					if (message.getCombatTimeTo() < from) {
 						break;
 					}
@@ -521,20 +577,19 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 					// no suitable combat found (possible in previous log after DC?)
 					if (logger.isDebugEnabled()) {
 						logger.debug("Ignoring too old combat update (not after "
-							+ combatBeginnings.keySet().toArray()[0] + "): " + message);
+								+ combatBeginnings.keySet().toArray()[0] + "): " + message);
 					}
-					continue loop;
+					continue;
 					// NOTREACHED
 				}
 			}
-			assert combatId != null;
 			raidService.storeCombatUpdate(combatLogName, combatId, message);
 
 			if (currentCombat != null && combatId.equals(currentCombat.getCombatId())) {
 				// displaying this combat, update table
 				isRefreshNeeded = true;
 				createOrReplaceTableRow(message);
-				for (final RaidDataListener listener: listeners) {
+				for (final RaidDataListener listener : listeners) {
 					listener.onRaidDataUpdate(currentCombat, message);
 				}
 			}
@@ -542,13 +597,14 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 
 		if (isRefreshNeeded) {
 			finalizeTable();
-			for (final RaidDataListener listener: listeners) {
+			for (final RaidDataListener listener : listeners) {
 				listener.onRaidDataFinalize();
 			}
 		}
 	}
 
 	private void resetTable() {
+		totalsItem = null;
 		clearTable(raidTable);
 		clearTable(combatLogTable);
 		absorptions.clear();
@@ -563,9 +619,13 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 
 	private void createOrReplaceTableRow(final RaidCombatMessage message) {
 
-		absorptions.put(message.getCharacterName(), message.getAbsorptionStats());
+		if (isFakePlayerHidden(message.getCharacterName(), raidTable.getItems())) {
+			return;
+		}
 
-		for (final RaidItem item: raidTable.getItems()) {
+		absorptions.put(Format.getRealNameEvenForFakePlayer(message.getCharacterName()), message.getAbsorptionStats());
+
+		for (final RaidItem item : raidTable.getItems()) {
 			if (item.getName().equals(message.getCharacterName())) {
 				// update item (table is bound and will update itself)
 				if ((item.getMessage() == null || item.getMessage().getDiscipline() == null) && message.getDiscipline() != null) {
@@ -584,27 +644,57 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 		raidTable.getItems().add(fillItem(new RaidItem(), message));
 	}
 
-	private final static Comparator<Node> deathComparator = new Comparator<Node>() {
-		@Override
-		public int compare(Node o1, Node o2) {
-			if (o1.getUserData() == null || o2.getUserData() == null) {
-				return 0;
-			}
-			if ((long) o2.getUserData() > ((long) o1.getUserData())) {
-				return -1;
-			}
-			return 1;
+	private final static Comparator<Node> deathComparator = (o1, o2) -> {
+		if (o1.getUserData() == null || o2.getUserData() == null) {
+			return 0;
 		}
+		if ((long) o2.getUserData() > ((long) o1.getUserData())) {
+			return -1;
+		}
+		return 1;
 	};
 
 	private void finalizeTable() {
+		final CombatTotals totals = new CombatTotals();
 		// cross-fill absorptions
-		for (final RaidItem item: raidTable.getItems()) {
+		final Iterator<RaidItem> it = raidTable.getItems().iterator();
+		while (it.hasNext()) {
+			final RaidItem item = it.next();
+			if (TOTALS_LABEL.equals(item.getName())) {
+				continue;
+			}
+			if (isFakePlayerHidden(item.getFullName(), raidTable.getItems())) {
+				it.remove();
+				continue;
+			}
+
 			fillAbsorption(item);
 			fillRank(item);
+
+			final CombatStats cs = item.getMessage().getCombatStats();
+			if (cs.getTick() > totals.tick) {
+				totals.tick = cs.getTick();
+			}
+
+			totals.actions += cs.getActions();
+			totals.damage += cs.getDamage();
+			totals.heal += cs.getHeal();
+			totals.effectiveHeal += cs.getEffectiveHeal();
+			totals.damageTaken += cs.getDamageTaken();
+			totals.damageTakenTotal += cs.getDamageTakenTotal();
+			totals.absorbed += cs.getAbsorbed();
+			totals.absorbedTotal += cs.getAbsorbedTotal();
+			totals.healTaken += cs.getHealTaken();
+			totals.effectiveHealTaken += cs.getEffectiveHealTaken();
+			totals.effectiveHealTakenTotal += cs.getEffectiveHealTakenTotal();
+			totals.threat += cs.getThreat();
+			totals.threatPositive += cs.getThreatPositive();
+
+			totals.shielding += item.getShielding();
+			totals.sps += item.getSps();
 		}
 
-		this.<RaidItem> resortTable(raidTable);
+		this.resortTable(raidTable);
 
 		if (!rankCol.isVisible() && canRank(currentCombat)) {
 			rankCol.setVisible(true);
@@ -612,7 +702,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 
 		if (currentCombat.isRunning()) {
 			int exits = 0;
-			for (final RaidItem item: raidTable.getItems()) {
+			for (final RaidItem item : raidTable.getItems()) {
 				if (item.getMessage().getExitEvent() != null) {
 					exits++;
 				}
@@ -627,13 +717,13 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 		final List<Node> items = new ArrayList<>();
 		items.add(raidDeathsTitle);
 
-		for (final RaidItem item: raidTable.getItems()) {
+		for (final RaidItem item : raidTable.getItems()) {
 			if (item.getMessage() == null) {
 				continue;
 			}
 
 			if (item.getMessage().getCombatEventStats() != null && !item.getMessage().getCombatEventStats().isEmpty()) {
-				for (final CombatEventStats ce: item.getMessage().getCombatEventStats()) {
+				for (final CombatEventStats ce : item.getMessage().getCombatEventStats()) {
 					fillCombatEvents(item, ce.getType(), ce.getTimestamp(), items);
 				}
 			}
@@ -645,7 +735,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 		}
 		int j = items.size();
 		if (j > 1) {
-			Collections.sort(items, deathComparator);
+			items.sort(deathComparator);
 			// ignore "wipe" deaths (if almost everyone dies, cut in half and include only if the gap is above X seconds)
 			if (j > raidTable.getItems().size()) { // i.e. wipe: j >= 2
 				j = items.size() - 1;
@@ -665,13 +755,41 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 				}
 			}
 		}
+
+		if (raidTable.getItems().size() > 1) {
+			// totals
+			if (totalsItem == null) {
+				totalsItem = new RaidItem();
+				raidTable.getItems().add(totalsItem);
+			}
+			fillItem(totalsItem, new RaidCombatMessage(
+					TOTALS_LABEL,
+					0, null,
+					null, null, null,
+					new CombatStats(totals.tick, totals.actions, totals.damage,
+							totals.heal, totals.effectiveHeal,
+							totals.damageTaken, totals.damageTakenTotal,
+							totals.absorbed, totals.absorbedTotal,
+							totals.healTaken, totals.effectiveHealTaken, totals.effectiveHealTakenTotal,
+							totals.threat, totals.threatPositive, null),
+					null,
+					null,
+					null,
+					totals.tick,
+					null,
+					null
+			));
+			totalsItem.shielding.set(totals.shielding);
+			totalsItem.sps.set(totals.sps);
+			totalsItem.rank.set(RankClass.Reason.RANK_DISABLED.getCode());
+		}
 	}
 
 	private void fillCombatEvents(final RaidItem item, final Event.Type type, final long timestamp, final List<Node> items) {
 		switch (type) {
 			case DEATH:
 				final RaidRequest request = new RaidRequest(RaidRequest.Type.DEATH_RECAP, item.getName(),
-					new RaidRequest.Params(timestamp));
+						new RaidRequest.Params(timestamp));
 
 				// already cached from earlier?
 				final Label death;
@@ -679,7 +797,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 					death = raidDeathLabels.get(request);
 
 					// already displaying?
-					for (final Node n: raidDeaths.getChildren()) {
+					for (final Node n : raidDeaths.getChildren()) {
 						if (n == death) {
 							items.add(n);
 							return;
@@ -691,12 +809,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 					death = new Label(Format.formatTime(timestamp - currentCombat.getTimeFrom()) + " " + item.getFullName());
 					death.getStyleClass().add("raid-death");
 					death.setUserData(timestamp);
-					death.setOnMouseClicked(new EventHandler<MouseEvent>() {
-						@Override
-						public void handle(MouseEvent e) {
-							handleDeathRecap(death, request);
-						}
-					});
+					death.setOnMouseClicked(e -> handleDeathRecap(death, request));
 					raidDeathLabels.put(request, death);
 				}
 
@@ -726,17 +839,17 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 		// item.sps.set(message.getCombatStats().
 
 		item.time.set((int) ((message.getCombatTimeTo() != null
-			? message.getCombatTimeTo()
-			: message.getTimestamp()) - message.getCombatTimeFrom()));
+				? message.getCombatTimeTo()
+				: message.getTimestamp()) - message.getCombatTimeFrom()));
 
 		return item;
 	}
 
 	private void fillAbsorption(final RaidItem item) {
-		Integer total = 0;
-		for (String target: absorptions.keySet()) {
-			for (AbsorptionStats as: absorptions.get(target)) {
-				if (item.getName().equals(as.getSource())) {
+		int total = 0;
+		for (String target : absorptions.keySet()) {
+			for (AbsorptionStats as : absorptions.get(target)) {
+				if (Format.getRealNameEvenForFakePlayer(item.getName()).equals(as.getSource())) {
 					total += as.getTotal();
 				}
 			}
@@ -746,8 +859,8 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 	}
 
 	public int getShieldingTotal(String name) {
-		for (final RaidItem item: raidTable.getItems()) {
-			if (item.getName().equals(name)) {
+		for (final RaidItem item : raidTable.getItems()) {
+			if (Format.getRealNameEvenForFakePlayer(item.getName()).equals(Format.getRealNameEvenForFakePlayer(name))) {
 				return item.shielding.get();
 			}
 		}
@@ -755,8 +868,8 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 	}
 
 	public int getShieldingPerSecond(String name) {
-		for (final RaidItem item: raidTable.getItems()) {
-			if (item.getName().equals(name)) {
+		for (final RaidItem item : raidTable.getItems()) {
+			if (Format.getRealNameEvenForFakePlayer(item.getName()).equals(Format.getRealNameEvenForFakePlayer(name))) {
 				return item.sps.get();
 			}
 		}
@@ -768,18 +881,17 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 		if (lastCombat == null || combatLogName == null || characterName == null) {
 			return null;
 		}
-		if (characterName != null && !raidTable.getItems().isEmpty() && context.getCombatSelection() == null) {
+		if (!raidTable.getItems().isEmpty() && context.getCombatSelection() == null) {
 			// load from normally from the table
 			return new int[]{getShieldingTotal(characterName), getShieldingPerSecond(characterName)};
 		}
 		// try to load from the cache (if raiding was active)
 		final Collection<RaidCombatMessage> messages = getCombatUpdates(combatLogName, lastCombat);
-		Integer total = null;
+		int total = 0;
 		if (messages != null && context.getCombatSelection() == null) {
-			total = 0;
-			for (final RaidCombatMessage message: messages) {
+			for (final RaidCombatMessage message : messages) {
 				if (message.getAbsorptionStats() != null) {
-					for (final AbsorptionStats s: message.getAbsorptionStats()) {
+					for (final AbsorptionStats s : message.getAbsorptionStats()) {
 						if (characterName.equals(s.getSource())) {
 							total += s.getTotal();
 						}
@@ -788,9 +900,8 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 			}
 		} else {
 			// last resort - load parsed data (self-only)
-			final List<AbsorptionStats> as = eventService.getAbsorptionStats(lastCombat, context.getCombatSelection());
-			total = 0;
-			for (final AbsorptionStats abs: as) {
+			final List<AbsorptionStats> as = eventService.getAbsorptionStats(lastCombat, context.getCombatSelection(), characterName);
+			for (final AbsorptionStats abs : as) {
 				if (characterName.equals(abs.getSource())) {
 					total += abs.getTotal();
 				}
@@ -802,9 +913,8 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 
 	private boolean canRank(final Combat combat) {
 		if (combat == null
-			|| combat.isRunning()
-			|| combat.getBoss() == null
-			|| combat.getDiscipline() == null) {
+				|| combat.isRunning()
+				|| combat.getBoss() == null) {
 			return false;
 		}
 		return !RaidBossName.OperationsTrainingDummy.equals(currentCombat.getBoss().getRaidBossName());
@@ -812,9 +922,10 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 
 	private void fillRank(final RaidItem item) {
 		if (!canRank(currentCombat) || item.getMessage().getDiscipline() == null) {
-			item.rank.set(-1);
+			item.rank.set(RankClass.Reason.RANK_DISABLED.getCode());
 			return;
 		}
+		item.rank.set(RankClass.Reason.PENDING.getCode());
 
 		final RankType type;
 		final int value;
@@ -834,43 +945,39 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 				break;
 		}
 
-		try {
-			RankClass rc = null;
-			try {
-				rc = getRank(item, type, currentCombat, value);
-			} catch (SocketTimeoutException | SocketException e) {
-				// try again
-				Thread.sleep(15000);
-				rc = getRank(item, type, currentCombat, value);
-			}
-
+		getRank(item, type, currentCombat, value, (rc) -> {
 			if (rc.getReason() != null) {
-				// unable to rank
-				if (logger.isDebugEnabled()) {
-					logger.debug("Unable to rank player " + item.name.get() + ": " + rc.getReason());
+				if (logger.isTraceEnabled()) {
+					logger.trace("Unable to rank player " + item.name.get() + ": " + rc.getReason());
 				}
-				item.rank.set(-2);
+				item.rank.set(rc.getReason().getCode());
+
 			} else {
 				item.rank.set(rc.getPercent());
 			}
-
-		} catch (Exception e) {
-			if (e.getMessage().equals("Read timed out")) {
-				// local issue, silently ignore
-				return;
+			// force redraw if all done
+			for (final RaidItem it : raidTable.getItems()) {
+				if (it.rank.get() == RankClass.Reason.PENDING.getCode()) {
+					return; // still not all done
+				}
 			}
-			logger.error("Failed to rank player " + item.name.get() + ": " + e.getMessage(), e);
-		}
+			rankCol.setVisible(false);
+			rankCol.setVisible(true);
+		});
+
 	}
 
-	private RankClass getRank(final RaidItem item, final RankType type, final Combat currentCombat, final int value) throws Exception {
-		return rankService.getRank(currentCombat.getBoss(),
-			type,
-			item.getMessage().getDiscipline(),
-			item.time.get(),
-			value);
+	private void getRank(final RaidItem item, final RankType type, final Combat currentCombat, final int value,
+			Consumer<RankClass> callback) {
+		rankService.getRank(currentCombat.getBoss(),
+				type,
+				item.getMessage().getDiscipline(),
+				item.time.get(),
+				value,
+				callback);
 	}
 
+	@SuppressWarnings("StringConcatenationInsideStringBufferAppend")
 	private String getTooltipText(final RaidItem item) {
 		final StringBuilder sb = new StringBuilder();
 		if (item.getMessage().getDiscipline() != null) {
@@ -891,22 +998,24 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 					}
 					sb.append(item.rank.get()).append("%\n");
 
-				} else if (item.rank.get() == -2) {
+				} else if (item.rank.get() == RankClass.Reason.NO_DATA_AVAILABLE.getCode()) {
+					sb.append("(not ranked - not enough samples yet)\n");
+				} else if (item.rank.get() == RankClass.Reason.TICK_TOO_LOW.getCode()) {
 					sb.append("(not ranked - combat too short)\n");
 				}
 			}
 		}
 		if (item.getMessage().getAbsorptionStats() != null && !item.getMessage().getAbsorptionStats().isEmpty()) {
 			sb.append("\nShielding received:\n");
-			for (AbsorptionStats as: item.getMessage().getAbsorptionStats()) {
+			for (AbsorptionStats as : item.getMessage().getAbsorptionStats()) {
 				sb.append(as.getSource() + " [" + Format.formatAbility(as.getAbility()) + "]: " + Format.formatThousands(as.getTotal()) + "\n");
 			}
 		}
 		if (item.shielding.get() > 0) {
 			sb.append("\nShielding done:\n");
-			for (String target: absorptions.keySet()) {
-				for (AbsorptionStats as: absorptions.get(target)) {
-					if (!item.getName().equals(as.getSource())) {
+			for (String target : absorptions.keySet()) {
+				for (AbsorptionStats as : absorptions.get(target)) {
+					if (!Format.getRealNameEvenForFakePlayer(item.getName()).equals(as.getSource())) {
 						continue;
 					}
 					sb.append(target + " [" + Format.formatAbility(as.getAbility()) + "]: " + Format.formatThousands(as.getTotal()) + "\n");
@@ -915,9 +1024,9 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 		}
 		if (item.getMessage().getChallengeStats() != null && !item.getMessage().getChallengeStats().isEmpty()) {
 			sb.append("\nChallenges:\n");
-			for (ChallengeStats cs: item.getMessage().getChallengeStats()) {
+			for (ChallengeStats cs : item.getMessage().getChallengeStats()) {
 				sb.append(cs.getChallengeName().getFullName() + " @ " + Format.formatTime(cs.getTickFrom()) + ": "
-					+ Format.formatThousands(cs.getHeal() > 0 ? cs.getHeal() : cs.getDamage()) + "\n");
+						+ Format.formatThousands(cs.getHeal() > 0 ? cs.getHeal() : cs.getDamage()) + "\n");
 			}
 		}
 		if (item.getMessage().getCombatStats().getApm() > 0) {
@@ -927,7 +1036,14 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 		if (Event.Type.DEATH.equals(item.getMessage().getExitEvent())) {
 			sb.append("\n(died)");
 		}
-		return sb.length() > 0 ? item.getFullName() + sb.toString() : null;
+//
+//		for (final String target : absorptions.keySet()) {
+//			for (final AbsorptionStats as : absorptions.get(target)) {
+//				sb.append("\n " + target + ": " + as);
+//			}
+//		}
+
+		return sb.length() > 0 ? item.getFullName() + sb : item.getFullName();
 	}
 
 	private void handleDeathRecap(final Label label, final RaidRequest request) {
@@ -941,9 +1057,10 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 		List<Event> events = raidService.getStoredResponses(combatLogName, request);
 
 		// is it me?
-		if (events == null && request.getTargetName().equals(characterName)) {
+		final String playerName = Format.getRealNameEvenForFakePlayer(request.getTargetName());
+		if (events == null && (request.getTargetName().equals(characterName) || Format.isFakePlayerName(request.getTargetName()))) {
 			try {
-				events = getDeathRecap(request);
+				events = getDeathRecap(request, playerName);
 				if (events == null) {
 					listener.setFlash("Unable to obtain death recap, combat is no longer available", Type.ERROR);
 					return;
@@ -957,7 +1074,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 
 		if (events != null) {
 			// great, display
-			showDeathRecap(label, events);
+			showDeathRecap(label, events, playerName);
 			return;
 		}
 
@@ -982,48 +1099,41 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 
 		// fire and wait
 		label.getStyleClass().add(style);
-		raidManager.sendRequest(request, new RequestOutgoingCallback() {
-			@Override
-			public void onResponseIncoming(final RaidResponseMessage message) {
-				label.getStyleClass().remove(style);
+		raidManager.sendRequest(request, message -> {
+			label.getStyleClass().remove(style);
 
-				try {
-					// is error?
-					if (RaidRequest.Type.SYSTEM_ERROR.equals(message.getRequestType())) {
-						listener.setFlash("Error while fetching death recap for " + request.getTargetName() + ": " + new String(message.getPayload()),
-							FlashMessage.Type.ERROR);
-						return;
-					}
-
-					final List<Event> events = raidService.decodeAndStoreResponse(combatLogName, request, message.getPayload());
-					Platform.runLater(new Runnable() {
-						public void run() {
-							showDeathRecap(label, events);
-						};
-					});
-
-				} catch (Exception e) {
-					logger.error("Unable to decode " + message + " as " + request + ": " + e.getMessage(), e);
-					listener.setFlash("Error while decoding death recap for " + request.getTargetName() + ": " + e.getMessage(),
-						FlashMessage.Type.ERROR);
+			try {
+				// is error?
+				if (RaidRequest.Type.SYSTEM_ERROR.equals(message.getRequestType())) {
+					listener.setFlash("Error while fetching death recap for " + request.getTargetName() + ": " + new String(message.getPayload()),
+							Type.ERROR);
+					return;
 				}
+
+				final List<Event> events1 = raidService.decodeAndStoreResponse(combatLogName, request, message.getPayload());
+				Platform.runLater(() -> showDeathRecap(label, events1, playerName));
+
+			} catch (Exception e) {
+				logger.error("Unable to decode " + message + " as " + request + ": " + e.getMessage(), e);
+				listener.setFlash("Error while decoding death recap for " + request.getTargetName() + ": " + e.getMessage(),
+						Type.ERROR);
 			}
 		});
 	}
 
-	private void showDeathRecap(final Label label, final List<Event> events) {
+	private void showDeathRecap(final Label label, final List<Event> events, final String playerName) {
 		raidTable.setVisible(false);
 		raidTable.setPrefHeight(0);
 
-		for (final Label l: raidDeathLabels.values()) {
+		for (final Label l : raidDeathLabels.values()) {
 			l.getStyleClass().remove("raid-death-active");
 		}
 		label.getStyleClass().add("raid-death-active");
 
 		// summary
 		int dt = 0, ht = 0;
-		for (final Event e: events) {
-			if (Helpers.isTargetThisPlayer(e)) {
+		for (final Event e : events) {
+			if (Helpers.isTargetEqual(e, null, playerName)) {
 				if (e.getEffectiveHeal() != null) {
 					ht += e.getEffectiveHeal();
 				} else if (e.getValue() != null && Helpers.isEffectDamage(e)) {
@@ -1042,6 +1152,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 		combatLogFilter.setVisible(true);
 
 		currentEvents = events;
+		currentEventsPlayerName = playerName;
 		try {
 			toggleBreakdown(null);
 		} catch (Exception e) {
@@ -1060,16 +1171,17 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 		raidTable.setPrefHeight(-1);
 		raidTable.setVisible(true);
 
-		for (final Label l: raidDeathLabels.values()) {
+		for (final Label l : raidDeathLabels.values()) {
 			l.getStyleClass().remove("raid-death-active");
 		}
 
 		currentEvents = null;
+		currentEventsPlayerName = null;
 	}
 
-	private List<Event> getDeathRecap(final RaidRequest request) throws Exception {
+	private List<Event> getDeathRecap(final RaidRequest request, final String playerName) throws Exception {
 		final long timestamp = request.getParams().getTimestamp();
-		final Integer combatId = context.findCombatIdByCombatEvent(Event.Type.DEATH, timestamp);
+		final Integer combatId = context.findCombatIdByCombatEvent(Event.Type.DEATH, timestamp, playerName);
 		Combat combat = null;
 		if (combatId != null) {
 			combat = eventService.findCombat(combatId);
@@ -1080,18 +1192,18 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 		}
 		final long deathTick = timestamp - combat.getTimeFrom();
 		final CombatSelection combatSel = new CombatSelection(
-			combat.getEventIdFrom(),
-			combat.getEventIdTo(),
-			deathTick > 10000 ? deathTick - 10000 : 0, // last 10 seconds
-			deathTick);
+				combat.getEventIdFrom(),
+				combat.getEventIdTo(),
+				deathTick > 10000 ? deathTick - 10000 : 0, // last 10 seconds
+				deathTick);
 
 		return eventService.getCombatEvents(combat,
-			Collections.singleton(Event.Type.SIMPLIFIED), null, null, null,
-			combatSel);
+				Collections.singleton(Event.Type.SIMPLIFIED), null, null, null,
+				combatSel, playerName);
 	}
 
 	@Override
-	public void toggleBreakdown(final ActionEvent event) throws Exception {
+	public void toggleBreakdown(final ActionEvent event) {
 		if (toggles.isEmpty()) {
 			toggles.put(damageDealtButton, Event.Type.DAMAGE_DEALT);
 			toggles.put(damageTakenButton, Event.Type.DAMAGE_TAKEN);
@@ -1099,7 +1211,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 			toggles.put(healingTakenButton, Event.Type.HEALING_TAKEN);
 			toggles.put(actionsButton, Event.Type.ACTIONS);
 		}
-		for (final CheckBox b: toggles.keySet()) {
+		for (final CheckBox b : toggles.keySet()) {
 			if (b.isSelected()) {
 				filterFlags.add(toggles.get(b));
 			} else {
@@ -1118,24 +1230,24 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 
 		final List<Event> filteredEvents = new ArrayList<>();
 
-		for (final Event e: currentEvents) {
+		for (final Event e : currentEvents) {
 			boolean keep = false;
-			for (Event.Type t: filterFlags) {
+			for (Event.Type t : filterFlags) {
 				switch (t) {
 					case DAMAGE_DEALT:
-						keep |= Helpers.isEffectDamage(e) && Helpers.isSourceThisPlayer(e);
+						keep |= Helpers.isEffectDamage(e) && Helpers.isSourceEqual(e, null, currentEventsPlayerName);
 						break;
 					case DAMAGE_TAKEN:
-						keep |= Helpers.isEffectDamage(e) && Helpers.isTargetThisPlayer(e);
+						keep |= Helpers.isEffectDamage(e) && Helpers.isTargetEqual(e, null, currentEventsPlayerName);
 						break;
 					case HEALING_DONE:
-						keep |= Helpers.isEffectHeal(e) && Helpers.isSourceThisPlayer(e);
+						keep |= Helpers.isEffectHeal(e) && Helpers.isSourceEqual(e, null, currentEventsPlayerName);
 						break;
 					case HEALING_TAKEN:
-						keep |= Helpers.isEffectHeal(e) && Helpers.isTargetThisPlayer(e);
+						keep |= Helpers.isEffectHeal(e) && Helpers.isTargetEqual(e, null, currentEventsPlayerName);
 						break;
 					case ACTIONS:
-						keep |= Helpers.isEffectAbilityActivate(e) && Helpers.isSourceThisPlayer(e);
+						keep |= Helpers.isEffectAbilityActivate(e) && Helpers.isSourceEqual(e, null, currentEventsPlayerName);
 						break;
 					default:
 				}
@@ -1147,22 +1259,22 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 
 		fillCombatLogTable(currentCombat, filteredEvents, null);
 	}
-
-	public void resetBreakdown(final ActionEvent event) throws Exception {
-
-		for (final CheckBox b: toggles.keySet()) {
-			b.setSelected(false);
-		}
-
-		toggleBreakdown(null);
-	}
+//
+//	public void resetBreakdown(final ActionEvent event) throws Exception {
+//
+//		for (final CheckBox b : toggles.keySet()) {
+//			b.setSelected(false);
+//		}
+//
+//		toggleBreakdown(null);
+//	}
 
 	public void onRequestIncoming(final RaidRequestMessage message, final RequestIncomingCallback callback) {
 		try {
 			final RaidRequest request = message.getRequest();
 			switch (request.getType()) {
 				case DEATH_RECAP:
-					List<Event> events = getDeathRecap(request);
+					List<Event> events = getDeathRecap(request, characterName /* = me */);
 					if (events == null) {
 						respondError("Combat is no longer available", callback);
 						return;
@@ -1176,7 +1288,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 				case RAID_PULL:
 					if (request.getParams().getTimestamp() > 0) {
 						TimerManager.startTimer(RaidPullTimer.class, TimeUtils.getCurrentTime(),
-							(int) (request.getParams().getTimestamp() - TimeUtils.getCurrentTime()));
+								(int) (request.getParams().getTimestamp() - TimeUtils.getCurrentTime()));
 					} else {
 						TimerManager.stopTimer(RaidPullTimer.class);
 					}
@@ -1184,7 +1296,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 				case RAID_BREAK:
 					if (request.getParams().getTimestamp() > 0) {
 						TimerManager.startTimer(RaidBreakTimer.class, TimeUtils.getCurrentTime(),
-							(int) (request.getParams().getTimestamp() - TimeUtils.getCurrentTime()));
+								(int) (request.getParams().getTimestamp() - TimeUtils.getCurrentTime()));
 					} else {
 						TimerManager.stopTimer(RaidBreakTimer.class);
 					}
@@ -1202,39 +1314,39 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 			logger.error("Unable to process request " + message + ": " + e.getMessage(), e);
 			respondError("General error: " + e.getMessage(), callback);
 		}
-	};
+	}
 
 	private void respondError(String error, final RequestIncomingCallback callback) {
 		callback.onResponseOutgoing(RaidRequest.Type.SYSTEM_ERROR, error.getBytes()); // TODO
 	}
 
-	public void handlePullCountdown(final ActionEvent e) {
+	public void handlePullCountdown(@SuppressWarnings("unused") final ActionEvent e) {
 		if (raidGroupName == null || !isAdmin) {
 			return;
 		}
 
 		final RaidRequest request = new RaidRequest(RaidRequest.Type.RAID_PULL, null,
-			new RaidRequest.Params(TimerManager.getTimer(RaidPullTimer.class) == null
-				? (TimeUtils.getCurrentTime() + config.getRaidPullSeconds() * 1000)
-				: 0));
+				new RaidRequest.Params(TimerManager.getTimer(RaidPullTimer.class) == null
+						? (TimeUtils.getCurrentTime() + config.getRaidPullSeconds() * 1000)
+						: 0));
 
 		handleAnnouncement(pullButton, request);
 	}
 
-	public void handleBreakCountdown(final ActionEvent e) {
+	public void handleBreakCountdown(@SuppressWarnings("unused") final ActionEvent e) {
 		if (raidGroupName == null || !isAdmin) {
 			return;
 		}
 
 		final RaidRequest request = new RaidRequest(RaidRequest.Type.RAID_BREAK, null,
-			new RaidRequest.Params(TimerManager.getTimer(RaidBreakTimer.class) == null
-				? (TimeUtils.getCurrentTime() + config.getRaidBreakMinutes() * 60 * 1000)
-				: 0));
+				new RaidRequest.Params(TimerManager.getTimer(RaidBreakTimer.class) == null
+						? (TimeUtils.getCurrentTime() + config.getRaidBreakMinutes() * 60 * 1000)
+						: 0));
 
 		handleAnnouncement(breakButton, request);
 	}
 
-	public void handleRaidNotes(final ActionEvent e) {
+	public void handleRaidNotes(@SuppressWarnings("unused") final ActionEvent e) {
 		if (raidGroupName == null || !isAdmin) {
 			return;
 		}
@@ -1259,29 +1371,35 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 
 		// fire and wait
 		button.getStyleClass().add("toggle-button-inter");
-		raidManager.sendRequest(request, new RequestOutgoingCallback() {
-			@Override
-			public void onResponseIncoming(final RaidResponseMessage message) {
-				button.getStyleClass().remove("toggle-button-inter");
+		raidManager.sendRequest(request, message -> {
+			button.getStyleClass().remove("toggle-button-inter");
 
-				try {
-					if (RaidRequest.Type.SYSTEM_OK.equals(message.getRequestType())) {
-						// okay
-						return;
-					}
-
-					// is error?
-					if (RaidRequest.Type.SYSTEM_ERROR.equals(message.getRequestType())) {
-						listener.setFlash("Error while broadcasting: " + new String(message.getPayload()), FlashMessage.Type.ERROR);
-						return;
-					}
-
-				} catch (Exception e) {
-					logger.error("Unable to decode " + message + " as " + request + ": " + e.getMessage(), e);
-					listener.setFlash("Error while broadcasting: " + e.getMessage(), FlashMessage.Type.ERROR);
+			try {
+				if (RaidRequest.Type.SYSTEM_OK.equals(message.getRequestType())) {
+					// okay
+					return;
 				}
+
+				// is error?
+				if (RaidRequest.Type.SYSTEM_ERROR.equals(message.getRequestType())) {
+					listener.setFlash("Error while broadcasting: " + new String(message.getPayload()), Type.ERROR);
+					return;
+				}
+
+			} catch (Exception e) {
+				logger.error("Unable to decode " + message + " as " + request + ": " + e.getMessage(), e);
+				listener.setFlash("Error while broadcasting: " + e.getMessage(), Type.ERROR);
 			}
 		});
 	}
+
+	public boolean isFakePlayerHidden(final String playerName, final List<RaidItem> items) {
+		if (!Format.isFakePlayerName(playerName)) {
+			return false;
+		}
+		final String realName = Format.getRealNameEvenForFakePlayer(playerName);
+		return items.stream().anyMatch(item -> item.getName().equals(realName));
+	}
+
 
 }

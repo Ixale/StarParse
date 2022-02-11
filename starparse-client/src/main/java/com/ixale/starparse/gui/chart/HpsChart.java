@@ -7,7 +7,7 @@ public class HpsChart extends BaseLineChart {
 	public HpsChart(Context context) {
 		super(context);
 
-		setBoundaries(2000, 1000, null);
+		setBoundaries(5000, null);
 
 		setAsOpaque("chart-hps");
 

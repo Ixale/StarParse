@@ -1,14 +1,5 @@
 package com.ixale.starparse.gui.main;
 
-import java.net.URL;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.regex.Pattern;
-
 import com.ixale.starparse.domain.Actor;
 import com.ixale.starparse.domain.Combat;
 import com.ixale.starparse.domain.Effect;
@@ -16,12 +7,11 @@ import com.ixale.starparse.domain.Event;
 import com.ixale.starparse.domain.stats.CombatStats;
 import com.ixale.starparse.gui.Format;
 import com.ixale.starparse.gui.table.EventEffectsCellFactory;
-
+import com.ixale.starparse.gui.table.item.EventItem;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -30,6 +20,15 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+
+import java.net.URL;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 public class CombatLogPresenter extends BaseCombatLogPresenter {
 	@FXML
@@ -74,7 +73,7 @@ public class CombatLogPresenter extends BaseCombatLogPresenter {
 			toggles.put(eventsOnOthersButton, Event.Type.EVENT_OTHERS);
 			toggles.put(simplifiedButton, Event.Type.SIMPLIFIED);
 		}
-		for (CheckBox b: toggles.keySet()) {
+		for (CheckBox b : toggles.keySet()) {
 			if (b.isSelected()) {
 				filterFlags.add(toggles.get(b));
 			} else {
@@ -88,53 +87,51 @@ public class CombatLogPresenter extends BaseCombatLogPresenter {
 		}
 
 		resetButton.setDisable(filterSearch == null
-			&& (filterFlags.contains(Event.Type.SIMPLIFIED) && filterFlags.size() == 1)
-			&& filterSource == null && filterTarget == null);
+				&& (filterFlags.contains(Event.Type.SIMPLIFIED) && filterFlags.size() == 1)
+				&& filterSource == null && filterTarget == null);
 
 		super.toggleBreakdown(event);
 	}
 
-	public void resetBreakdown(final ActionEvent event) throws Exception {
+	public void resetBreakdown(@SuppressWarnings("unused") final ActionEvent event) throws Exception {
 		searchText.setText(null);
 		sourceLoader.reset();
 		targetLoader.reset();
 
-		for (final CheckBox b: toggles.keySet()) {
+		for (final CheckBox b : toggles.keySet()) {
 			b.setSelected(b == simplifiedButton);
 		}
 
 		toggleBreakdown(null);
 	}
 
-	public void searchTable(final ActionEvent event) {
+	public void searchTable(@SuppressWarnings("unused") final ActionEvent event) {
 		if (searchText.getText() == null || searchText.getText().isEmpty()) {
 			return;
 		}
 		findButton.setDisable(true);
 
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				final Pattern needle = Pattern.compile(".*" + searchText.getText() + ".*", Pattern.CASE_INSENSITIVE);
+		Platform.runLater(() -> {
+			final Pattern needle = Pattern.compile(".*" + searchText.getText() + ".*", Pattern.CASE_INSENSITIVE);
 
-				boolean wrapped = false;
-				int j = combatLogTable.getSelectionModel().getSelectedIndex() + 1;
-				for (int i = j; i < combatLogTable.getItems().size() && (!wrapped || i < j); i++) {
-					if (needle.matcher(combatLogTable.getItems().get(i).getAction()).find()
-						|| needle.matcher(combatLogTable.getItems().get(i).getAbility()).find()
-						|| needle.matcher(combatLogTable.getItems().get(i).getSourceName()).find()
-						|| needle.matcher(combatLogTable.getItems().get(i).getTargetName()).find()) {
-						combatLogTable.getSelectionModel().clearAndSelect(i);
-						combatLogTable.scrollTo(i);
-						break;
-					}
-					if (i + 1 == combatLogTable.getItems().size() && !wrapped) {
-						i = 0;
-						wrapped = true;
-					}
+			boolean wrapped = false;
+			int j = combatLogTable.getSelectionModel().getSelectedIndex() + 1;
+			for (int i = j; i < combatLogTable.getItems().size() && (!wrapped || i < j); i++) {
+				final EventItem it = combatLogTable.getItems().get(i);
+				if (needle.matcher(it.getAction()).find()
+						|| needle.matcher(it.getAbility()).find()
+						|| needle.matcher(it.getEvent().getSource().getName()).find()
+						|| needle.matcher(it.getEvent().getTarget().getName()).find()) {
+					combatLogTable.getSelectionModel().clearAndSelect(i);
+					combatLogTable.scrollTo(i);
+					break;
 				}
-				findButton.setDisable(false);
+				if (i + 1 == combatLogTable.getItems().size() && !wrapped) {
+					i = 0;
+					wrapped = true;
+				}
 			}
+			findButton.setDisable(false);
 		});
 	}
 
@@ -149,7 +146,7 @@ public class CombatLogPresenter extends BaseCombatLogPresenter {
 		final List<Effect> effects = eventService.getCombatEffects(combat, context.getCombatSelection());
 
 		final List<Event> events = eventService.getCombatEvents(combat, filterFlags, filterSource, filterTarget, filterSearch,
-			context.getCombatSelection());
+				context.getCombatSelection(), context.getSelectedPlayer());
 
 		fillCombatLogTable(combat, events, effects);
 
@@ -176,12 +173,7 @@ public class CombatLogPresenter extends BaseCombatLogPresenter {
 		private final Long GUID_PLAYER = -1L, GUID_OTHER = -2L;
 
 		final Actor.Role role;
-		final TreeMap<Actor, TreeSet<Actor>> menuTree = new TreeMap<Actor, TreeSet<Actor>>(new Comparator<Actor>() {
-			@Override
-			public int compare(Actor o1, Actor o2) {
-				return o1.compareTo(o2);
-			}
-		});
+		final TreeMap<Actor, TreeSet<Actor>> menuTree = new TreeMap<>(Comparator.naturalOrder());
 
 		public ActorMenuLoader(final MenuButton mb, final Actor.Role role) {
 			this.mb = mb;
@@ -190,10 +182,10 @@ public class CombatLogPresenter extends BaseCombatLogPresenter {
 
 		public void setCombat(final Combat combat, final Long tickFrom, final Long tickTo) {
 			if (this.combat == null || combat == null
-				|| this.combat.getCombatId() != combat.getCombatId()
-				|| this.combat.getEventIdTo() == null
-				|| ((tickFrom == null && this.tickFrom != null) || (tickFrom != null && (this.tickFrom == null || !tickFrom.equals(this.tickFrom))))
-				|| ((tickTo == null && this.tickTo != null) || (tickTo != null && (this.tickTo == null || !tickTo.equals(this.tickTo))))) {
+					|| this.combat.getCombatId() != combat.getCombatId()
+					|| this.combat.getEventIdTo() == null
+					|| ((tickFrom == null && this.tickFrom != null) || (tickFrom != null && (!tickFrom.equals(this.tickFrom))))
+					|| ((tickTo == null && this.tickTo != null) || (tickTo != null && (!tickTo.equals(this.tickTo))))) {
 				mb.getItems().clear();
 			}
 			this.combat = combat;
@@ -211,8 +203,8 @@ public class CombatLogPresenter extends BaseCombatLogPresenter {
 			menuTree.clear();
 
 			try {
-				final HashMap<Long, TreeSet<Actor>> items = new HashMap<Long, TreeSet<Actor>>();
-				for (final Actor a: eventService.getCombatActors(combat, role, context.getCombatSelection())) {
+				final HashMap<Long, TreeSet<Actor>> items = new HashMap<>();
+				for (final Actor a : eventService.getCombatActors(combat, role, context.getCombatSelection())) {
 					final Long guid;
 					if (a.getType() != Actor.Type.NPC) {
 						guid = GUID_PLAYER;
@@ -222,11 +214,11 @@ public class CombatLogPresenter extends BaseCombatLogPresenter {
 						guid = a.getGuid();
 					}
 					if (!items.containsKey(guid)) {
-						items.put(guid, new TreeSet<Actor>());
+						items.put(guid, new TreeSet<>());
 					}
 					items.get(guid).add(a);
 				}
-				for (final Long k: items.keySet()) {
+				for (final Long k : items.keySet()) {
 					// ensure proper sorting
 					menuTree.put(items.get(k).first(), items.get(k).size() > 1 ? items.get(k) : null);
 				}
@@ -236,7 +228,7 @@ public class CombatLogPresenter extends BaseCombatLogPresenter {
 				return;
 			}
 
-			for (final Actor a: menuTree.keySet()) {
+			for (final Actor a : menuTree.keySet()) {
 				if (a.getType() != Actor.Type.NPC || a.getInstanceId() == null || menuTree.get(a) != null) {
 					final String label;
 					if (a.getType() != Actor.Type.NPC) {
@@ -253,7 +245,7 @@ public class CombatLogPresenter extends BaseCombatLogPresenter {
 						if (a.getType() == Actor.Type.NPC) {
 							m.getItems().add(createMenuItem(new Actor(a.getName() + " (all)", a.getType(), a.getGuid())));
 						}
-						for (Actor sa: menuTree.get(a)) {
+						for (Actor sa : menuTree.get(a)) {
 							m.getItems().add(createMenuItem(sa));
 						}
 					} else {
@@ -280,12 +272,7 @@ public class CombatLogPresenter extends BaseCombatLogPresenter {
 				label = a.getName();
 			}
 			m = new MenuItem(label);
-			m.setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent e) {
-					handleClick(m, a);
-				}
-			});
+			m.setOnAction(e -> handleClick(m, a));
 			return m;
 		}
 

@@ -18,11 +18,6 @@ public class RaidTpsPopoutPresenter extends BaseRaidPopoutPresenter {
 	}
 
 	@Override
-	protected boolean isMessageEligible(final RaidCombatMessage message) {
-		return true;
-	}
-
-	@Override
 	protected ValueType getSetKey(final RaidCombatMessage message) {
 		return ValueType.THREAT;
 	}

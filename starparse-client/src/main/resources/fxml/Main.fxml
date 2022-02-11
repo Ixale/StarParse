@@ -1,21 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.effect.*?>
-<?import java.lang.*?>
-<?import java.net.*?>
 <?import javafx.geometry.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.control.CheckMenuItem?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
-<?scenebuilder-stylesheet ../styles.css?>
 
-<BorderPane fx:id="root" minHeight="-1.0" minWidth="-1.0" prefHeight="520.0" prefWidth="805.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ixale.starparse.gui.main.MainPresenter">
+<BorderPane fx:id="root" minHeight="-1.0" minWidth="-1.0" prefHeight="520.0" prefWidth="805.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ixale.starparse.gui.main.MainPresenter">
   <bottom>
     <AnchorPane fx:id="status" minHeight="21.0" prefHeight="-1.0" prefWidth="-1.0">
       <children>
@@ -25,7 +19,7 @@
         <Hyperlink fx:id="linkDonate" text="Donate" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="0.0" />
         <Line endX="10.0" endY="-10.0" rotate="0.0" startX="0.0" startY="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
           <stroke>
-            <Color blue="0.376" green="0.376" red="0.376" fx:id="x2" />
+            <Color red="0.376" green="0.376" blue="0.376" fx:id="x2" />
           </stroke>
         </Line>
         <Line endX="5.0" endY="-5.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x2" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
@@ -96,7 +90,12 @@
       <children>
         <Pane id="characterPane" minHeight="-Infinity" prefHeight="27.0" prefWidth="-1.0" visible="true">
           <children>
-            <Label fx:id="characterName" contentDisplay="CENTER" disable="false" layoutX="5.0" layoutY="5.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="90.0" text="Ready!" textAlignment="CENTER" />
+                  <HBox fx:id="characterName" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="155.0">
+                     <children>
+                  <MenuButton fx:id="characterNameMenu" contentDisplay="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="135.0" mnemonicParsing="false" prefHeight="26.0" text="Ready!" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="characterNameReset" alignment="CENTER" ellipsisString="" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="26.0" prefWidth="0.0" text="x" textOverrun="CLIP" visible="false" HBox.hgrow="NEVER" />
+                     </children>
+                  </HBox>
           </children>
         </Pane>
         <GridPane alignment="TOP_LEFT" hgap="0.0" prefHeight="-1.0" prefWidth="-1.0" styleClass="combat-stats" vgap="2.0" VBox.vgrow="NEVER">
@@ -186,7 +185,9 @@
             <Menu mnemonicParsing="false" text="Interface">
               <items>
                 <CheckMenuItem fx:id="personalStatsPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Personal Stats" />
-                <CheckMenuItem fx:id="timersPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Combat Timers" />
+                <CheckMenuItem fx:id="timersAPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Combat Timers A" />
+                <CheckMenuItem fx:id="timersBPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Combat Timers B" />
+                <CheckMenuItem fx:id="timersCPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Combat Timers C" />
                 <CheckMenuItem fx:id="timersCenterPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Timers Center" visible="false" />
                 <SeparatorMenuItem mnemonicParsing="false" text="" />
                 <CheckMenuItem fx:id="challengesPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Raid Challenges" />
@@ -233,7 +234,12 @@
         </HBox>
         <HBox id="toolbar" alignment="CENTER_RIGHT" prefHeight="40.0" prefWidth="109.0" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0">
           <children>
-            <Button onAction="#handleAbout" text="?" />
+            <Button id="darkModeButton" fx:id="darkModeButton" onAction="#handleDarkMode" text="D" />
+            <Button onAction="#handleAbout" text="?">
+              <HBox.margin>
+                <Insets left="1.0" right="1.0" />
+              </HBox.margin>
+            </Button>
             <Button onAction="#handleMinimize" text="_">
               <HBox.margin>
                 <Insets left="1.0" right="1.0" />
@@ -250,7 +256,7 @@
         <ColumnConstraints fillWidth="false" hgrow="NEVER" maxWidth="-Infinity" minWidth="150.0" prefWidth="215.0" />
         <ColumnConstraints hgrow="ALWAYS" maxWidth="-1.0" minWidth="220.0" />
         <ColumnConstraints fillWidth="false" hgrow="NEVER" maxWidth="-Infinity" minWidth="130.0" prefWidth="136.0" />
-        <ColumnConstraints fillWidth="false" hgrow="NEVER" maxWidth="-Infinity" minWidth="100.0" prefWidth="109.0" />
+        <ColumnConstraints fillWidth="false" hgrow="NEVER" maxWidth="-Infinity" minWidth="130.0" prefWidth="136.0" />
       </columnConstraints>
       <rowConstraints>
         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />

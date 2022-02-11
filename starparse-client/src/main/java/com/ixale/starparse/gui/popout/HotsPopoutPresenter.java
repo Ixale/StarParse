@@ -5,11 +5,13 @@ import java.io.FilenameFilter;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,6 +24,7 @@ import com.ixale.starparse.time.TimeUtils;
 
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -63,7 +66,7 @@ public class HotsPopoutPresenter extends BasePopoutPresenter {
 	@FXML
 	private Button autosizeButton;
 
-	private class PlayerFrame {
+	private static class PlayerFrame {
 		int col, row;
 		final AnchorPane pane;
 		final ActorState state;
@@ -111,61 +114,44 @@ public class HotsPopoutPresenter extends BasePopoutPresenter {
 		}
 
 		// target node
-		frames.setOnDragEntered(new EventHandler<DragEvent>() {
-			@Override
-			public void handle(DragEvent dragEvent) {
-				dragEvent.consume();
+		frames.setOnDragEntered(Event::consume);
+		frames.setOnDragOver(dragEvent -> {
+			if (dragEvent.getDragboard().hasString()) {
+				dragEvent.acceptTransferModes(TransferMode.MOVE);
 			}
+			dragEvent.consume();
 		});
-		frames.setOnDragOver(new EventHandler<DragEvent>() {
-			@Override
-			public void handle(DragEvent dragEvent) {
-				// drop to folders or root
-				if (dragEvent.getDragboard().hasString()) {
-					dragEvent.acceptTransferModes(TransferMode.MOVE);
-				}
-				dragEvent.consume();
+		frames.setOnDragExited(Event::consume);
+		frames.setOnDragDropped(dragEvent -> {
+			// lookup who is being moved
+			final PlayerFrame playerToMove = players.get(dragEvent.getDragboard().getString());
+			if (playerToMove == null) {
+				return;
 			}
-		});
-		frames.setOnDragExited(new EventHandler<DragEvent>() {
-			@Override
-			public void handle(DragEvent dragEvent) {
-				dragEvent.consume();
-			}
-		});
-		frames.setOnDragDropped(new EventHandler<DragEvent>() {
-			@Override
-			public void handle(DragEvent dragEvent) {
-				// lookup who is being moved
-				final PlayerFrame playerToMove = players.get(dragEvent.getDragboard().getString());
-				if (playerToMove == null) {
-					return;
-				}
 
-				// translate to x,y
-				int toCol = (int) Math.floor(dragEvent.getX() / slotWidth);
-				int toRow = (int) Math.floor(dragEvent.getY() / slotHeight);
+			// translate to x,y
+			int toCol = (int) Math.floor(dragEvent.getX() / slotWidth);
+			int toRow = (int) Math.floor(dragEvent.getY() / slotHeight);
 
-				// anyone already there?
-				for (final PlayerFrame frame: players.values()) {
-					if (frame.col == toCol && frame.row == toRow) {
-						if (frame == playerToMove) {
-							// nothing to do
-							return;
-						}
-						// swap places
-						frame.col = playerToMove.col;
-						frame.row = playerToMove.row;
-						break;
+			// anyone already there?
+			for (final PlayerFrame frame: players.values()) {
+				if (frame.col == toCol && frame.row == toRow) {
+					if (frame == playerToMove) {
+						// nothing to do
+						return;
 					}
+					// swap places
+					frame.col = playerToMove.col;
+					frame.row = playerToMove.row;
+					break;
 				}
-
-				playerToMove.col = toCol;
-				playerToMove.row = toRow;
-
-				dragEvent.consume();
-				repaintPlayers();
 			}
+
+			playerToMove.col = toCol;
+			playerToMove.row = toRow;
+
+			dragEvent.consume();
+			repaintPlayers();
 		});
 
 		autosizeButton.setVisible(false);
@@ -242,12 +228,7 @@ public class HotsPopoutPresenter extends BasePopoutPresenter {
 			return;
 		}
 		// ensure the players are added according to their HOT application to allow simpler overlay setup
-		Collections.sort(newPlayers, new Comparator<Object[]>() {
-			@Override
-			public int compare(Object[] o1, Object[] o2) {
-				return ((ActorState) o1[1]).hotLast.compareTo(((ActorState) o2[1]).hotLast);
-			}
-		});
+		newPlayers.sort(Comparator.comparing(o -> ((ActorState) o[1]).hotLast));
 		for (final Object[] pair: newPlayers) {
 			addPlayer((String) pair[0], (ActorState) pair[1]);
 		}
@@ -258,10 +239,8 @@ public class HotsPopoutPresenter extends BasePopoutPresenter {
 			frames.getChildren().remove(frame.pane);
 		}
 		players.clear();
-		for (int c = 0; c < matrix.length; c++) {
-			for (int r = 0; r < matrix[c].length; r++) {
-				matrix[c][r] = null;
-			}
+		for (final PlayerFrame[] playerFrames : matrix) {
+			Arrays.fill(playerFrames, null);
 		}
 		ignorePlayers.clear();
 	}
@@ -342,12 +321,7 @@ public class HotsPopoutPresenter extends BasePopoutPresenter {
 		final Button button = new Button("X");
 		button.opacityProperty().bind(Bindings.when(pane.hoverProperty()).then(1.0).otherwise(0.0));
 		button.setFont(Font.font("System", 12));
-		button.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(final ActionEvent event) {
-				removePlayer(characterName);
-			}
-		});
+		button.setOnAction(event -> removePlayer(characterName));
 
 		AnchorPane.setTopAnchor(button, 5d);
 		AnchorPane.setRightAnchor(button, 18d);
@@ -355,23 +329,15 @@ public class HotsPopoutPresenter extends BasePopoutPresenter {
 		pane.getChildren().addAll(title, hot, stacks, button);
 
 		// source node
-		pane.setOnDragDetected(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				final Dragboard dragBoard = pane.startDragAndDrop(TransferMode.MOVE);
-				dragBoard.setDragView(pane.snapshot(null, null));
-				final ClipboardContent content = new ClipboardContent();
-				content.put(DataFormat.PLAIN_TEXT, characterName);
-				dragBoard.setContent(content);
-				event.consume();
-			}
+		pane.setOnDragDetected(event -> {
+			final Dragboard dragBoard = pane.startDragAndDrop(TransferMode.MOVE);
+			dragBoard.setDragView(pane.snapshot(null, null));
+			final ClipboardContent content = new ClipboardContent();
+			content.put(DataFormat.PLAIN_TEXT, characterName);
+			dragBoard.setContent(content);
+			event.consume();
 		});
-		pane.setOnDragDone(new EventHandler<DragEvent>() {
-			@Override
-			public void handle(DragEvent dragEvent) {
-				dragEvent.consume();
-			}
-		});
+		pane.setOnDragDone(dragEvent -> dragEvent.consume());
 
 		// try to find space in visible area
 		final PlayerFrame frame = new PlayerFrame(pane, state);
@@ -538,7 +504,7 @@ public class HotsPopoutPresenter extends BasePopoutPresenter {
 		if (since == null || (duration != null && duration < (TimeUtils.getCurrentTime() - since - TIMEOUT_WITH_DURATION))) { // arbitrary tolerance
 			return false;
 		}
-		if (since != null && (TimeUtils.getCurrentTime() - since) > TIMEOUT_WITHOUT_DURATION) {
+		if (TimeUtils.getCurrentTime() - since > TIMEOUT_WITHOUT_DURATION) {
 			// expired (out of range etc.)
 			return false;
 		}
@@ -551,7 +517,7 @@ public class HotsPopoutPresenter extends BasePopoutPresenter {
 			gc.setFill(Color.DARKGREEN);
 		}
 		gc.fillRoundRect(0, 0, canvas.getWidth(), canvas.getHeight(), 0, 0);
-		if (duration != null && since != null) {
+		if (duration != null) {
 			gc.setFill(Color.LIMEGREEN);
 			double a = 360 * ((TimeUtils.getCurrentTime() - since) * 1.0 / duration);
 			if (a > 360) {
@@ -616,7 +582,7 @@ public class HotsPopoutPresenter extends BasePopoutPresenter {
 		repaint(null);
 	}
 
-	private class UiEntry {
+	private static class UiEntry {
 		final int type;
 		final double value;
 
@@ -639,12 +605,7 @@ public class HotsPopoutPresenter extends BasePopoutPresenter {
 		}
 
 		File clientConfig = null;
-		for (String item: settingsDir.list(new FilenameFilter() {
-			@Override
-			public boolean accept(final File dir, final String name) {
-				return name != null && !name.isEmpty() && name.contains(characterName);
-			}
-		})) {
+		for (String item: Objects.requireNonNull(settingsDir.list((dir, name) -> name != null && !name.isEmpty() && name.contains(characterName)))) {
 			final File f = new File(settingsDir, item);
 			if (clientConfig == null || (clientConfig.lastModified() < f.lastModified())) {
 				clientConfig = f;
@@ -657,7 +618,7 @@ public class HotsPopoutPresenter extends BasePopoutPresenter {
 		String profileName = null;
 		try {
 			for (String line: Files.readAllLines(clientConfig.toPath())) {
-				if (line != null && !line.isEmpty() && line.startsWith("GUI_Current_Profile = ")) {
+				if (line != null && line.startsWith("GUI_Current_Profile = ")) {
 					profileName = line.substring("GUI_Current_Profile = ".length()).trim();
 					break;
 				}
@@ -790,9 +751,10 @@ public class HotsPopoutPresenter extends BasePopoutPresenter {
 			Boolean read = null;
 			for (String line: Files.readAllLines(profileFile.toPath())) {
 				if (Boolean.TRUE.equals(read)) {
-					if (line != null && !line.isEmpty() && line.contains("</RaidFrames>")) {
+					if (line != null && line.contains("</RaidFrames>")) {
 						break;
 					}
+					assert line != null;
 					final Matcher m = p.matcher(line.trim());
 					if (!m.matches()) {
 						throw new Exception("Unable to match: " + line);
@@ -800,9 +762,8 @@ public class HotsPopoutPresenter extends BasePopoutPresenter {
 					ui.put(m.group("name"), new UiEntry(Integer.parseInt(m.group("type")), Double.parseDouble(m.group("value"))));
 					continue;
 				}
-				if (line != null && !line.isEmpty() && line.contains("<RaidFrames>")) {
+				if (line != null && line.contains("<RaidFrames>")) {
 					read = true;
-					continue;
 				}
 			}
 		} catch (Exception e) {

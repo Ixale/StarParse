@@ -1,23 +1,9 @@
 package com.ixale.starparse.gui.dialog;
 
-import java.io.File;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.TimeZone;
-
-import javax.swing.KeyStroke;
-
 import com.ixale.starparse.domain.ConfigPopoutDefault;
 import com.ixale.starparse.domain.ConfigTimer;
 import com.ixale.starparse.domain.ConfigTimer.Condition;
+import com.ixale.starparse.domain.ConfigTimers;
 import com.ixale.starparse.domain.RaidBoss;
 import com.ixale.starparse.domain.RaidGroup;
 import com.ixale.starparse.domain.ServerName;
@@ -35,17 +21,15 @@ import com.ixale.starparse.timer.TimerManager;
 import com.ixale.starparse.ws.RaidGroupClient;
 import com.ixale.starparse.ws.RaidGroupMessage;
 import com.ixale.starparse.ws.RaidGroupMessage.Action;
-
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
@@ -68,13 +52,12 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
-import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.TextFieldTreeCell;
+import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -86,12 +69,29 @@ import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.WindowEvent;
-import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 
+import javax.swing.*;
+import java.io.File;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.ResourceBundle;
+import java.util.TimeZone;
+import java.util.stream.Collectors;
+
 public class SettingsDialogPresenter extends BaseDialogPresenter {
+
+	private final static String TIMERS_MAGIC = "PGNvbS5peGFsZS5zdGFycGFyc2UuZG9tYWluLkNvbmZpZ1RpbWVyPg";
 
 	@FXML
 	private TabPane dialogRoot;
@@ -100,50 +100,50 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 	@FXML
 	private TextField logDirectoryField, recentParsedLogsLimitField, recentOpenedLogsLimitField, timeSyncHostField,
-		raidGroupNameField, raidGroupClientPasswordField, raidGroupAdminPasswordField,
-		raidPullSec, raidPullHotkey, raidBreakMin,
-		raidDamageOpacityText, raidHealingOpacityText, raidThreatOpacityText,
-		raidChallengesOpacityText, timersOpacityText, timersFractions, personalOpacityText, lockOverlaysHotkey,
-		guildField, parselyLoginField, parselyPasswordField,
-		timerName, timerSourceName, timerTargetName, timerAbilityName, timerEffectName,
-		timerDuration, timerRepeat, timerSoundOffset, timerCountdownCount;
+			raidGroupNameField, raidGroupClientPasswordField, raidGroupAdminPasswordField,
+			raidPullSec, raidPullHotkey, raidBreakMin,
+			raidDamageOpacityText, raidHealingOpacityText, raidThreatOpacityText,
+			raidChallengesOpacityText, timersOpacityText, timersFractions, personalOpacityText, lockOverlaysHotkey,
+			guildField, parselyLoginField, parselyPasswordField,
+			timerName, timerSourceName, timerTargetName, timerAbilityName, timerEffectName,
+			timerDuration, timerRepeat, timerSoundOffset, timerCountdownCount;
 
 	@FXML
 	private Slider raidDamageOpacitySlider, raidHealingOpacitySlider, raidThreatOpacitySlider,
-		raidChallengesOpacitySlider, timersOpacitySlider, personalOpacitySlider, timerSoundVolume, timerCountdownVolume;
+			raidChallengesOpacitySlider, timersOpacitySlider, personalOpacitySlider, timerSoundVolume, timerCountdownVolume;
 
 	@FXML
 	private Button raidGroupJoinButton, raidGroupCreateButton, timersCenterMoveButton, overlaysResetButton,
-		timerSaveButton, timerCopyButton, timerSoundButton, timerCountdownButton;
+			timerSaveButton, timerCopyButton, timersImportButton, timerSoundButton, timerCountdownButton;
 
 	@FXML
 	private CheckBox timeSyncEnabledButton, serverStoreEnabledButton,
-		raidDamageBars, raidHealingBars, raidThreatBars, raidChallengesBars, timersBars, personalBars, timersCenter, popoutSolid,
-		timerDisplay, timerPlaySound, timersIgnoreRepeated, timerPlayCountdown;
+			raidDamageBars, raidHealingBars, raidThreatBars, raidChallengesBars, timersBars, personalBars, timersCenter, popoutSolid,
+			timerDisplay, timerPlaySound, timersIgnoreRepeated, timersShowSource, timerPlayCountdown;
 
 	@FXML
 	private ListView<RaidGroup> raidGroupList;
 
 	@FXML
 	private ColorPicker popoutBackgroundColor, popoutTextColor,
-		popoutDamageColor, popoutHealingColor, popoutThreatColor, popoutFriendlyColor,
-		timerColor;
+			popoutDamageColor, popoutHealingColor, popoutThreatColor, popoutFriendlyColor,
+			timerColor;
 
 	@FXML
 	private ChoiceBox<String> timezoneList, serverList,
-		raidHealingMode, personalMode,
-		timerTrigger, timerTriggerTimer, timerBoss, timerCancel;
+			raidHealingMode, personalMode,
+			timerTrigger, timerTriggerTimer, timerBoss, timerCancel, timerSlot;
 
 	@FXML
 	private Text currentTime, serverLabel, timerTriggerTimerLabel, timerEffectLabel, timerBossLabel, timerSoundOffsetLabel;
 
 	@FXML
 	private RadioButton timerSourceYou, timerSourceOther, timerSourceCustom,
-		timerTargetYou, timerTargetOther, timerTargetCustom;
+			timerTargetYou, timerTargetOther, timerTargetCustom;
 
 	@FXML
 	private AnchorPane timerSourceContainer, timerTargetContainer, timerAbilityContainer,
-		timerIntervalContainer, timerTriggerContainer, timerCancelContainer;
+			timerIntervalContainer, timerTriggerContainer, timerCancelContainer;
 
 	@FXML
 	private TreeView<TimerNode> timersList;
@@ -169,7 +169,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 	private Timeline clock;
 
 	interface Validator<T extends Control> {
-			boolean isValid(T c);
+		boolean isValid(T c);
 	}
 
 	public interface SettingsUpdatedListener {
@@ -177,23 +177,23 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 		void onRaidGroupsUpdated(final RaidGroup newGroup);
 
 		void onOverlaysSettings(
-			Color backgroundColor,
-			Color textColor,
-			Color damageColor,
-			Color healingColor,
-			Color threatColor,
-			Color friendlyColor,
-			//
-			double raidDamageOpacity, boolean raidDamageBars,
-			double raidHealingOpacity, boolean raidHealingBars, String raidHealingMode,
-			double raidThreatOpacity, boolean raidThreatBars,
-			double raidChallengesOpacity, boolean raidChallengesBars,
-			double timersOpacity, boolean timersBars,
-			double personalOpacity, boolean personalBars, String personalMode,
-			//
-			boolean timersCenter, Double timersCenterX, Double timersCenterY,
-			Integer fractions,
-			boolean popoutSolid);
+				Color backgroundColor,
+				Color textColor,
+				Color damageColor,
+				Color healingColor,
+				Color threatColor,
+				Color friendlyColor,
+				//
+				double raidDamageOpacity, boolean raidDamageBars,
+				double raidHealingOpacity, boolean raidHealingBars, String raidHealingMode,
+				double raidThreatOpacity, boolean raidThreatBars,
+				double raidChallengesOpacity, boolean raidChallengesBars,
+				double timersOpacity, boolean timersBars,
+				double personalOpacity, boolean personalBars, String personalMode,
+				//
+				boolean timersCenter, Double timersCenterX, Double timersCenterY,
+				Integer fractions,
+				boolean popoutSolid);
 
 		void onOverlaysReset(String characterName);
 
@@ -204,33 +204,31 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 		void onHotkeyUpdated(Config.Hotkey hotkey, String oldHotkey, String newHotkey);
 	}
 
-	private final Validator<TextField> hotkeyValidator = new Validator<TextField>() {
-		@Override
-		public boolean isValid(TextField c) {
-			if (c.getText() == null || c.getText().isEmpty()) {
-				return true;
-			}
-			String v = c.getText();
-			if (KeyStroke.getKeyStroke(v) != null) {
-				return true;
-			}
-			// try to capitalize
-			final String[] parts = v.split("\\s+");
-			v = "";
-			for (String p: parts) {
-				if (p.matches("(shift|control|ctrl|meta|alt|altGraph|pressed|released)")) {
-					v += p + " ";
-					continue;
-				}
-				v += p.toUpperCase() + " ";
-			}
-			v = v.trim();
-			if (KeyStroke.getKeyStroke(v) != null) {
-				c.setText(v);
-				return true;
-			}
-			return false;
+	@SuppressWarnings("StringConcatenationInLoop")
+	private final Validator<TextField> hotkeyValidator = c -> {
+		if (c.getText() == null || c.getText().isEmpty()) {
+			return true;
 		}
+		String v = c.getText();
+		if (KeyStroke.getKeyStroke(v) != null) {
+			return true;
+		}
+		// try to capitalize
+		final String[] parts = v.split("\\s+");
+		v = "";
+		for (String p : parts) {
+			if (p.matches("(shift|control|ctrl|meta|alt|altGraph|pressed|released)")) {
+				v += p + " ";
+				continue;
+			}
+			v += p.toUpperCase() + " ";
+		}
+		v = v.trim();
+		if (KeyStroke.getKeyStroke(v) != null) {
+			c.setText(v);
+			return true;
+		}
+		return false;
 	};
 
 	public void setConfig(final Config config) {
@@ -245,38 +243,85 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 		setContent(dialogRoot, "Settings", null);
 
-		for (final BaseSettings s: settings) {
+		for (final BaseSettings s : settings) {
 			s.initialize();
 		}
 
 		final SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+		final Tooltip tooltipCopyTimers = new Tooltip("Copy timers to import in your clipboard");
+		final Tooltip tooltipSaveTimers = new Tooltip("Pending imported timers will be saved");
 		clock = new Timeline(
-			new KeyFrame(Duration.seconds(0),
-				new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent actionEvent) {
-						Long time = TimeUtils.getCurrentTime();
-						final TimeZone tz;
-						if (timezoneList.getValue() != null) {
-							// simulate other time zone
-							tz = TimeZone.getTimeZone(timezoneList.getValue());
-						} else {
-							tz = TimeUtils.getCurrentTimezone();
-						}
-						if (!tz.equals(sdf.getTimeZone())) {
-							sdf.setTimeZone(tz);
-						}
-						currentTime.setText("Time (" + TimeUtils.formatTimezoneOffset(tz.getOffset(time)) + "): " + sdf.format(time));
-					}
-				}),
-			new KeyFrame(Duration.seconds(1)));
+				new KeyFrame(Duration.seconds(0),
+						actionEvent -> {
+							Long time = TimeUtils.getCurrentTime();
+							final TimeZone tz;
+							if (timezoneList.getValue() != null) {
+								// simulate other time zone
+								tz = TimeZone.getTimeZone(timezoneList.getValue());
+							} else {
+								tz = TimeUtils.getCurrentTimezone();
+							}
+							if (!tz.equals(sdf.getTimeZone())) {
+								sdf.setTimeZone(tz);
+							}
+							currentTime.setText("Time (" + TimeUtils.formatTimezoneOffset(tz.getOffset(time)) + "): " + sdf.format(time));
+
+							if (!timersSettings.pendingImportedTimers.isEmpty()) {
+								timersImportButton.setDisable(false);
+								timersImportButton.setText("Save imported timers (" + timersSettings.pendingImportedTimers.size() + ")");
+								timersImportButton.setTooltip(tooltipSaveTimers);
+								timersImportButton.setUserData(null);
+
+							} else {
+								final String clipboard = Clipboard.getSystemClipboard().getString();
+								if (clipboard != null && clipboard.startsWith(TIMERS_MAGIC)) {
+									if (Objects.equals(clipboard.hashCode(), timersImportButton.getUserData())) {
+										return;
+									}
+									timersImportButton.setUserData(clipboard.hashCode());
+									try {
+										final List<ConfigTimer> timers = getTimersFromClipboard(clipboard);
+										final List<ConfigTimer> eligible = new ArrayList<>();
+										timers: for (final ConfigTimer timer : timers) {
+											for (final ConfigTimer other : config.getConfigTimers().getTimers()) {
+												if (other.getName().equals(timer.getName())) {
+													continue timers;
+												}
+											}
+											eligible.add(timer);
+										}
+										if (!eligible.isEmpty()) {
+											timersImportButton.setDisable(false);
+											timersImportButton.setText("Import timers (" + eligible.size() + ")");
+											timersImportButton.setTooltip(new Tooltip(eligible.toString()));
+										} else {
+											timersImportButton.setDisable(true);
+											timersImportButton.setText("No new timers to import");
+										}
+										return;
+
+									} catch (Exception e) {
+										timersImportButton.setText("Invalid data to import");
+										timersImportButton.setTooltip(new Tooltip("Error: " + e.getMessage()));
+										timersImportButton.setDisable(true);
+										return;
+									}
+								}
+								if (timersImportButton.getTooltip() != tooltipCopyTimers) {
+									timersImportButton.setText("No timers to import");
+									timersImportButton.setTooltip(tooltipCopyTimers);
+									timersImportButton.setDisable(true);
+								}
+							}
+						}),
+				new KeyFrame(Duration.seconds(1)));
 		clock.setCycleCount(Animation.INDEFINITE);
 	}
 
 	@Override
 	public void show() {
 		// load values & resolve differences
-		for (final BaseSettings s: settings) {
+		for (final BaseSettings s : settings) {
 			s.loadCurrent();
 			s.suppressEvents = true;
 			loadValues(s.current);
@@ -314,15 +359,15 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 	@SuppressWarnings("unchecked")
 	private void loadValues(final HashMap<Control, Object> values) {
 
-		for (final Control c: values.keySet()) {
+		for (final Control c : values.keySet()) {
 			if (c instanceof TextField) {
 				if (values.get(c) == null) {
 					((TextField) c).setText("");
 					continue;
 				}
 				((TextField) c).setText(String.valueOf(values.get(c) instanceof Double
-					? Math.round((double) values.get(c))
-					: (values.get(c))));
+						? Math.round((double) values.get(c))
+						: (values.get(c))));
 			} else if (c instanceof CheckBox) {
 				((CheckBox) c).setSelected((Boolean) values.get(c));
 			} else if (c instanceof ChoiceBox) {
@@ -331,9 +376,9 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 				((Slider) c).setValue((Double) values.get(c));
 			} else if (c instanceof ColorPicker) {
 				((ColorPicker) c).setValue((Color) values.get(c));
-				((ColorPicker) c).fireEvent(new ActionEvent());
+				c.fireEvent(new ActionEvent());
 			} else if (c instanceof Button) {
-				((Button) c).setUserData(values.get(c));
+				c.setUserData(values.get(c));
 			}
 		}
 	}
@@ -342,7 +387,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 		generalSettings.handleLogDirectory(e);
 	}
 
-	public void handleSettingsDefaults(final ActionEvent event) {
+	public void handleSettingsDefaults(@SuppressWarnings("unused") final ActionEvent event) {
 		loadValues(generalSettings.defaults);
 		generalSettings.validateAll();
 	}
@@ -363,17 +408,17 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 		raidSettings.handleSave(event);
 	}
 
-	public void handleAnnouncementsDefaults(final ActionEvent event) {
+	public void handleAnnouncementsDefaults(@SuppressWarnings("unused") final ActionEvent event) {
 		loadValues(raidSettings.defaults);
 		raidSettings.validateAll();
 	}
 
-	public void handleOverlaysDefaults(final ActionEvent event) {
+	public void handleOverlaysDefaults(@SuppressWarnings("unused") final ActionEvent event) {
 		loadValues(overlaysSettings.defaults);
 		overlaysSettings.validateAll();
 	}
 
-	public void handleOverlaysReset(final ActionEvent event) {
+	public void handleOverlaysReset(@SuppressWarnings("unused") final ActionEvent event) {
 		overlaysSettings.resetAllPopouts();
 	}
 
@@ -389,13 +434,57 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 		timersSettings.handleSave(event, true);
 	}
 
-	public void handleTimerReset(final ActionEvent event) {
+	public void handleTimerReset(@SuppressWarnings("unused") final ActionEvent event) {
 		setFlash(null);
 		if (timersList.getSelectionModel().getSelectedItem() == null) {
 			timersSettings.resetForm(null);
 			return;
 		}
 		timersList.getSelectionModel().clearSelection();
+	}
+
+	public void handleTimersImport(@SuppressWarnings("unused") final ActionEvent event) {
+		if (!timersSettings.pendingImportedTimers.isEmpty()) {
+			int pending = 0;
+			for (final ConfigTimer timer : config.getConfigTimers().getTimers()) {
+				if (Boolean.TRUE.equals(timer.getIsPreview())) {
+					timer.setIsPreview(false);
+					pending++;
+				}
+			}
+			if (pending > 0) {
+				timersSettings.fireSaveAndRefresh(pending > 1
+						? "All pending imported timers saved (" + pending + ")"
+						: "Pending imported timer saved");
+			}
+			timersSettings.pendingImportedTimers.clear();
+			return;
+		}
+		final String clipboard = Clipboard.getSystemClipboard().getString();
+		if (clipboard != null && clipboard.startsWith(TIMERS_MAGIC)) {
+			try {
+				final List<ConfigTimer> timers = getTimersFromClipboard(clipboard);
+				List<ConfigTimer> pending = new ArrayList<>();
+				timers:
+				for (final ConfigTimer timer : timers) {
+					for (final ConfigTimer other : config.getConfigTimers().getTimers()) {
+						if (other.getName().equals(timer.getName())) {
+							continue timers;
+						}
+					}
+					timer.setIsPreview(true);
+					config.getConfigTimers().getTimers().add(timer);
+					pending.add(timer);
+				}
+				if (!pending.isEmpty()) {
+					timersSettings.loadCurrent();
+					timersSettings.pendingImportedTimers.addAll(pending);
+				}
+
+			} catch (Exception e) {
+				setFlash("Invalid data to import: " + e.getMessage());
+			}
+		}
 	}
 
 	public void handleUploadSave(final ActionEvent event) {
@@ -406,13 +495,15 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 	public void handleClose(final ActionEvent event) {
 		overlaysSettings.cleanup();
 		clock.stop();
+		config.getConfigTimers().getTimers().removeAll(timersSettings.pendingImportedTimers);
+		timersSettings.pendingImportedTimers.clear();
 		super.handleClose(event);
 	}
 
-	abstract private class BaseSettings {
-		protected final HashMap<Control, Validator<? extends Control>> validators = new HashMap<Control, SettingsDialogPresenter.Validator<? extends Control>>();
-		protected final HashMap<Control, Object> defaults = new HashMap<Control, Object>();
-		protected final HashMap<Control, Object> current = new HashMap<Control, Object>();
+	abstract private static class BaseSettings {
+		protected final HashMap<Control, Validator<? extends Control>> validators = new HashMap<>();
+		protected final HashMap<Control, Object> defaults = new HashMap<>();
+		protected final HashMap<Control, Object> current = new HashMap<>();
 
 		public boolean isDirty = false, suppressEvents = false;
 
@@ -422,7 +513,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 		public boolean validateAll() {
 			boolean isValid = true;
-			for (final Control control: current.keySet()) {
+			for (final Control control : current.keySet()) {
 				if (!validate(control)) {
 					isValid = false;
 				}
@@ -444,31 +535,31 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 						control.getStyleClass().add("input-updated");
 
 					} else if (control instanceof TextField
-						&& !((TextField) control).getText().equals(defaults.get(control))) {
+							&& !((TextField) control).getText().equals(defaults.get(control))) {
 						control.getStyleClass().add("input-nondefault");
 
 					} else if (control instanceof CheckBox
-						&& ((CheckBox) control).isSelected() != (boolean) current.get(control)) {
+							&& ((CheckBox) control).isSelected() != (boolean) current.get(control)) {
 						control.getStyleClass().add("input-updated");
 
 					} else if (control instanceof CheckBox
-						&& ((CheckBox) control).isSelected() != (boolean) defaults.get(control)) {
+							&& ((CheckBox) control).isSelected() != (boolean) defaults.get(control)) {
 						control.getStyleClass().add("input-nondefault");
 
 					} else if (control instanceof ColorPicker
-						&& !((ColorPicker) control).getValue().toString().equals(current.get(control).toString())) {
+							&& !((ColorPicker) control).getValue().toString().equals(current.get(control).toString())) {
 						control.getStyleClass().add("input-updated");
 
 					} else if (control instanceof ColorPicker
-						&& !((ColorPicker) control).getValue().toString().equals(defaults.get(control).toString())) {
+							&& !((ColorPicker) control).getValue().toString().equals(defaults.get(control).toString())) {
 						control.getStyleClass().add("input-nondefault");
 
 					} else if (control instanceof ChoiceBox
-						&& !((ChoiceBox<String>) control).getValue().toString().equals(current.get(control).toString())) {
+							&& !((ChoiceBox<String>) control).getValue().equals(current.get(control).toString())) {
 						control.getStyleClass().add("input-updated");
 
 					} else if (control instanceof ChoiceBox
-						&& !((ChoiceBox<String>) control).getValue().toString().equals(defaults.get(control).toString())) {
+							&& !((ChoiceBox<String>) control).getValue().equals(defaults.get(control).toString())) {
 						control.getStyleClass().add("input-nondefault");
 					}
 				}
@@ -481,13 +572,12 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 		}
 
 		public boolean validate(final Control... controls) {
-			boolean isValid = true;
-			for (final Control control: controls) {
+			for (final Control control : controls) {
 				if (!validate(control)) {
-					isValid = false;
+					return false;
 				}
 			}
-			return isValid;
+			return true;
 		}
 	}
 
@@ -507,19 +597,19 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 			// initialize values
 			final List<String> tzs = new ArrayList<>();
-			for (final String tz: TimeZone.getAvailableIDs()) {
+			for (final String tz : TimeZone.getAvailableIDs()) {
 				if (!tz.contains("/") && !"UTC".equals(tz)) {
 					continue;
 				}
 				if (!tz.startsWith("Africa")
-					&& !tz.startsWith("America")
-					&& !tz.startsWith("Australia")
-					&& !tz.startsWith("Asia")
-					&& !tz.startsWith("Atlantic")
-					&& !tz.startsWith("Europe")
-					&& !tz.startsWith("Indian")
-					&& !tz.startsWith("Pacific")
-					&& !tz.startsWith("UTC")) {
+						&& !tz.startsWith("America")
+						&& !tz.startsWith("Australia")
+						&& !tz.startsWith("Asia")
+						&& !tz.startsWith("Atlantic")
+						&& !tz.startsWith("Europe")
+						&& !tz.startsWith("Indian")
+						&& !tz.startsWith("Pacific")
+						&& !tz.startsWith("UTC")) {
 					continue;
 				}
 
@@ -530,64 +620,42 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			defaults.put(timezoneList, TimeUtils.getDefaultTimezone().getID());
 
 			// validators
-			validators.put(logDirectoryField, new Validator<TextField>() {
-				@Override
-				public boolean isValid(TextField c) {
-					return c.getText() != null && !c.getText().isEmpty() && new File(c.getText()).isDirectory();
-				}
-			});
+			validators.put(logDirectoryField, (Validator<TextField>) c
+					-> c.getText() != null && !c.getText().isEmpty() && new File(c.getText()).isDirectory());
 
-			final Validator<TextField> recentsValidator = new Validator<TextField>() {
-				@Override
-				public boolean isValid(TextField c) {
-					if (c.getText() == null || c.getText().isEmpty()) {
-						return false;
-					}
-					try {
-						int x = Integer.parseInt(c.getText());
-						return x > 0 && x < 20;
-					} catch (NumberFormatException e) {
-						return false;
-					}
+			final Validator<TextField> recentsValidator = c -> {
+				if (c.getText() == null || c.getText().isEmpty()) {
+					return false;
+				}
+				try {
+					int x = Integer.parseInt(c.getText());
+					return x > 0 && x < 20;
+				} catch (NumberFormatException e) {
+					return false;
 				}
 			};
 
 			validators.put(recentParsedLogsLimitField, recentsValidator);
 			validators.put(recentOpenedLogsLimitField, recentsValidator);
 
-			validators.put(timeSyncHostField, new Validator<TextField>() {
-				@Override
-				public boolean isValid(TextField c) {
-					return !timeSyncEnabledButton.isSelected()
-						|| (c.getText() != null && !c.getText().isEmpty() && c.getText().length() >= 10 && c.getText().length() < 255);
-				}
-			});
+			validators.put(timeSyncHostField, (Validator<TextField>) c
+					-> !timeSyncEnabledButton.isSelected()
+					|| (c.getText() != null && !c.getText().isEmpty() && c.getText().length() >= 10 && c.getText().length() < 255));
 
-			for (final Control control: validators.keySet()) {
-				control.focusedProperty().addListener(new ChangeListener<Boolean>() {
-					@Override
-					public void changed(ObservableValue<? extends Boolean> val, Boolean oldVal, Boolean newVal) {
-						if (!newVal) {
-							validate(control);
-						}
+			for (final Control control : validators.keySet()) {
+				control.focusedProperty().addListener((val, oldVal, newVal) -> {
+					if (!newVal) {
+						validate(control);
 					}
 				});
 			}
 
-			final Validator<CheckBox> boolValidator = new Validator<CheckBox>() {
-				@Override
-				public boolean isValid(CheckBox c) {
-					return true;
-				}
-			};
+			final Validator<CheckBox> boolValidator = c -> true;
 			validators.put(timeSyncEnabledButton, boolValidator);
 
-			timeSyncEnabledButton.selectedProperty().addListener(new ChangeListener<Boolean>() {
-				@Override
-				public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldVal, Boolean newVal) {
-					validate(timeSyncEnabledButton);
-					validate(timeSyncHostField);
-				}
+			timeSyncEnabledButton.selectedProperty().addListener((arg0, oldVal, newVal) -> {
+				validate(timeSyncEnabledButton);
+				validate(timeSyncHostField);
 			});
 
 			timeSyncHostField.disableProperty().bind(timeSyncEnabledButton.selectedProperty().not());
@@ -608,7 +676,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 		private void handleSave(final ActionEvent event) {
 			if (!validate(logDirectoryField, recentParsedLogsLimitField, recentOpenedLogsLimitField, timeSyncEnabledButton,
-				timeSyncHostField)) {
+					timeSyncHostField)) {
 				setFlash("Please fix the highlighted fields");
 				return;
 			}
@@ -629,7 +697,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			handleClose(event);
 		}
 
-		private void handleLogDirectory(ActionEvent e) {
+		private void handleLogDirectory(@SuppressWarnings("unused") final ActionEvent event) {
 			if (directoryChooser == null) {
 				directoryChooser = new DirectoryChooser();
 				directoryChooser.setTitle("Combat Log Directory");
@@ -682,7 +750,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 				label.setText(raidGroup.getName());
 				time.setText(raidGroup.getClientPassword()
-					+ (raidGroup.getAdminPassword() != null ? " / " + raidGroup.getAdminPassword() : ""));
+						+ (raidGroup.getAdminPassword() != null ? " / " + raidGroup.getAdminPassword() : ""));
 
 				setGraphic(container);
 			}
@@ -696,48 +764,42 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			final RaidGroupClient client = new RaidGroupClient(config, new RaidGroupClient.ResultHandler() {
 				@Override
 				public void onSuccess(final String message) {
-					Platform.runLater(new Runnable() {
-						@Override
-						public void run() {
-							setFlash(message, FlashMessage.Type.SUCCESS);
-							RaidGroup newGroup = null;
+					Platform.runLater(() -> {
+						setFlash(message, FlashMessage.Type.SUCCESS);
+						RaidGroup newGroup = null;
 
-							switch (action) {
-								case CREATE:
-								case JOIN:
-									// store & reload list
-									config.getRaidGroups().add(raidGroup);
+						switch (action) {
+							case CREATE:
+							case JOIN:
+								// store & reload list
+								config.getRaidGroups().add(raidGroup);
 
-									raidGroupNameField.setText("");
-									raidGroupClientPasswordField.setText("");
-									raidGroupAdminPasswordField.setText("");
-									newGroup = raidGroup;
-									break;
-								case REMOVE:
-									// remove & reload list
-									config.getRaidGroups().remove(raidGroup);
-									break;
-							}
-							loadRaidGroups();
-							raidSettings.enableButtons();
-							raidSettings.fireRaidGroupsUpdated(newGroup);
+								raidGroupNameField.setText("");
+								raidGroupClientPasswordField.setText("");
+								raidGroupAdminPasswordField.setText("");
+								newGroup = raidGroup;
+								break;
+							case REMOVE:
+								// remove & reload list
+								config.getRaidGroups().remove(raidGroup);
+								break;
 						}
+						loadRaidGroups();
+						raidSettings.enableButtons();
+						raidSettings.fireRaidGroupsUpdated(newGroup);
 					});
 					client.close();
 				}
 
 				@Override
 				public void onError(final String message) {
-					Platform.runLater(new Runnable() {
-						@Override
-						public void run() {
-							setFlash(message);
-							try {
-								Thread.sleep(1000);
-							} catch (InterruptedException e) {
-							}
-							raidSettings.enableButtons();
+					Platform.runLater(() -> {
+						setFlash(message);
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException ignored) {
 						}
+						raidSettings.enableButtons();
 					});
 					client.close();
 				}
@@ -771,20 +833,17 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 					}
 				};
 			}
-		};
+		}
 
 		@Override
 		public void initialize() {
 
 			// raid groups
-			final Validator<TextField> stringValidator = new Validator<TextField>() {
-				@Override
-				public boolean isValid(TextField c) {
-					if (c == raidGroupAdminPasswordField) {
-						return c.getText() == null || c.getText().isEmpty() || (c.getText().length() >= 5 && c.getText().length() < 20);
-					}
-					return c.getText() != null && !c.getText().isEmpty() && c.getText().length() >= 5 && c.getText().length() < 20;
+			final Validator<TextField> stringValidator = c -> {
+				if (c == raidGroupAdminPasswordField) {
+					return c.getText() == null || c.getText().isEmpty() || (c.getText().length() >= 5 && c.getText().length() < 20);
 				}
+				return c.getText() != null && !c.getText().isEmpty() && c.getText().length() >= 5 && c.getText().length() < 20;
 			};
 
 			validators.put(raidGroupNameField, stringValidator);
@@ -792,56 +851,43 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			validators.put(raidGroupAdminPasswordField, stringValidator);
 
 			// list
-			raidGroupList.setCellFactory(new Callback<ListView<RaidGroup>, ListCell<RaidGroup>>() {
-				public ListCell<RaidGroup> call(ListView<RaidGroup> combatListView) {
-					return new RaidGroupCell();
-				}
-			});
+			raidGroupList.setCellFactory(combatListView -> new RaidGroupCell());
 
 			final MenuItem miRemoveClient = new MenuItem("Remove group from your list");
-			miRemoveClient.setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent ae) {
-					if (raidGroupList.getSelectionModel().getSelectedItems().isEmpty()) {
-						return;
-					}
-					config.getRaidGroups().remove(raidGroupList.getSelectionModel().getSelectedItem());
-					loadRaidGroups();
-					fireRaidGroupsUpdated(null);
+			miRemoveClient.setOnAction(ae -> {
+				if (raidGroupList.getSelectionModel().getSelectedItems().isEmpty()) {
+					return;
 				}
+				config.getRaidGroups().remove(raidGroupList.getSelectionModel().getSelectedItem());
+				loadRaidGroups();
+				fireRaidGroupsUpdated(null);
 			});
 
 			final MenuItem miRemoveServer = new MenuItem("Remove group from server");
-			miRemoveServer.setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent ae) {
-					if (raidGroupList.getSelectionModel().getSelectedItems().isEmpty()) {
-						return;
-					}
-					new RaidGroupAction(Action.REMOVE, raidGroupList.getSelectionModel().getSelectedItem()).start();
+			miRemoveServer.setOnAction(ae -> {
+				if (raidGroupList.getSelectionModel().getSelectedItems().isEmpty()) {
+					return;
 				}
+				new RaidGroupAction(Action.REMOVE, raidGroupList.getSelectionModel().getSelectedItem()).start();
 			});
 
 			final ContextMenu menu = new ContextMenu(miRemoveClient, miRemoveServer);
-			menu.setOnShowing(new EventHandler<WindowEvent>() {
-				@Override
-				public void handle(WindowEvent arg0) {
-					if (raidGroupList.getSelectionModel().getSelectedItems().isEmpty()
+			menu.setOnShowing(arg0 -> {
+				if (raidGroupList.getSelectionModel().getSelectedItems().isEmpty()
 						|| raidGroupList.getSelectionModel().getSelectedItem() == null) {
-						miRemoveClient.setDisable(true);
-						miRemoveServer.setDisable(true);
-						return;
-					}
+					miRemoveClient.setDisable(true);
+					miRemoveServer.setDisable(true);
+					return;
+				}
 
-					miRemoveClient.setText("Remove '" + raidGroupList.getSelectionModel().getSelectedItem().getName()
+				miRemoveClient.setText("Remove '" + raidGroupList.getSelectionModel().getSelectedItem().getName()
 						+ "' from your list");
-					miRemoveClient.setDisable(false);
+				miRemoveClient.setDisable(false);
 
-					if (raidGroupList.getSelectionModel().getSelectedItem().getAdminPassword() != null) {
-						miRemoveServer.setDisable(false);
-						miRemoveServer.setText("Remove '" + raidGroupList.getSelectionModel().getSelectedItem().getName()
+				if (raidGroupList.getSelectionModel().getSelectedItem().getAdminPassword() != null) {
+					miRemoveServer.setDisable(false);
+					miRemoveServer.setText("Remove '" + raidGroupList.getSelectionModel().getSelectedItem().getName()
 							+ "' from the server");
-					}
 				}
 			});
 			raidGroupList.setContextMenu(menu);
@@ -851,33 +897,27 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			defaults.put(raidBreakMin, String.valueOf(Config.DEFAULT_RAID_BREAK_MINUTES));
 
 			// validators
-			validators.put(raidPullSec, new Validator<TextField>() {
-				@Override
-				public boolean isValid(TextField c) {
-					if (c.getText() == null || c.getText().isEmpty()) {
-						return false;
-					}
-					try {
-						int x = Integer.parseInt(c.getText());
-						return x >= 5 && x <= 99;
-					} catch (NumberFormatException e) {
-						return false;
-					}
+			validators.put(raidPullSec, (Validator<TextField>) c -> {
+				if (c.getText() == null || c.getText().isEmpty()) {
+					return false;
+				}
+				try {
+					int x = Integer.parseInt(c.getText());
+					return x >= 5 && x <= 99;
+				} catch (NumberFormatException e) {
+					return false;
 				}
 			});
 			validators.put(raidPullHotkey, hotkeyValidator);
-			validators.put(raidBreakMin, new Validator<TextField>() {
-				@Override
-				public boolean isValid(TextField c) {
-					if (c.getText() == null || c.getText().isEmpty()) {
-						return false;
-					}
-					try {
-						int x = Integer.parseInt(c.getText());
-						return x >= 1 && x <= 99;
-					} catch (NumberFormatException e) {
-						return false;
-					}
+			validators.put(raidBreakMin, (Validator<TextField>) c -> {
+				if (c.getText() == null || c.getText().isEmpty()) {
+					return false;
+				}
+				try {
+					int x = Integer.parseInt(c.getText());
+					return x >= 1 && x <= 99;
+				} catch (NumberFormatException e) {
+					return false;
 				}
 			});
 		}
@@ -916,7 +956,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			raidGroupList.getItems().setAll(config.getRaidGroups());
 		}
 
-		private void handleRaidGroupJoin(final ActionEvent event) {
+		private void handleRaidGroupJoin(@SuppressWarnings("unused") final ActionEvent event) {
 
 			if (!validateRaidGroup()) {
 				return;
@@ -925,7 +965,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			new RaidGroupAction(Action.JOIN).start();
 		}
 
-		private void handleRaidGroupCreate(final ActionEvent event) {
+		private void handleRaidGroupCreate(@SuppressWarnings("unused") final ActionEvent event) {
 
 			if (!validateRaidGroup()) {
 				return;
@@ -939,6 +979,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			new RaidGroupAction(Action.CREATE).start();
 		}
 
+		@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 		private boolean validateRaidGroup() {
 			if (!validate(raidGroupNameField, raidGroupClientPasswordField, raidGroupAdminPasswordField)) {
 				setFlash("Please fix the highlighted fields");
@@ -946,8 +987,8 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			}
 			setFlash(null);
 
-			for (final RaidGroup group: config.getRaidGroups()) {
-				if (group.getName().toLowerCase().equals(raidGroupNameField.getText().toLowerCase())) {
+			for (final RaidGroup group : config.getRaidGroups()) {
+				if (group.getName().equalsIgnoreCase(raidGroupNameField.getText())) {
 					setFlash("This group is already in your list");
 					return false;
 				}
@@ -1014,50 +1055,35 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			bindPreview(popoutSolid);
 
 			defaults.put(timersCenter, false);
-			validators.put(timersCenter, new Validator<CheckBox>() {
-				@Override
-				public boolean isValid(CheckBox c) {
-					return true;
-				}
-			});
-			timersCenter.selectedProperty().addListener(new ChangeListener<Boolean>() {
-				@Override
-				public void changed(ObservableValue<? extends Boolean> obsVal, Boolean oldVal, Boolean newVal) {
-					timersCenterMoveButton.setDisable(!newVal);
-					fireSettingsUpdated();
-				}
+			validators.put(timersCenter, (Validator<CheckBox>) c -> true);
+			timersCenter.selectedProperty().addListener((obsVal, oldVal, newVal) -> {
+				timersCenterMoveButton.setDisable(!newVal);
+				fireSettingsUpdated();
 			});
 
 			defaults.put(timersFractions, "");
-			validators.put(timersFractions, new Validator<TextField>() {
-				@Override
-				public boolean isValid(TextField c) {
-					if (c.getText() == null || c.getText().isEmpty()) {
-						return true;
-					}
-					try {
-						int x = Integer.parseInt(c.getText());
-						return x >= 1 && x <= 99;
-					} catch (NumberFormatException e) {
-						return false;
-					}
+			validators.put(timersFractions, (Validator<TextField>) c -> {
+				if (c.getText() == null || c.getText().isEmpty()) {
+					return true;
+				}
+				try {
+					int x = Integer.parseInt(c.getText());
+					return x >= 1 && x <= 99;
+				} catch (NumberFormatException e) {
+					return false;
 				}
 			});
-			timersFractions.textProperty().addListener(new ChangeListener<String>() {
-				@Override
-				public void changed(ObservableValue<? extends String> obsVal, String oldVal, String newVal) {
-					if (newVal == null) {
+			timersFractions.textProperty().addListener((obsVal, oldVal, newVal) -> {
+				if (newVal == null) {
+					return;
+				}
+				try {
+					if (!validate(timersFractions)) {
 						return;
 					}
-					try {
-						if (!validate(timersFractions)) {
-							return;
-						}
-						fireSettingsUpdated();
+					fireSettingsUpdated();
 
-					} catch (Exception e) {
-
-					}
+				} catch (Exception ignored) {
 				}
 			});
 
@@ -1067,6 +1093,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 				private double initialPosX, initialPosY, initialMouseX, initialMouseY;
 
 				final AnchorPane n = new AnchorPane();
+
 				{
 					n.setPrefWidth(150);
 					n.setPrefHeight(80);
@@ -1090,12 +1117,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 					final Button cancel = new Button("Cancel");
 					cancel.setCursor(Cursor.HAND);
-					cancel.setOnAction(new EventHandler<ActionEvent>() {
-						@Override
-						public void handle(ActionEvent arg0) {
-							cleanTimersCenterMove();
-						}
-					});
+					cancel.setOnAction(arg0 -> cleanTimersCenterMove());
 					n.getChildren().setAll(sign, ok, cancel);
 					n.setId("toolbar");
 
@@ -1135,8 +1157,8 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 					timersAnchor.setGraphic(n);
 					timersAnchor.setGraphicTextGap(0);
 					timersAnchor.setStyle("-fx-background-color: transparent; -fx-border-width: 0; "
-						+ "-fx-padding: 0; -fx-background-radius: 0; "
-						+ "-fx-background-insets: 0; -fx-effect: null");
+							+ "-fx-padding: 0; -fx-background-radius: 0; "
+							+ "-fx-background-insets: 0; -fx-effect: null");
 				}
 
 				private int getPosition(double pos, Integer snap) {
@@ -1174,45 +1196,35 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 			defaults.put(text, String.valueOf((int) (Config.DEFAULT_POPOUT_OPACITY * 100)));
 
-			validators.put(text, new Validator<TextField>() {
-				@Override
-				public boolean isValid(TextField c) {
-					if (c.getText() == null || c.getText().isEmpty()) {
-						return false;
-					}
-					try {
-						int x = Integer.parseInt(c.getText());
-						return x > 0 && x <= 100;
-					} catch (NumberFormatException e) {
-						return false;
-					}
+			validators.put(text, (Validator<TextField>) c -> {
+				if (c.getText() == null || c.getText().isEmpty()) {
+					return false;
+				}
+				try {
+					int x = Integer.parseInt(c.getText());
+					return x > 0 && x <= 100;
+				} catch (NumberFormatException e) {
+					return false;
 				}
 			});
 
-			slider.valueProperty().addListener(new ChangeListener<Number>() {
-				@Override
-				public void changed(ObservableValue<? extends Number> obsVal, Number oldVal, Number newVal) {
-					text.setText(String.valueOf(Math.round((double) newVal)));
-					fireSettingsUpdated();
-				}
+			slider.valueProperty().addListener((obsVal, oldVal, newVal) -> {
+				text.setText(String.valueOf(Math.round((double) newVal)));
+				fireSettingsUpdated();
 			});
 
-			text.textProperty().addListener(new ChangeListener<String>() {
-				@Override
-				public void changed(ObservableValue<? extends String> obsVal, String oldVal, String newVal) {
-					if (newVal == null) {
+			text.textProperty().addListener((obsVal, oldVal, newVal) -> {
+				if (newVal == null) {
+					return;
+				}
+				try {
+					if (!validate(text)) {
 						return;
 					}
-					try {
-						if (!validate(text)) {
-							return;
-						}
-						slider.adjustValue(Integer.valueOf(newVal));
-						fireSettingsUpdated();
+					slider.adjustValue(Integer.parseInt(newVal));
+					fireSettingsUpdated();
 
-					} catch (Exception e) {
-
-					}
+				} catch (Exception ignored) {
 				}
 			});
 		}
@@ -1221,19 +1233,11 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 			defaults.put(control, color);
 
-			validators.put(control, new Validator<ColorPicker>() {
-				@Override
-				public boolean isValid(ColorPicker c) {
-					return true;
-				}
-			});
+			validators.put(control, (Validator<ColorPicker>) c -> true);
 
-			control.valueProperty().addListener(new ChangeListener<Color>() {
-				@Override
-				public void changed(ObservableValue<? extends Color> obsVal, Color oldVal, Color newVal) {
-					if (validate(control)) {
-						fireSettingsUpdated();
-					}
+			control.valueProperty().addListener((obsVal, oldVal, newVal) -> {
+				if (validate(control)) {
+					fireSettingsUpdated();
 				}
 			});
 
@@ -1243,30 +1247,17 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 			defaults.put(control, control != timersCenter && control != popoutSolid);
 
-			validators.put(control, new Validator<CheckBox>() {
-				@Override
-				public boolean isValid(CheckBox c) {
-					return true;
-				}
-			});
+			validators.put(control, (Validator<CheckBox>) c -> true);
 
-			control.selectedProperty().addListener(new ChangeListener<Boolean>() {
-				@Override
-				public void changed(ObservableValue<? extends Boolean> obsVal, Boolean oldVal, Boolean newVal) {
-					if (validate(control)) {
-						fireSettingsUpdated();
-					}
+			control.selectedProperty().addListener((obsVal, oldVal, newVal) -> {
+				if (validate(control)) {
+					fireSettingsUpdated();
 				}
 			});
 		}
 
 		private void bindPreview(final ChoiceBox<String> combo) {
-			combo.valueProperty().addListener(new ChangeListener<String>() {
-				@Override
-				public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
-					fireSettingsUpdated();
-				}
-			});
+			combo.valueProperty().addListener((arg0, arg1, arg2) -> fireSettingsUpdated());
 		}
 
 		@Override
@@ -1312,7 +1303,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 		}
 
 		private void loadPopoutCurrent(String name, Slider opacitySlider, TextField opacityText, CheckBox bars, final List<Mode> modes,
-			final ChoiceBox<String> mode) {
+				final ChoiceBox<String> mode) {
 
 			Double opacity = config.getDefaultCharacter().getPopout(name).getOpacity();
 			if (opacity == null) {
@@ -1334,7 +1325,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			if (modes.isEmpty()) {
 				modes.addAll(BasePopoutPresenter.getPopoutModes(name));
 				final List<String> items = new ArrayList<>();
-				for (final Mode m: modes) {
+				for (final Mode m : modes) {
 					items.add(m.getTitle());
 				}
 				mode.setItems(FXCollections.observableList(items));
@@ -1343,7 +1334,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			final String c = config.getCurrentCharacter().getPopout(name).getMode();
 			boolean found = false;
 			if (c != null) {
-				for (final Mode m: modes) {
+				for (final Mode m : modes) {
 					if (m.getMode().equals(c)) {
 						mode.getSelectionModel().select(m.getTitle());
 						current.put(mode, m.getTitle());
@@ -1446,31 +1437,31 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 		private void fireSettingsUpdated() {
 			if (!suppressEvents && listener != null) {
 				listener.onOverlaysSettings(
-					popoutBackgroundColor.getValue(),
-					popoutTextColor.getValue(),
-					popoutDamageColor.getValue(),
-					popoutHealingColor.getValue(),
-					popoutThreatColor.getValue(),
-					popoutFriendlyColor.getValue(),
-					//
-					raidDamageOpacitySlider.getValue() / 100, raidDamageBars.isSelected(),
-					raidHealingOpacitySlider.getValue() / 100, raidHealingBars.isSelected(), getMode(raidHealingMode, raidHealingModes),
-					raidThreatOpacitySlider.getValue() / 100, raidThreatBars.isSelected(),
-					raidChallengesOpacitySlider.getValue() / 100, raidChallengesBars.isSelected(),
-					timersOpacitySlider.getValue() / 100, timersBars.isSelected(),
-					personalOpacitySlider.getValue() / 100, personalBars.isSelected(), getMode(personalMode, personalModes),
-					//
-					timersCenter.isSelected(),
-					timersCenterMoveButton.getUserData() != null ? ((Double[]) timersCenterMoveButton.getUserData())[0] : null,
-					timersCenterMoveButton.getUserData() != null ? ((Double[]) timersCenterMoveButton.getUserData())[1] : null,
-					getSafeInt(timersFractions),
-					popoutSolid.isSelected());
+						popoutBackgroundColor.getValue(),
+						popoutTextColor.getValue(),
+						popoutDamageColor.getValue(),
+						popoutHealingColor.getValue(),
+						popoutThreatColor.getValue(),
+						popoutFriendlyColor.getValue(),
+						//
+						raidDamageOpacitySlider.getValue() / 100, raidDamageBars.isSelected(),
+						raidHealingOpacitySlider.getValue() / 100, raidHealingBars.isSelected(), getMode(raidHealingMode, raidHealingModes),
+						raidThreatOpacitySlider.getValue() / 100, raidThreatBars.isSelected(),
+						raidChallengesOpacitySlider.getValue() / 100, raidChallengesBars.isSelected(),
+						timersOpacitySlider.getValue() / 100, timersBars.isSelected(),
+						personalOpacitySlider.getValue() / 100, personalBars.isSelected(), getMode(personalMode, personalModes),
+						//
+						timersCenter.isSelected(),
+						timersCenterMoveButton.getUserData() != null ? ((Double[]) timersCenterMoveButton.getUserData())[0] : null,
+						timersCenterMoveButton.getUserData() != null ? ((Double[]) timersCenterMoveButton.getUserData())[1] : null,
+						getSafeInt(timersFractions),
+						popoutSolid.isSelected());
 			}
 			isDirty = true;
 		}
 
 		private String getMode(ChoiceBox<String> combo, List<Mode> modes) {
-			for (final Mode m: modes) {
+			for (final Mode m : modes) {
 				if (m.getTitle().equals(combo.getValue())) {
 					return m.getMode();
 				}
@@ -1484,7 +1475,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 		@Override
 		public void initialize() {
 			final List<String> servers = new ArrayList<>();
-			for (final ServerName sn: ServerName.values()) {
+			for (final ServerName sn : ServerName.values()) {
 				if (sn.getActive().equals(sn)) {
 					servers.add(sn.getName());
 				}
@@ -1534,7 +1525,9 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 		private ConfigTimer currentTimer;
 
-		private final TreeItem<TimerNode> rootItem = new TreeItem<TimerNode>(new TimerNode("Timers"));
+		private final TreeItem<TimerNode> rootItem = new TreeItem<>(new TimerNode("Timers"));
+
+		private final List<ConfigTimer> pendingImportedTimers = new ArrayList<>();
 
 		private final Map<Condition.Type, List<? extends Node>> controls = new HashMap<>();
 
@@ -1544,34 +1537,24 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			final ContextMenu treeMenu = new ContextMenu();
 			final MenuItem addItem = new MenuItem("Add new Folder");
 			treeMenu.getItems().add(addItem);
-			addItem.setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent arg0) {
-					timersList.getSelectionModel().clearSelection();
-					final TreeItem<TimerNode> newFolder = new TreeItem<TimerNode>(new TimerNode("New folder"));
-					rootItem.getChildren().add(newFolder);
-					timersList.setRoot(rootItem);
-					timersList.getSelectionModel().select(newFolder);
-				}
+			addItem.setOnAction(arg0 -> {
+				timersList.getSelectionModel().clearSelection();
+				final TreeItem<TimerNode> newFolder = new TreeItem<>(new TimerNode("New folder"));
+				rootItem.getChildren().add(newFolder);
+				timersList.setRoot(rootItem);
+				sortAllItems();
+				timersList.getSelectionModel().select(newFolder);
 			});
 			timersList.setContextMenu(treeMenu);
 
-			timersList.setCellFactory(new Callback<TreeView<TimerNode>, TreeCell<TimerNode>>() {
-				@Override
-				public TreeCell<TimerNode> call(TreeView<TimerNode> param) {
-					return new TimerCell(param);
+			timersList.setCellFactory(TimerCell::new);
+			timersList.getSelectionModel().selectedItemProperty().addListener((arg0, arg1, newNode) -> {
+				if (newNode == null || newNode.getValue().isFolder()) {
+					resetForm(null);
+					return;
 				}
-			});
-			timersList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<TimerNode>>() {
-				@Override
-				public void changed(ObservableValue<? extends TreeItem<TimerNode>> arg0, TreeItem<TimerNode> arg1, TreeItem<TimerNode> newNode) {
-					if (newNode == null || newNode.getValue().isFolder()) {
-						resetForm(null);
-						return;
-					}
-					if (!newNode.getValue().timer.equals(currentTimer)) {
-						resetForm(newNode.getValue().timer);
-					}
+				if (newNode.getValue().timer != null && !newNode.getValue().timer.equals(currentTimer)) {
+					resetForm(newNode.getValue().timer);
 				}
 			});
 
@@ -1580,42 +1563,37 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			rootItem.setExpanded(true);
 
 			// setup relevant controls
-			controls.put(Condition.Type.ABILITY_ACTIVATED, Arrays.asList(timerAbilityContainer));
+			controls.put(Condition.Type.ABILITY_ACTIVATED, Arrays.asList(timerSourceContainer, timerAbilityContainer));
 			controls.put(Condition.Type.COMBAT_START, null);
 			// controls.put(Condition.Type.COMBAT_END, null);
-			controls.put(Condition.Type.DAMAGE, Arrays.asList(timerSourceContainer, timerTargetContainer,
-				timerAbilityContainer));
+			controls.put(Condition.Type.DAMAGE, Arrays.asList(timerSourceContainer, timerTargetContainer, timerAbilityContainer));
 			controls.put(Condition.Type.HEAL, controls.get(Condition.Type.DAMAGE));
-			controls.put(Condition.Type.EFFECT_GAINED, Arrays.asList(timerSourceContainer, timerTargetContainer,
-				timerAbilityContainer, timerEffectLabel, timerEffectName));
+			controls.put(Condition.Type.EFFECT_GAINED, Arrays.asList(timerSourceContainer, timerTargetContainer, timerAbilityContainer, timerEffectLabel, timerEffectName));
 			controls.put(Condition.Type.EFFECT_LOST, controls.get(Condition.Type.EFFECT_GAINED));
 			controls.put(Condition.Type.TIMER_STARTED, Arrays.asList(timerTriggerTimerLabel, timerTriggerTimer));
 			controls.put(Condition.Type.TIMER_FINISHED, controls.get(Condition.Type.TIMER_STARTED));
 
 			// initialize values
 			final List<String> triggers = new ArrayList<>();
-			for (final Condition.Type type: controls.keySet()) {
+			for (final Condition.Type type : controls.keySet()) {
 				triggers.add(type.getLabel());
 			}
 			Collections.sort(triggers);
 			timerTrigger.setItems(FXCollections.observableList(triggers));
-			timerTrigger.valueProperty().addListener(new ChangeListener<String>() {
-				@Override
-				public void changed(ObservableValue<? extends String> arg0, String oldVal, String newVal) {
-					if (newVal != null) {
-						final Condition.Type t = Condition.Type.parse(newVal);
-						if (t != null) {
-							resetCondition(t);
-							return;
-						}
+			timerTrigger.valueProperty().addListener((arg0, oldVal, newVal) -> {
+				if (newVal != null) {
+					final Condition.Type t = Condition.Type.parse(newVal);
+					if (t != null) {
+						resetCondition(t);
+						return;
 					}
-					resetCondition(null);
 				}
+				resetCondition(null);
 			});
 
 			final List<String> bosses = new ArrayList<>();
 			bosses.add(EMPTY_VALUE);
-			for (final RaidBoss boss: Helpers.getRaidBosses()) {
+			for (final RaidBoss boss : Helpers.getRaidBosses()) {
 				if (bosses.contains(boss.getName())) {
 					continue;
 				}
@@ -1623,206 +1601,157 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			}
 			Collections.sort(bosses);
 			timerBoss.setItems(FXCollections.observableList(bosses));
+			timerSlot.setItems(FXCollections.observableList(Arrays.stream(ConfigTimer.Slot.values()).map(Enum::name).collect(Collectors.toList())));
 
 			final List<String> sounds = new ArrayList<>();
 			sounds.add(SOUND_FILE);
-			for (final File sound: SoundManager.getDefaultSounds(null)) {
+			for (final File sound : SoundManager.getDefaultSounds(null)) {
 				sounds.add(sound.getName());
 			}
 			timerSoundFile.setItems(FXCollections.observableList(sounds));
-			timerSoundFile.valueProperty().addListener(new ChangeListener<String>() {
-				@Override
-				public void changed(ObservableValue<? extends String> arg0, String oldVal, String newVal) {
-					if (suppressEvents) {
-						return;
-					}
-					if (SOUND_FILE.equals(newVal)) {
-						handleCustomSoundFile();
+			timerSoundFile.valueProperty().addListener((arg0, oldVal, newVal) -> {
+				if (suppressEvents) {
+					return;
+				}
+				if (SOUND_FILE.equals(newVal)) {
+					handleCustomSoundFile();
 
-					} else if (newVal != null && (currentTimer == null || oldVal != null || !newVal.equals(currentTimer.getAudio()))) {
-						stopAllSounds();
-						SoundManager.play(newVal, timerSoundVolume.getValue());
-					}
+				} else if (newVal != null && (currentTimer == null || oldVal != null || !newVal.equals(currentTimer.getAudio()))) {
+					stopAllSounds();
+					SoundManager.play(newVal, timerSoundVolume.getValue());
 				}
 			});
 
-			timerPlaySound.selectedProperty().addListener(new ChangeListener<Boolean>() {
-				@Override
-				public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean newVal) {
-					timerSoundFile.setDisable(!newVal);
-					timerSoundButton.setDisable(!newVal);
-					timerSoundVolume.setDisable(!newVal);
-					timerSoundOffset.setDisable(!newVal);
-					timerSoundOffsetLabel.setFill(newVal ? Color.BLACK : Color.SILVER);
+			timerPlaySound.selectedProperty().addListener((arg0, arg1, newVal) -> {
+				timerSoundFile.setDisable(!newVal);
+				timerSoundButton.setDisable(!newVal);
+				timerSoundVolume.setDisable(!newVal);
+				timerSoundOffset.setDisable(!newVal);
+				timerSoundOffsetLabel.getStyleClass().clear();
+				if (!newVal) {
+					timerSoundOffsetLabel.getStyleClass().add("disabled");
 				}
 			});
 
-			timerSoundButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-				@Override
-				public void handle(MouseEvent arg0) {
-					if (suppressEvents) {
-						return;
-					}
-					if (timerSoundFile.getValue() != null && !SOUND_FILE.equals(timerSoundFile.getValue())) {
-						stopAllSounds();
-						SoundManager.play(timerSoundFile.getValue(), timerSoundVolume.getValue());
-					}
+			timerSoundButton.setOnMouseClicked(arg0 -> {
+				if (suppressEvents) {
+					return;
+				}
+				if (timerSoundFile.getValue() != null && !SOUND_FILE.equals(timerSoundFile.getValue())) {
+					stopAllSounds();
+					SoundManager.play(timerSoundFile.getValue(), timerSoundVolume.getValue());
 				}
 			});
 
-			final List<String> voices = new ArrayList<>();
-			for (final String voice: SoundManager.getDefaultVoices()) {
-				voices.add(voice);
-			}
+			final List<String> voices = new ArrayList<>(SoundManager.getDefaultVoices());
 			timerCountdownVoice.setItems(FXCollections.observableList(voices));
 
-			timerPlayCountdown.selectedProperty().addListener(new ChangeListener<Boolean>() {
-				@Override
-				public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean newVal) {
-					timerCountdownVoice.setDisable(!newVal);
-					timerCountdownButton.setDisable(!newVal);
-					timerCountdownVolume.setDisable(!newVal);
-					timerCountdownCount.setDisable(!newVal);
+			timerPlayCountdown.selectedProperty().addListener((arg0, arg1, newVal) -> {
+				timerCountdownVoice.setDisable(!newVal);
+				timerCountdownButton.setDisable(!newVal);
+				timerCountdownVolume.setDisable(!newVal);
+				timerCountdownCount.setDisable(!newVal);
+			});
+
+			timerCountdownButton.setOnMouseClicked(arg0 -> {
+				if (timerCountdownVoice.getValue() != null && !SOUND_FILE.equals(timerCountdownVoice.getValue())) {
+					stopAllSounds();
+					playCountdown(timerCountdownVoice.getValue());
 				}
 			});
 
-			timerCountdownButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-				@Override
-				public void handle(MouseEvent arg0) {
-					if (timerCountdownVoice.getValue() != null && !SOUND_FILE.equals(timerCountdownVoice.getValue())) {
-						stopAllSounds();
-						playCountdown(timerCountdownVoice.getValue());
-					}
-				}
-			});
-
-			timerDisplay.selectedProperty().addListener(new ChangeListener<Boolean>() {
-				@Override
-				public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean newVal) {
-					timerColor.setDisable(!newVal);
-				}
+			timerDisplay.selectedProperty().addListener((arg0, arg1, newVal) -> {
+				timerColor.setDisable(!newVal);
+				timerSlot.setDisable(!newVal);
 			});
 
 			timersIgnoreRepeated.setTooltip(new Tooltip("If selected, timer will NOT be restarted every time a trigger occurs"));
+			timersShowSource.setTooltip(new Tooltip("If selected, timer name will display the caster"));
 
 			// validators
-			validators.put(timerName, new Validator<TextField>() {
-				@Override
-				public boolean isValid(TextField c) {
-					if (c.getText() == null || c.getText().isEmpty()) {
+			validators.put(timerName, (Validator<TextField>) c -> {
+				if (c.getText() == null || c.getText().isEmpty()) {
+					return false;
+				}
+				for (final ConfigTimer other : config.getConfigTimers().getTimers()) {
+					if (other.getName().equals(timerName.getText()) && !other.equals(currentTimer)) {
 						return false;
 					}
-					for (final ConfigTimer other: config.getConfigTimers().getTimers()) {
-						if (other.getName().equals(timerName.getText()) && !other.equals(currentTimer)) {
-							return false;
-						}
-					}
+				}
+				return true;
+			});
+			validators.put(timerTriggerTimer, (Validator<ChoiceBox<String>>) c -> {
+				if (!timerTriggerContainer.isVisible()) {
 					return true;
 				}
-			});
-			validators.put(timerTriggerTimer, new Validator<ChoiceBox<String>>() {
-				@Override
-				public boolean isValid(ChoiceBox<String> c) {
-					if (!timerTriggerContainer.isVisible()) {
-						return true;
-					}
-					return !(Condition.Type.TIMER_STARTED.getLabel().equals(timerTrigger.getValue())
+				return !(Condition.Type.TIMER_STARTED.getLabel().equals(timerTrigger.getValue())
 						|| Condition.Type.TIMER_FINISHED.getLabel().equals(timerTrigger.getValue()))
 						|| (timerTriggerTimer.getValue() != null && !timerTriggerTimer.getValue().equals(EMPTY_VALUE));
-				}
 			});
-			validators.put(timerSourceName, new Validator<TextField>() {
-				@Override
-				public boolean isValid(TextField c) {
-					return !timerSourceCustom.isSelected()
-						|| (c.getText() != null && !c.getText().isEmpty() && c.getText().length() < 255);
-				}
-			});
-			validators.put(timerTargetName, new Validator<TextField>() {
-				@Override
-				public boolean isValid(TextField c) {
-					return !timerTargetCustom.isSelected()
-						|| (c.getText() != null && !c.getText().isEmpty() && c.getText().length() < 255);
-				}
-			});
-			validators.put(timerAbilityName, new Validator<TextField>() {
-				@Override
-				public boolean isValid(TextField c) {
-					return !Condition.Type.ABILITY_ACTIVATED.getLabel().equals(timerTrigger.getValue())
-						|| (c.getText() != null && !c.getText().isEmpty() && c.getText().length() < 255);
-				}
-			});
-			validators.put(timerEffectName, new Validator<TextField>() {
-				@Override
-				public boolean isValid(TextField c) {
-					return !(Condition.Type.EFFECT_GAINED.getLabel().equals(timerTrigger.getValue())
-						|| Condition.Type.EFFECT_LOST.getLabel().equals(timerTrigger.getValue()))
-						|| (c.getText() != null && !c.getText().isEmpty() && c.getText().length() < 255);
-				}
-			});
+			validators.put(timerSourceName, (Validator<TextField>) c
+					-> !timerSourceCustom.isSelected()
+					|| (c.getText() != null && !c.getText().isEmpty() && c.getText().length() < 255));
+			validators.put(timerTargetName, (Validator<TextField>) c
+					-> !timerTargetCustom.isSelected()
+					|| (c.getText() != null && !c.getText().isEmpty() && c.getText().length() < 255));
+			validators.put(timerAbilityName, (Validator<TextField>) c
+					-> !Condition.Type.ABILITY_ACTIVATED.getLabel().equals(timerTrigger.getValue())
+					|| (c.getText() != null && !c.getText().isEmpty() && c.getText().length() < 255));
+			validators.put(timerEffectName, (Validator<TextField>) c
+					-> !(Condition.Type.EFFECT_GAINED.getLabel().equals(timerTrigger.getValue())
+					|| Condition.Type.EFFECT_LOST.getLabel().equals(timerTrigger.getValue()))
+					|| (c.getText() != null && !c.getText().isEmpty() && c.getText().length() < 255));
 
-			validators.put(timerDuration, new Validator<TextField>() {
-				@Override
-				public boolean isValid(TextField c) {
-					if (c.getText() == null || c.getText().isEmpty()) {
-						return true;
-					}
-					try {
-						Double x = safeDouble(c.getText());
-						return x >= 0 && x <= 1000;
-					} catch (NumberFormatException e) {
-						return false;
-					}
+			validators.put(timerDuration, (Validator<TextField>) c -> {
+				if (c.getText() == null || c.getText().isEmpty()) {
+					return true;
+				}
+				try {
+					double x = safeDouble(c.getText());
+					return x >= 0 && x <= 1000;
+				} catch (NumberFormatException e) {
+					return false;
 				}
 			});
-			validators.put(timerRepeat, new Validator<TextField>() {
-				@Override
-				public boolean isValid(TextField c) {
-					if (c.getText() == null || c.getText().isEmpty()) {
-						return true;
-					}
-					try {
-						int x = Integer.parseInt(c.getText());
-						return x >= 0 && x <= 999;
-					} catch (NumberFormatException e) {
-						return false;
-					}
+			validators.put(timerRepeat, (Validator<TextField>) c -> {
+				if (c.getText() == null || c.getText().isEmpty()) {
+					return true;
+				}
+				try {
+					int x = Integer.parseInt(c.getText());
+					return x >= 0 && x <= 999;
+				} catch (NumberFormatException e) {
+					return false;
 				}
 			});
-			validators.put(timerSoundOffset, new Validator<TextField>() {
-				@Override
-				public boolean isValid(TextField c) {
-					if (c.getText() == null || c.getText().isEmpty()) {
+			validators.put(timerSoundOffset, (Validator<TextField>) c -> {
+				if (c.getText() == null || c.getText().isEmpty()) {
+					return true;
+				}
+				try {
+					int x = Integer.parseInt(c.getText());
+					if (x == 0) {
+						c.setText(null);
 						return true;
 					}
-					try {
-						int x = Integer.parseInt(c.getText());
-						if (x == 0) {
-							c.setText(null);
-							return true;
-						}
-						if (x < 0) {
-							x = -x;
-							c.setText(String.valueOf(x));
-						}
-						return x >= 1 && x <= 1000;
-					} catch (NumberFormatException e) {
-						return false;
+					if (x < 0) {
+						x = -x;
+						c.setText(String.valueOf(x));
 					}
+					return x >= 1 && x <= 1000;
+				} catch (NumberFormatException e) {
+					return false;
 				}
 			});
-			validators.put(timerCountdownCount, new Validator<TextField>() {
-				@Override
-				public boolean isValid(TextField c) {
-					if (c.getText() == null || c.getText().isEmpty()) {
-						return true;
-					}
-					try {
-						int x = Integer.parseInt(c.getText());
-						return x >= 1 && x <= 10;
-					} catch (NumberFormatException e) {
-						return false;
-					}
+			validators.put(timerCountdownCount, (Validator<TextField>) c -> {
+				if (c.getText() == null || c.getText().isEmpty()) {
+					return true;
+				}
+				try {
+					int x = Integer.parseInt(c.getText());
+					return x >= 1 && x <= 10;
+				} catch (NumberFormatException e) {
+					return false;
 				}
 			});
 		}
@@ -1833,11 +1762,13 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			// load current timers
 			rootItem.getChildren().clear();
 
-			for (final ConfigTimer timer: config.getConfigTimers().getTimers()) {
+			for (final ConfigTimer timer : config.getConfigTimers().getTimers()) {
 				TreeItem<TimerNode> appendTo = null;
 				if (timer.getFolder() != null && !timer.getFolder().isEmpty()) {
-					for (TreeItem<TimerNode> item: rootItem.getChildren()) {
-						if (item.getValue().isFolder() && item.getValue().folderName.equals(timer.getFolder())) {
+					for (TreeItem<TimerNode> item : rootItem.getChildren()) {
+						if (item.getValue().isFolder()
+								&& item.getValue().folderName != null
+								&& item.getValue().folderName.equals(timer.getFolder())) {
 							// found
 							appendTo = item;
 							break;
@@ -1845,7 +1776,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 					}
 					if (appendTo == null) {
 						// folder does not exist
-						appendTo = new TreeItem<TimerNode>(new TimerNode(timer.getFolder()));
+						appendTo = new TreeItem<>(new TimerNode(timer.getFolder()));
 						appendTo.setExpanded(!timer.isSystem());
 						rootItem.getChildren().add(appendTo);
 					}
@@ -1854,27 +1785,31 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 					// no folder, straight to root
 					appendTo = rootItem;
 				}
-				appendTo.getChildren().add(new TreeItem<TimerNode>(new TimerNode(timer)));
+				appendTo.getChildren().add(new TreeItem<>(new TimerNode(timer)));
 			}
 			// sort them
-			for (final TreeItem<TimerNode> item: rootItem.getChildren()) {
+			sortAllItems();
+
+			resetForm(null);
+		}
+
+		private void sortAllItems() {
+			for (final TreeItem<TimerNode> item : rootItem.getChildren()) {
 				if (item.isLeaf()) {
 					continue;
 				}
 				sortItems(item);
 			}
 			sortItems(rootItem);
-
-			resetForm(null);
 		}
 
 		private void resetCondition(Condition.Type selectedType) {
 			// hide all conditional items
-			for (final Condition.Type type: controls.keySet()) {
+			for (final Condition.Type type : controls.keySet()) {
 				if (controls.get(type) == null) {
 					continue;
 				}
-				for (final Node node: controls.get(type)) {
+				for (final Node node : controls.get(type)) {
 					node.setVisible(false);
 					if (node instanceof AnchorPane) {
 						((AnchorPane) node).setPrefHeight(0);
@@ -1886,15 +1821,15 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			}
 
 			// and show those relevant
-			for (final Condition.Type type: controls.keySet()) {
+			for (final Condition.Type type : controls.keySet()) {
 				if (controls.get(type) == null) {
 					continue;
 				}
-				for (final Node node: controls.get(type)) {
+				for (final Node node : controls.get(type)) {
 					if (type.equals(selectedType)) {
 						node.setVisible(true);
 						if (node instanceof AnchorPane) {
-							((AnchorPane) node).setPrefHeight(23);
+							((AnchorPane) node).setPrefHeight(30);
 						}
 					}
 				}
@@ -1903,11 +1838,11 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 		private List<String> getAvailableTimers(final ConfigTimer currentTimer) {
 			final List<String> timers = new ArrayList<>();
-			for (final ConfigTimer timer: config.getConfigTimers().getTimers()) {
+			for (final ConfigTimer timer : config.getConfigTimers().getTimers()) {
 				if (timer.isSystem()) {
 					continue;
 				}
-				if (currentTimer != null && timer.equals(currentTimer)) {
+				if (timer.equals(currentTimer)) {
 					continue;
 				}
 				timers.add(timer.getName());
@@ -1920,13 +1855,13 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			resetCondition(null);
 
 			timerName.setText(null);
-			timerName.setPrefWidth(105.0);
+			timerName.setPrefWidth(120.0);
 			timerName.setDisable(false);
 			timerBoss.setVisible(true);
 			timerBossLabel.setVisible(true);
 			timerBoss.getSelectionModel().clearSelection();
 			timerTriggerContainer.setVisible(true);
-			timerTriggerContainer.setPrefHeight(23.0);
+			timerTriggerContainer.setPrefHeight(30);
 			timerTrigger.setVisible(true);
 			timerTrigger.getSelectionModel().clearSelection();
 
@@ -1945,7 +1880,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			timerEffectName.setText(null);
 
 			timerIntervalContainer.setVisible(true);
-			timerIntervalContainer.setPrefHeight(23.0);
+			timerIntervalContainer.setPrefHeight(30);
 			timerDuration.setVisible(true);
 			timerDuration.setText(null);
 			timerRepeat.setVisible(true);
@@ -1955,6 +1890,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			timerDisplay.setSelected(false);
 			timerColor.setValue(Color.WHEAT);
 			timerColor.fireEvent(new ActionEvent());
+			timerSlot.setValue(ConfigTimer.Slot.A.name());
 
 			timerPlaySound.setSelected(true);
 			timerPlaySound.setSelected(false);
@@ -1975,8 +1911,9 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			cancel.addAll(getAvailableTimers(timer));
 			timerCancel.setItems(FXCollections.observableList(cancel));
 			timerCancelContainer.setVisible(true);
-			timerCancelContainer.setPrefHeight(23.0);
+			timerCancelContainer.setPrefHeight(30);
 			timersIgnoreRepeated.setSelected(false);
+			timersShowSource.setSelected(false);
 
 			if (timer != null) {
 				loadTimer(timer);
@@ -2017,8 +1954,10 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 				timerName.setDisable(true);
 				timerBoss.setVisible(false);
 				timerBossLabel.setVisible(false);
+				timersShowSource.setVisible(false);
 			} else if (timer.getTrigger() != null && timer.getTrigger().getType() != null) {
 				timerTrigger.getSelectionModel().select(timer.getTrigger().getType().getLabel());
+				timersShowSource.setVisible(true);
 			}
 
 			if (timer.getTrigger() != null) {
@@ -2097,6 +2036,8 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 				timerColor.fireEvent(new ActionEvent());
 			}
 
+			timerSlot.setValue((timer.getSlot() == null ? ConfigTimer.Slot.A : timer.getSlot()).name());
+
 			if (timer.getAudio() != null) {
 				timerPlaySound.setSelected(true);
 				timerSoundFile.getSelectionModel().select(timer.getAudio());
@@ -2124,6 +2065,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 				timerCancelContainer.setPrefHeight(0);
 			} else {
 				timersIgnoreRepeated.setSelected(timer.isIgnoreRepeated());
+				timersShowSource.setSelected(timer.isShowSource());
 			}
 
 			if (timer.getCancel() != null) {
@@ -2144,16 +2086,16 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 		@Override
 		public boolean validateAll() {
 			return validate(timerName, timerTriggerTimer,
-				timerSourceName, timerTargetName,
-				timerAbilityName, timerEffectName,
-				timerDuration, timerRepeat,
-				timerSoundOffset, timerCountdownCount);
+					timerSourceName, timerTargetName,
+					timerAbilityName, timerEffectName,
+					timerDuration, timerRepeat,
+					timerSoundOffset, timerCountdownCount);
 		}
 
-		private void handleSave(final ActionEvent event, boolean asCopy) {
+		private void handleSave(@SuppressWarnings("unused") final ActionEvent event, boolean asCopy) {
 			if (currentTimer != null && asCopy && currentTimer.isSystem()) {
 				// reset and save
-				TimerManager.getSystemTimer(currentTimer).fillConfig(currentTimer);
+				Objects.requireNonNull(TimerManager.getSystemTimer(currentTimer)).fillConfig(currentTimer);
 
 				fireSaveAndRefresh("Timer " + currentTimer.getName() + " reset");
 				return;
@@ -2167,7 +2109,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 				return;
 			}
 			if (asCopy) {
-				for (final ConfigTimer other: config.getConfigTimers().getTimers()) {
+				for (final ConfigTimer other : config.getConfigTimers().getTimers()) {
 					if (other.getName().equals(timerName.getText())) {
 						timerName.setText(timerName.getText() + " (2)");
 					}
@@ -2205,6 +2147,8 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 				currentTimer.setColor(null);
 			}
 
+			currentTimer.setSlot(timerSlot.getValue() == null ? null : ConfigTimer.Slot.valueOf(timerSlot.getValue()));
+
 			if (timerPlaySound.isSelected() && timerSoundFile.getValue() != null) {
 				currentTimer.setAudio(timerSoundFile.getValue());
 				currentTimer.setVolume((int) (timerSoundVolume.getValue()));
@@ -2232,6 +2176,10 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 				currentTimer.setCountdownCount(null);
 				currentTimer.setCountdownVolume(null);
 			}
+			if (Boolean.TRUE.equals(currentTimer.getIsPreview())) {
+				currentTimer.setIsPreview(false);
+				pendingImportedTimers.remove(currentTimer);
+			}
 
 			// reload
 			fireSaveAndRefresh("Timer " + currentTimer.getName() + " saved");
@@ -2239,10 +2187,12 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 		private void fireSaveAndRefresh(String message) {
 			// store as it will disappear
-			final String newName = currentTimer.getName();
+			final String newName = currentTimer == null ? null : currentTimer.getName();
 			loadCurrent();
 			// will fire reset
-			timersList.getSelectionModel().select(searchTimerNode(rootItem, newName));
+			if (newName != null) {
+				timersList.getSelectionModel().select(searchTimerNode(rootItem, newName));
+			}
 			setFlash(message, FlashMessage.Type.SUCCESS);
 
 			if (listener != null) {
@@ -2251,6 +2201,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 			// save now
 			Marshaller.storeToFile(config.getConfigTimers(), StarparseApp.CONFIG_TIMERS_FILE);
+			timersImportButton.setUserData(null); // force new eval
 		}
 
 		private boolean handleCustomTimer() {
@@ -2356,6 +2307,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			}
 			currentTimer.setCancel(cancel);
 			currentTimer.setIgnoreRepeated(timersIgnoreRepeated.isSelected());
+			currentTimer.setShowSource(timersShowSource.isSelected());
 			return true;
 		}
 
@@ -2369,12 +2321,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			final File file = fileChooser.showOpenDialog(null);
 			if (file != null) {
 				// avoid race condition with change handler
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						timerSoundFile.setValue(file.getAbsolutePath());
-					}
-				});
+				Platform.runLater(() -> timerSoundFile.setValue(file.getAbsolutePath()));
 			}
 		}
 
@@ -2384,7 +2331,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			Integer s = null;
 			try {
 				s = Integer.parseInt(timerCountdownCount.getText());
-			} catch (Exception e) {
+			} catch (Exception ignored) {
 			}
 			if (s == null || s < 1 || s > 10) {
 				s = 5;
@@ -2440,7 +2387,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 		}
 
 		public String toString() {
-			if (type.equals(Type.FOLDER)) {
+			if (timer == null || type.equals(Type.FOLDER)) {
 				return folderName;
 			}
 			return timer.getName();
@@ -2451,7 +2398,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 		}
 
 		public boolean isSystemFolder() {
-			return Type.FOLDER.equals(type) && folderName.startsWith(ConfigTimer.SYSTEM_FOLDER);
+			return Type.FOLDER.equals(type) && folderName != null && folderName.startsWith(ConfigTimer.SYSTEM_FOLDER);
 		}
 	}
 
@@ -2475,103 +2422,98 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 			final MenuItem renameItem = new MenuItem("Rename Folder");
 			folderMenu.getItems().add(renameItem);
-			renameItem.setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent arg0) {
-					startEdit();
+			renameItem.setOnAction(arg0 -> startEdit());
+
+			final MenuItem exportFolderItem = new MenuItem("Export Folder");
+			folderMenu.getItems().add(exportFolderItem);
+			exportFolderItem.setOnAction(arg0 -> {
+				final List<ConfigTimer> timers = new ArrayList<>();
+				for (final ConfigTimer timer : config.getConfigTimers().getTimers()) {
+					if (Objects.equals(getItem().folderName, timer.getFolder())) {
+						timers.add(timer);
+					}
+				}
+				if (timers.size() > 0) {
+					copyTimersToClipboard(timers);
+					setFlash("Timers exported into your clipboard (" + timers.size() + ")", FlashMessage.Type.INFO);
+				} else {
+					setFlash("Folder is empty", FlashMessage.Type.INFO);
 				}
 			});
 
 			final MenuItem deleteItem = new MenuItem("Remove Timer");
 			timerMenu.getItems().add(deleteItem);
-			deleteItem.setOnAction(new EventHandler<ActionEvent>() {
-				@Override
-				public void handle(ActionEvent arg0) {
-					config.getConfigTimers().getTimers().remove(getItem().timer);
-					timersSettings.loadCurrent();
-					if (listener != null) {
-						listener.onTimersUpdated();
-					}
+			deleteItem.setOnAction(arg0 -> {
+				final ConfigTimer timer = getItem().timer;
+				config.getConfigTimers().getTimers().remove(timer);
+				timersSettings.pendingImportedTimers.remove(timer);
+				timersSettings.loadCurrent();
+				if (listener != null) {
+					listener.onTimersUpdated();
 				}
+			});
+
+			final MenuItem exportTimerItem = new MenuItem("Export Timer");
+			timerMenu.getItems().add(exportTimerItem);
+			exportTimerItem.setOnAction(arg0 -> {
+				final ConfigTimer timer = getItem().timer;
+				copyTimersToClipboard(Collections.singletonList(timer));
+				setFlash("Timer " + timer + " exported into your clipboard", FlashMessage.Type.INFO);
 			});
 
 			// source node
-			setOnDragDetected(new EventHandler<MouseEvent>() {
-				@Override
-				public void handle(MouseEvent event) {
-					if (getItem() == null || getItem().isFolder() || getItem().timer.isSystem()) {
-						return;
-					}
-					final Dragboard dragBoard = startDragAndDrop(TransferMode.MOVE);
-					final ClipboardContent content = new ClipboardContent();
-					content.put(DataFormat.PLAIN_TEXT, getItem().timer.getName());
-					dragBoard.setContent(content);
-					event.consume();
+			setOnDragDetected(event -> {
+				if (getItem() == null || getItem().isFolder() || getItem().timer == null || getItem().timer.isSystem()) {
+					return;
 				}
+				final Dragboard dragBoard = startDragAndDrop(TransferMode.MOVE);
+				final ClipboardContent content = new ClipboardContent();
+				content.put(DataFormat.PLAIN_TEXT, getItem().timer.getName());
+				dragBoard.setContent(content);
+				event.consume();
 			});
-			setOnDragDone(new EventHandler<DragEvent>() {
-				@Override
-				public void handle(DragEvent dragEvent) {
-					dragEvent.consume();
-				}
-			});
+			setOnDragDone(Event::consume);
 
 			// target node
-			setOnDragEntered(new EventHandler<DragEvent>() {
-				@Override
-				public void handle(DragEvent dragEvent) {
-					dragEvent.consume();
+			setOnDragEntered(Event::consume);
+			setOnDragOver(dragEvent -> {
+				if (getItem() == null) {
+					return;
 				}
-			});
-			setOnDragOver(new EventHandler<DragEvent>() {
-				@Override
-				public void handle(DragEvent dragEvent) {
-					if (getItem() == null) {
-						return;
+				// drop to folders or root
+				if ((getItem().isFolder() && !getItem().isSystemFolder()) || getItem().folderName == null) {
+					if (dragEvent.getDragboard().hasString()) {
+						dragEvent.acceptTransferModes(TransferMode.MOVE);
 					}
-					// drop to folders or root
-					if ((getItem().isFolder() && !getItem().isSystemFolder()) || getItem().folderName == null) {
-						if (dragEvent.getDragboard().hasString()) {
-							dragEvent.acceptTransferModes(TransferMode.MOVE);
-						}
-					}
-					dragEvent.consume();
 				}
+				dragEvent.consume();
 			});
-			setOnDragExited(new EventHandler<DragEvent>() {
-				@Override
-				public void handle(DragEvent dragEvent) {
-					dragEvent.consume();
-				}
-			});
-			setOnDragDropped(new EventHandler<DragEvent>() {
-				@Override
-				public void handle(DragEvent dragEvent) {
-					final String valueToMove = dragEvent.getDragboard().getString();
-					final TreeItem<TimerNode> itemToMove = searchTimerNode(parentTree.getRoot(), valueToMove);
-					final TreeItem<TimerNode> newParent;
-					if (getItem().isFolder() && !getItem().isSystemFolder()
+			setOnDragExited(Event::consume);
+			setOnDragDropped(dragEvent -> {
+				final String valueToMove = dragEvent.getDragboard().getString();
+				final TreeItem<TimerNode> itemToMove = searchTimerNode(parentTree.getRoot(), valueToMove);
+				final TreeItem<TimerNode> newParent;
+				if (getItem().isFolder() && !getItem().isSystemFolder()
 						&& !getItem().folderName.equals(itemToMove.getValue().timer.getFolder())) {
-						// dropping to new folder
-						newParent = getTreeItem();
-						itemToMove.getValue().timer.setFolder(getItem().folderName);
-					} else {
-						// dropping to root
-						newParent = getTreeItem().getParent();
-						itemToMove.getValue().timer.setFolder(null);
-					}
-					// Remove from former parent.
-					getTreeView().getSelectionModel().clearSelection();
-					itemToMove.getParent().getChildren().remove(itemToMove);
-					// Add to new parent.
-					newParent.getChildren().add(itemToMove);
-					sortItems(newParent);
-					getTreeView().getSelectionModel().select(itemToMove);
-					dragEvent.consume();
+					// dropping to new folder
+					newParent = getTreeItem();
+					itemToMove.getValue().timer.setFolder(getItem().folderName);
+				} else {
+					// dropping to root
+					newParent = getTreeItem().getParent();
+					itemToMove.getValue().timer.setFolder(null);
+				}
+				// Remove from former parent.
+				getTreeView().getSelectionModel().clearSelection();
+				itemToMove.getParent().getChildren().remove(itemToMove);
+				// Add to new parent.
+				newParent.getChildren().add(itemToMove);
+				sortItems(newParent);
+				getTreeView().getSelectionModel().select(itemToMove);
+				dragEvent.consume();
 
-					if (listener != null) {
-						listener.onTimersUpdated();
-					}
+				if (listener != null) {
+					listener.onTimersUpdated();
 				}
 			});
 		}
@@ -2580,7 +2522,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 		public void commitEdit(TimerNode node) {
 			super.commitEdit(node);
 
-			for (final TreeItem<TimerNode> item: getTreeItem().getChildren()) {
+			for (final TreeItem<TimerNode> item : getTreeItem().getChildren()) {
 				item.getValue().timer.setFolder(node.folderName);
 			}
 
@@ -2597,6 +2539,11 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			setEditable(item != null && item.isFolder() && !item.isSystemFolder());
 			String text = (item == null) ? null : item.toString();
 			setText(text);
+			if (item != null && item.timer != null && Boolean.TRUE.equals(item.timer.getIsPreview())) {
+				this.getStyleClass().add("timer-preview");
+			} else {
+				this.getStyleClass().remove("timer-preview");
+			}
 
 			if (!isEditing() && isEditable()) {
 				setContextMenu(folderMenu);
@@ -2610,11 +2557,13 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 	private TreeItem<TimerNode> searchTimerNode(final TreeItem<TimerNode> currentNode, final String valueToSearch) {
 		TreeItem<TimerNode> result = null;
-		if (!currentNode.getValue().isFolder() && currentNode.getValue().timer.getName().equals(valueToSearch)) {
+		if (!currentNode.getValue().isFolder()
+				&& currentNode.getValue().timer != null
+				&& currentNode.getValue().timer.getName().equals(valueToSearch)) {
 			result = currentNode;
 
 		} else if (!currentNode.isLeaf()) {
-			for (final TreeItem<TimerNode> child: currentNode.getChildren()) {
+			for (final TreeItem<TimerNode> child : currentNode.getChildren()) {
 				result = searchTimerNode(child, valueToSearch);
 				if (result != null) {
 					break;
@@ -2627,23 +2576,21 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 	@SuppressWarnings("unchecked")
 	private void sortItems(TreeItem<TimerNode> item) {
 		final List<?> items = Arrays.asList(item.getChildren().toArray());
-		Collections.sort((List<TreeItem<TimerNode>>) items, new Comparator<TreeItem<TimerNode>>() {
-			@Override
-			public int compare(final TreeItem<TimerNode> o1, final TreeItem<TimerNode> o2) {
-				if (o1.getValue().isFolder() && !o2.getValue().isFolder()) {
-					return 1;
-				}
-				if (o1.getValue().isSystemFolder()) {
-					return 1;
-				}
-				if (o2.getValue().isFolder() && !o1.getValue().isFolder()) {
-					return -1;
-				}
-				if (o2.getValue().isSystemFolder()) {
-					return -1;
-				}
-				return o1.toString().compareTo(o2.toString());
+		//noinspection Java8ListSort
+		Collections.sort((List<TreeItem<TimerNode>>) items, (o1, o2) -> {
+			if (o1.getValue().isFolder() && !o2.getValue().isFolder()) {
+				return 1;
 			}
+			if (o1.getValue().isSystemFolder()) {
+				return 1;
+			}
+			if (o2.getValue().isFolder() && !o1.getValue().isFolder()) {
+				return -1;
+			}
+			if (o2.getValue().isSystemFolder()) {
+				return -1;
+			}
+			return o1.toString().compareTo(o2.toString());
 		});
 		item.getChildren().setAll((List<TreeItem<TimerNode>>) items);
 	}
@@ -2657,5 +2604,34 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 		} catch (NumberFormatException e) {
 			return Double.parseDouble(text.trim().replace(',', '.'));
 		}
+	}
+
+	private void copyTimersToClipboard(final List<ConfigTimer> timers) {
+		try {
+			final StringBuilder sb = new StringBuilder();
+			for (final ConfigTimer timer : timers) {
+				sb.append(Marshaller.storeToString(timer));
+			}
+			final ClipboardContent content = new ClipboardContent();
+			content.put(DataFormat.PLAIN_TEXT, new String(Base64.getEncoder().encode(sb.toString().getBytes(StandardCharsets.UTF_8))));
+			Clipboard.getSystemClipboard().setContent(content);
+
+		} catch (Exception e) {
+			setFlash("Unable to export timer: " + e.getMessage());
+		}
+	}
+
+	private List<ConfigTimer> getTimersFromClipboard(final String clipboard) {
+		final String xml = "<com.ixale.starparse.domain.ConfigTimers><timers>"
+				+ new String(Base64.getDecoder().decode(clipboard), StandardCharsets.UTF_8)
+				+ "</timers></com.ixale.starparse.domain.ConfigTimers>";
+		final ConfigTimers imported = Marshaller.loadFromString(xml);
+		if (imported == null) {
+			throw new IllegalArgumentException("Invalid data");
+		}
+		if (imported.getTimers() != null) {
+			return imported.getTimers();
+		}
+		return new ArrayList<>();
 	}
 }

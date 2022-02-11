@@ -34,6 +34,10 @@ public class ChallengesPopoutPresenter extends BaseRaidPopoutPresenter {
 	@Override
 	protected boolean isMessageEligible(final RaidCombatMessage message) {
 
+		if (!super.isMessageEligible(message)) {
+			return false;
+		}
+
 		if (message.getChallengeStats() == null || message.getChallengeStats().isEmpty()) {
 			// nothing to do
 			return false;

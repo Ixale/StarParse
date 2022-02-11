@@ -1,9 +1,9 @@
 package com.ixale.starparse.service;
 
-import java.util.Collection;
-
 import com.ixale.starparse.domain.RaidRequest;
 import com.ixale.starparse.ws.RaidCombatMessage;
+
+import java.util.Collection;
 
 public interface RaidService {
 

@@ -5,8 +5,20 @@ import com.ixale.starparse.service.RankService.RankType;
 public class RankClass {
 
 	public enum Reason {
-		TICK_TOO_LOW,
-		NO_DATA_AVAILABLE
+		RANK_DISABLED(-1),
+		TICK_TOO_LOW(-101),
+		NO_DATA_AVAILABLE(-102),
+		PENDING(-999);
+
+		final int code;
+
+		Reason(final int code) {
+			this.code = code;
+		}
+
+		public int getCode() {
+			return code;
+		}
 	}
 
 	private Reason reason;
@@ -15,6 +27,11 @@ public class RankClass {
 
 	public RankClass(RankType rankType) {
 		this.rankType = rankType;
+	}
+
+	public RankClass(final RankType rankType, final Reason reason) {
+		this.rankType = rankType;
+		this.reason = reason;
 	}
 
 	public Reason getReason() {

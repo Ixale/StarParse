@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.Objects;
 
 import org.junit.Test;
 
@@ -25,15 +26,15 @@ import com.ixale.starparse.utils.FileDownloader;
 
 public class RankTest {
 
-	private RankServiceImpl service;
-	private byte[] dpsContent;
-	private String dpsFileName = "dps_ColossalMonolith_HM_16m_Commando.xml";
+	private final RankServiceImpl service;
+	private final byte[] dpsContent;
+	private final String dpsFileName = "dps_ColossalMonolith_HM_16m_Commando.xml";
 
 	public RankTest() {
 		service = new RankServiceImpl();
 
 		try {
-			dpsContent = Files.readAllBytes(new File(getClass().getClassLoader().getResource(dpsFileName).toURI()).toPath());
+			dpsContent = Files.readAllBytes(new File(Objects.requireNonNull(getClass().getClassLoader().getResource(dpsFileName)).toURI()).toPath());
 		} catch (Exception e) {
 			throw new RuntimeException("Missing " + dpsFileName, e);
 		}
@@ -73,11 +74,11 @@ public class RankTest {
 	}
 
 	@Test
-	public void testPercentile() throws Exception {
+	public void testPercentile() {
 		Ranking r = service.readRanking(new String(dpsContent));
 		assertNotNull(r);
 		assertNotNull(r.getPercentiles());
-		assertEquals(360000, (int) r.getMinTick());
+		assertEquals(360000, r.getMinTick());
 
 		RankClass rc = service.getRank(r, 360000 - 1, 2485);
 		assertNotNull(rc);
@@ -97,7 +98,7 @@ public class RankTest {
 	}
 
 	@Test
-	public void testFull() throws Exception {
+	public void testFull() {
 		Raid raid = new WorldBoss();
 		RaidBoss boss = raid.getBosses().get(4);
 
@@ -106,29 +107,31 @@ public class RankTest {
 		assertEquals(boss.getSize(), Size.Eight);
 
 		service.initialize(Config.DEFAULT_SERVER_HOST);
-		RankClass rc = service.getRank(boss, RankType.DPS, CharacterDiscipline.Darkness, 360001, 2485);
-		assertNotNull(rc);
-		assertNull(rc.getReason());
-		assertTrue(rc.getPercent() >= 0 && rc.getPercent() <= 100);
-		assertEquals(RankType.DPS, rc.getType());
+		service.getRank(boss, RankType.DPS, CharacterDiscipline.Darkness, 360001, 2485, (rc) -> {
+			assertNotNull(rc);
+			assertNull(rc.getReason());
+			assertTrue(rc.getPercent() >= 0 && rc.getPercent() <= 100);
+			assertEquals(RankType.DPS, rc.getType());
+		});
 
 		try {
-			rc = service.getRank(boss, RankType.DTPS, CharacterDiscipline.CombatMedic, 360001, 2485);
-			fail("Healer should not have DTPS");
+			service.getRank(boss, RankType.DTPS, CharacterDiscipline.CombatMedic, 360001, 2485, (rc) -> fail("Healer should not have DTPS"));
 
 		} catch (Exception e) {
 			// OK, healer should not have DTPS (yet)
 		}
-		rc = service.getRank(boss, RankType.DTPS, CharacterDiscipline.Defense, 360001, 2485);
-		assertNotNull(rc);
-		assertNull(rc.getReason());
-		assertTrue(rc.getPercent() > 0 && rc.getPercent() < 100);
-		assertEquals(RankType.DTPS, rc.getType());
+		service.getRank(boss, RankType.DTPS, CharacterDiscipline.Defense, 360001, 2485, (rc) -> {
+			assertNotNull(rc);
+			assertNull(rc.getReason());
+			assertTrue(rc.getPercent() > 0 && rc.getPercent() < 100);
+			assertEquals(RankType.DTPS, rc.getType());
+		});
 
-		rc = service.getRank(boss, RankType.EHPS, CharacterDiscipline.CombatMedic, 360001, 2485);
-		assertNotNull(rc);
-		assertNull(rc.getReason());
-		assertTrue(rc.getPercent() >= 0 && rc.getPercent() <= 100);
-		assertEquals(RankType.EHPS, rc.getType());
+		service.getRank(boss, RankType.EHPS, CharacterDiscipline.CombatMedic, 360001, 2485, (rc) -> {
+			assertNotNull(rc);
+			assertNull(rc.getReason());
+			assertTrue(rc.getPercent() >= 0 && rc.getPercent() <= 100);
+			assertEquals(RankType.EHPS, rc.getType());
+		});
 	}
 }

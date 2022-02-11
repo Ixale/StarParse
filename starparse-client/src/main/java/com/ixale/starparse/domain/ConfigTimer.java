@@ -1,10 +1,14 @@
 package com.ixale.starparse.domain;
 
+import com.ixale.starparse.timer.TimerManager;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import javafx.scene.paint.Color;
 
-import com.ixale.starparse.timer.TimerManager;
+import java.io.Serializable;
+import java.util.Objects;
 
-public class ConfigTimer {
+@SuppressWarnings("unused")
+public class ConfigTimer implements Serializable {
 
 	public static final String SYSTEM_FOLDER = "Built-in:";
 
@@ -35,7 +39,7 @@ public class ConfigTimer {
 			}
 
 			public static Type parse(String label) {
-				for (final Type t: values()) {
+				for (final Type t : values()) {
 					if (t.label.equals(label)) {
 						return t;
 					}
@@ -173,19 +177,24 @@ public class ConfigTimer {
 
 	}
 
+	public enum Slot {
+		A, B, C
+	}
+
 	private String name, folder;
 	private Condition trigger, cancel;
 	private Integer repeat, volume, soundOffset;
 	private Double interval;
 
 	private String color;
+	private Slot slot;
 	private String audio;
 	private Boolean showCenter;
 
 	private String countdownVoice;
 	private Integer countdownCount, countdownVolume;
 
-	private Boolean enabled, ignoreRepeated;
+	private Boolean enabled, ignoreRepeated, showSource;
 
 	public String getName() {
 		return name;
@@ -247,6 +256,14 @@ public class ConfigTimer {
 		this.color = color == null ? null : color.toString();
 	}
 
+	public Slot getSlot() {
+		return slot;
+	}
+
+	public void setSlot(final Slot slot) {
+		this.slot = slot;
+	}
+
 	public String getAudio() {
 		return audio;
 	}
@@ -280,7 +297,7 @@ public class ConfigTimer {
 	}
 
 	public boolean isEnabled() {
-		return enabled == null ? false : enabled;
+		return enabled != null && enabled;
 	}
 
 	public void setEnabled(Boolean enabled) {
@@ -288,11 +305,19 @@ public class ConfigTimer {
 	}
 
 	public boolean isIgnoreRepeated() {
-		return ignoreRepeated == null ? false : ignoreRepeated;
+		return ignoreRepeated != null && ignoreRepeated;
 	}
 
 	public void setIgnoreRepeated(Boolean ignoreRepeated) {
 		this.ignoreRepeated = ignoreRepeated;
+	}
+
+	public boolean isShowSource() {
+		return showSource != null && showSource;
+	}
+
+	public void setShowSource(Boolean showSource) {
+		this.showSource = showSource;
 	}
 
 	public String getCountdownVoice() {
@@ -325,15 +350,29 @@ public class ConfigTimer {
 
 	public boolean isSystemModified() {
 		final ConfigTimer original = new ConfigTimer();
-		TimerManager.getSystemTimer(this).fillConfig(original);
+		Objects.requireNonNull(TimerManager.getSystemTimer(this)).fillConfig(original);
 		return !(isSystem()
-			&& ((original.getAudio() == null && getAudio() == null) || (original.getAudio() != null && original.getAudio().equals(getAudio())))
-			&& ((original.getCountdownVoice() == null && getCountdownVoice() == null) || (original.getCountdownVoice() != null && original.getCountdownVoice().equals(getCountdownVoice())))
-			&& getColor() != null
-			&& original.getColor().toString().equals(getColor().toString()));
+				&& Objects.equals(original.getAudio(), getAudio())
+				&& Objects.equals(original.getCountdownVoice(), getCountdownVoice())
+				&& (getColor() != null && original.getColor().toString().equals(getColor().toString()))
+				&& Objects.equals(
+				original.getSlot() == null ? Slot.A : original.getSlot(),
+				getSlot() == null ? Slot.A : getSlot())
+		);
 	}
 
 	public String toString() {
 		return name + (folder == null ? "" : " (" + folder + ")");
+	}
+
+	@XStreamOmitField
+	private transient Boolean isPreview;
+
+	public Boolean getIsPreview() {
+		return isPreview;
+	}
+
+	public void setIsPreview(final Boolean isPreview) {
+		this.isPreview = isPreview;
 	}
 }

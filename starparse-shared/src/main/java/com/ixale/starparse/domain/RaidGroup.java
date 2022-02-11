@@ -1,7 +1,7 @@
 package com.ixale.starparse.domain;
 
-import java.io.IOException;
 import java.io.Serializable;
+import java.util.Base64;
 
 public class RaidGroup implements Serializable {
 
@@ -12,7 +12,7 @@ public class RaidGroup implements Serializable {
 	private String clientPasswordEnc, adminPasswordEnc;
 
 	public RaidGroup() {
-		
+
 	}
 
 	public RaidGroup(String name) {
@@ -26,15 +26,15 @@ public class RaidGroup implements Serializable {
 	@SuppressWarnings("restriction")
 	public String getClientPassword() {
 		try {
-			return new String(new sun.misc.BASE64Decoder().decodeBuffer(this.clientPasswordEnc));
-		} catch (IOException e) {
+			return new String(Base64.getDecoder().decode(this.clientPasswordEnc));
+		} catch (Exception e) {
 			return null;
 		}
 	}
 
 	@SuppressWarnings("restriction")
 	public void setClientPassword(String clientPassword) {
-		this.clientPasswordEnc = new sun.misc.BASE64Encoder().encode(clientPassword.getBytes());
+		this.clientPasswordEnc = new String(Base64.getEncoder().encode(clientPassword.getBytes()));
 	}
 
 	@SuppressWarnings("restriction")
@@ -43,18 +43,18 @@ public class RaidGroup implements Serializable {
 			return null;
 		}
 		try {
-			return new String(new sun.misc.BASE64Decoder().decodeBuffer(this.adminPasswordEnc));
-		} catch (IOException e) {
+			return new String(Base64.getDecoder().decode(this.adminPasswordEnc));
+		} catch (Exception e) {
 			return null;
 		}
 	}
 
 	@SuppressWarnings("restriction")
 	public void setAdminPassword(String adminPassword) {
-		this.adminPasswordEnc = new sun.misc.BASE64Encoder().encode(adminPassword.getBytes());
+		this.adminPasswordEnc = new String(Base64.getEncoder().encode(adminPassword.getBytes()));
 	}
 
 	public String toString() {
-		return name+" ["+clientPasswordEnc+"]["+adminPasswordEnc+"]";
+		return name + " [" + clientPasswordEnc + "][" + adminPasswordEnc + "]";
 	}
 }

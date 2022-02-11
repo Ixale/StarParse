@@ -81,7 +81,7 @@ public class Format {
 
 	public static String formatSeconds(long time, Integer thresholdMs) {
 		if (thresholdMs == null || thresholdMs < time) {
-			return String.valueOf(Math.round(time / 1000));
+			return String.valueOf(Math.round(time / 1000.0));
 		}
 		return secondsFormat.format(time / 1000.0);
 	}
@@ -93,6 +93,7 @@ public class Format {
 		return sdfTimeHMSM.format(time);
 	}
 
+	@SuppressWarnings("unused")
 	public static String formatDate(long date) {
 		return sdfDate.format(date);
 	}
@@ -121,9 +122,7 @@ public class Format {
 			if (number >= 10000000 || number <= -10000000) {
 				return integerFormat.format(number / 1000000.0) + " M";
 			}
-			if (thousands || number >= 100000 || number <= -100000) {
-				return integerFormat.format(number / 1000.0) + " k";
-			}
+			return integerFormat.format(number / 1000.0) + " k";
 		}
 		return integerFormat.format(number);
 	}
@@ -149,7 +148,7 @@ public class Format {
 		}
 	}
 
-	final static String entityRegex = "([A-Z][a-z]+)(Warrior|Knight|Smuggler|Agent|)(30|)";
+	final static String entityRegex = "([A-Z][a-z]+)(Warrior|Knight|Smuggler|Agent|)([0-9]+|)";
 	final static String entityReplacement = "$1 ";
 
 	public static String formatAbility(final EntityGuid ability) {
@@ -160,6 +159,18 @@ public class Format {
 		}
 
 		return ability.name().replaceAll(entityRegex, entityReplacement).trim();
+	}
+
+	public static String formatFakePlayerName(final String playerName) {
+		return "(" + playerName + ")";
+	}
+
+	public static boolean isFakePlayerName(final String name) {
+		return name != null && name.startsWith("(");
+	}
+
+	public static String getRealNameEvenForFakePlayer(final String playerName) {
+		return isFakePlayerName(playerName) ? playerName.substring(1, playerName.length() - 1) : playerName;
 	}
 
 	public static void resetTimezone() {

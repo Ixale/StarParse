@@ -84,11 +84,10 @@ public class Popout {
 		this.freeform = freeform;
 
 		scene = new Scene(root, Color.TRANSPARENT);
+		scene.getStylesheets().add("popouts.bss");
 		if (javafx.stage.Screen.getPrimary().getDpi() > 96) { // 125% = 96
 			// FIXME: workaround for JavaFX bug
 			scene.getStylesheets().add("popouts120.bss");
-		} else {
-			scene.getStylesheets().add("popouts.bss");
 		}
 
 		wrapper = new Stage();

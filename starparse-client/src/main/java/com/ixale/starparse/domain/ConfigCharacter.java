@@ -2,6 +2,7 @@ package com.ixale.starparse.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ConfigCharacter implements Serializable {
 
@@ -25,7 +26,7 @@ public class ConfigCharacter implements Serializable {
 		// fix server
 		if (server != null) {
 			try {
-				server = ServerName.getFromName(server).getActive().getName();
+				server = Objects.requireNonNull(ServerName.getFromName(server)).getActive().getName();
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -57,7 +58,7 @@ public class ConfigCharacter implements Serializable {
 
 	public ConfigPopout getPopout(String name) {
 		if (popouts == null) {
-			popouts = new ArrayList<ConfigPopout>();
+			popouts = new ArrayList<>();
 		}
 
 		for (final ConfigPopout cp : popouts) {

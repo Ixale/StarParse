@@ -1,11 +1,10 @@
 package com.ixale.starparse.ws;
 
 
-import javax.websocket.ClientEndpoint;
-
 import com.ixale.starparse.domain.RaidGroup;
 import com.ixale.starparse.gui.Config;
-import com.ixale.starparse.ws.RaidGroupMessage;
+
+import javax.websocket.ClientEndpoint;
 
 @ClientEndpoint(encoders = BaseEncoder.class, decoders = BaseDecoder.class, configurator = BaseClientConfigurator.class)
 public class RaidGroupClient extends BaseClient {

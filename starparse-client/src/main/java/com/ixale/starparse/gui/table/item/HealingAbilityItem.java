@@ -15,7 +15,9 @@ public class HealingAbilityItem extends BaseStatsItem {
 		avgNormal = new SimpleIntegerProperty(),
 		avgCrit = new SimpleIntegerProperty(),
 		hps = new SimpleIntegerProperty(),
-		ehps = new SimpleIntegerProperty();
+		ehps = new SimpleIntegerProperty(),
+		aps = new SimpleIntegerProperty(),
+		absorbed = new SimpleIntegerProperty();
 	
 	public final SimpleDoubleProperty 
 		pctCrit = new SimpleDoubleProperty(),
@@ -55,6 +57,14 @@ public class HealingAbilityItem extends BaseStatsItem {
 
 	public Integer getEhps() {
 		return ehps.get();
+	}
+
+	public Integer getAps() {
+		return aps.getValue();
+	}
+
+	public Integer getAbsorbed() {
+		return absorbed.getValue();
 	}
 
 	public Double getPctTotal() {

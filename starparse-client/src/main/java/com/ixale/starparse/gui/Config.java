@@ -1,17 +1,18 @@
 package com.ixale.starparse.gui;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TimeZone;
-
 import com.ixale.starparse.domain.CombatLog;
 import com.ixale.starparse.domain.ConfigAttacks;
 import com.ixale.starparse.domain.ConfigCharacter;
 import com.ixale.starparse.domain.ConfigPopoutDefault;
 import com.ixale.starparse.domain.ConfigTimers;
 import com.ixale.starparse.domain.RaidGroup;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.TimeZone;
 
 public class Config implements Serializable {
 
@@ -33,35 +34,36 @@ public class Config implements Serializable {
 	}
 
 	public static final String DEFAULT_CHARACTER = "@Default",
-		DEFAULT_POPOUT = "@DefaultPopout",
-		DEFAULT_TIME_SYNC_HOST = "time.nist.gov",
-		DEFAULT_SERVER_HOST = "ixparse.com:8080/starparse",
-		SECURED_SERVER_HOST = "ixparse.com:443/starparse",
-		DEFAULT_LOG_DIRECTORY = System.getProperty("user.home") + "/Documents/Star Wars - The Old Republic/CombatLogs/",
-		PARSELY_UPLOAD_API = "https://parsely.io/api/upload";
+	//		DEFAULT_POPOUT = "@DefaultPopout",
+	DEFAULT_TIME_SYNC_HOST = "time.nist.gov",
+			DEFAULT_SERVER_HOST = "ixparse.com:8080/starparse",
+			SECURED_SERVER_HOST = "ixparse.com:443/starparse",
+			DEFAULT_LOG_DIRECTORY = System.getProperty("user.home") + "/Documents/Star Wars - The Old Republic/CombatLogs/",
+			PARSELY_UPLOAD_API = "https://parsely.io/api/upload2";
 
 	public static final int DEFAULT_RECENT_PARSED_LOGS_LIMIT = 5,
-		DEFAULT_RECENT_OPENED_LOGS_LIMIT = 5,
+			DEFAULT_RECENT_OPENED_LOGS_LIMIT = 5,
 
 	DEFAULT_POPOUT_SNAP = 10,
 
 	DEFAULT_RAID_PULL_SECONDS = 10,
-		DEFAULT_RAID_BREAK_MINUTES = 15;
+			DEFAULT_RAID_BREAK_MINUTES = 15;
 
 	public static final double DEFAULT_POPOUT_OPACITY = 0.6;
 
 	private String logDirectory;
-	private int logPolling = 3000;
+	private final int logPolling = 3000;
 
 	private Double windowWidth, windowHeight, windowX, windowY;
+	private Boolean darkMode;
 
 	private Integer recentParsedLogsLimit;
 	private Integer recentOpenedLogsLimit;
 
 	private String lastVersion = "0.1a";
 
-	private final ArrayList<CombatLog> recentParsedLogs = new ArrayList<CombatLog>();
-	private final ArrayList<CombatLog> recentOpenedLogs = new ArrayList<CombatLog>();
+	private final ArrayList<CombatLog> recentParsedLogs = new ArrayList<>();
+	private final ArrayList<CombatLog> recentOpenedLogs = new ArrayList<>();
 
 	private Integer popoutSnap;
 	private ConfigPopoutDefault popoutDefault;
@@ -79,7 +81,9 @@ public class Config implements Serializable {
 
 	private Boolean storeDataOnServerEnabled;
 
-	private String timezone, parselyLogin, parselyPasswordEnc, parselyEndpoint;
+	private String timezone, parselyLogin, parselyPasswordEnc;
+	@SuppressWarnings("unused")
+	private String parselyEndpoint;
 
 	private Integer raidPullSeconds, raidBreakMinutes;
 	private String raidPullHotkey, lockOverlaysHotkey;
@@ -123,9 +127,17 @@ public class Config implements Serializable {
 		this.windowY = windowY;
 	}
 
+	public Boolean getDarkMode() {
+		return darkMode;
+	}
+
+	public void setDarkMode(final Boolean darkMode) {
+		this.darkMode = darkMode;
+	}
+
 	public void addRecentParsedLog(CombatLog combatLog) {
 		// already there?
-		for (CombatLog l: recentParsedLogs) {
+		for (CombatLog l : recentParsedLogs) {
 			if (l.getFileName().equals(combatLog.getFileName())) {
 				return;
 			}
@@ -139,7 +151,7 @@ public class Config implements Serializable {
 
 	public void addRecentOpenedLog(CombatLog combatLog) {
 		// already there?
-		for (CombatLog l: recentOpenedLogs) {
+		for (CombatLog l : recentOpenedLogs) {
 			if (l.getFileName().equals(combatLog.getFileName())) {
 				return;
 			}
@@ -166,7 +178,7 @@ public class Config implements Serializable {
 		if (characters == null) {
 			return false;
 		}
-		for (final ConfigCharacter ch: characters) {
+		for (final ConfigCharacter ch : characters) {
 			if (ch.getName().equals(characterName)) {
 				return true;
 			}
@@ -176,10 +188,10 @@ public class Config implements Serializable {
 
 	private ConfigCharacter getCharacter(final String characterName) {
 		if (characters == null) {
-			characters = new ArrayList<ConfigCharacter>();
+			characters = new ArrayList<>();
 		}
 
-		for (final ConfigCharacter ch: characters) {
+		for (final ConfigCharacter ch : characters) {
 			if (ch.getName().equals(characterName)) {
 				return ch;
 			}
@@ -256,7 +268,7 @@ public class Config implements Serializable {
 
 	public ArrayList<RaidGroup> getRaidGroups() {
 		if (raidGroups == null) {
-			raidGroups = new ArrayList<RaidGroup>();
+			raidGroups = new ArrayList<>();
 		}
 		return raidGroups;
 	}
@@ -293,7 +305,7 @@ public class Config implements Serializable {
 	}
 
 	public boolean isRaidGroupAdmin(final String raidGroupName) {
-		for (RaidGroup group: getRaidGroups()) {
+		for (RaidGroup group : getRaidGroups()) {
 			if (group.getName() != null && group.getName().equals(raidGroupName)) {
 				return group.getAdminPassword() != null && !group.getAdminPassword().isEmpty();
 			}
@@ -309,6 +321,7 @@ public class Config implements Serializable {
 		return popoutSnap == null ? DEFAULT_POPOUT_SNAP : popoutSnap;
 	}
 
+	@SuppressWarnings("unused")
 	public void setPopoutSnap(Integer popoutSnap) {
 		this.popoutSnap = popoutSnap;
 	}
@@ -346,8 +359,8 @@ public class Config implements Serializable {
 			return null;
 		}
 		try {
-			return new String(new sun.misc.BASE64Decoder().decodeBuffer(this.parselyPasswordEnc));
-		} catch (IOException e) {
+			return new String(Base64.getDecoder().decode(this.parselyPasswordEnc));
+		} catch (Exception e) {
 			return null;
 		}
 	}
@@ -358,7 +371,7 @@ public class Config implements Serializable {
 			this.parselyPasswordEnc = null;
 			return;
 		}
-		this.parselyPasswordEnc = new sun.misc.BASE64Encoder().encode(parselyPassword.getBytes());
+		this.parselyPasswordEnc = new String(Base64.getEncoder().encode(parselyPassword.getBytes()));
 	}
 
 	public String getParselyEndpoint() {

@@ -48,11 +48,12 @@ public class DamageAbilityNameCellFactory<T> implements Callback<TableColumn<T, 
 			}
 
 			Long guid = null;
-			if (getTableView().getItems().get(getIndex()) instanceof BaseStatsItem) {
-				guid = ((BaseStatsItem) getTableView().getItems().get(getIndex())).guid;
-			} else if (getTableView().getItems().get(getIndex()) instanceof EventItem) {
-				if (Helpers.isEffectAbilityActivate(((EventItem) getTableView().getItems().get(getIndex())).getEvent())) {
-					guid = ((EventItem) getTableView().getItems().get(getIndex())).getEvent().getAbility().getGuid();
+			final T it = getTableView().getItems().get(getIndex());
+			if (it instanceof BaseStatsItem) {
+				guid = ((BaseStatsItem) it).guid;
+			} else if (it instanceof EventItem) {
+				if (Helpers.isEffectAbilityActivate(((EventItem) it).getEvent())) {
+					guid = ((EventItem) it).getEvent().getAbility().getGuid();
 				}
 			}
 			if (guid != null) {

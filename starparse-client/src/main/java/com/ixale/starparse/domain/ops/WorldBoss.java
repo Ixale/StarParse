@@ -5,6 +5,7 @@ import com.ixale.starparse.domain.Event;
 import com.ixale.starparse.domain.Raid;
 import com.ixale.starparse.domain.RaidBoss;
 import com.ixale.starparse.domain.RaidBossName;
+import com.ixale.starparse.parser.Helpers;
 import com.ixale.starparse.timer.BaseTimer;
 import com.ixale.starparse.timer.TimerManager;
 
@@ -72,6 +73,8 @@ public class WorldBoss extends Raid {
 		}
 
 		switch (c.getBoss().getRaidBossName()) {
+			case ColossalMonolith:
+				return getNewPhaseNameForMonolith(e, c, currentPhaseName);
 			case MutatedGeonosianQueen:
 				return getNewPhaseNameForQueen(e, c, currentPhaseName);
 			default:
@@ -79,14 +82,21 @@ public class WorldBoss extends Raid {
 		}
 	}
 
-	private String getNewPhaseNameForQueen(final Event e, final Combat c, final String currentPhaseName) {
+	private String getNewPhaseNameForMonolith(final Event e, final Combat c, final String currentPhaseName) {
 
-//		switch (c.getBoss().getMode()) {
-//			case SM:
-//				// only HM/NiM
-//				return null;
-//		}
-//
+		// ------------------ Timers ------------------
+
+		if (Helpers.isAbilityEqual(e, 3546045258661888L)) {        // Bite Wounds
+			TimerManager.stopTimer(MonolithBiteWoundsTimer.class);
+			TimerManager.startTimer(MonolithBiteWoundsTimer.class, e.getTimestamp());
+		}
+
+		return null;
+	}
+
+	private String getNewPhaseNameForQueen(final Event e, final Combat c, final String currentPhaseName) {
+		if (Helpers.isTargetOtherPlayer(e)) return null;    // returns if target is other player
+
 		if (currentPhaseName == null) {
 			phaseTimers.clear();
 			phaseTimers.put(QUEEN_PHASE_GUARDS_1, c.getTimeFrom() + 2500 + 48000 + 3000);
@@ -158,8 +168,14 @@ public class WorldBoss extends Raid {
 		return null;
 	}
 
-	public static class QueenRoyalSummonsGuardsTimer extends BaseTimer {
+	public static class MonolithBiteWoundsTimer extends BaseTimer {
+		public MonolithBiteWoundsTimer() {
+			super("Bite Wounds", "Monolith Bite Wounds", 20000);
+			setColor(0);
+		}
+	}
 
+	public static class QueenRoyalSummonsGuardsTimer extends BaseTimer {
 		public QueenRoyalSummonsGuardsTimer() {
 			super("Royal Guards", "Queen Royal Summons - Guards", 48000);
 			setColor(0);
@@ -167,7 +183,6 @@ public class WorldBoss extends Raid {
 	}
 
 	public static class QueenRoyalSummonsCausticTimer extends BaseTimer {
-
 		public QueenRoyalSummonsCausticTimer() {
 			super("Caustic Drones", "Queen Royal Summons - Caustic", 74000);
 			setColor(1);

@@ -1,80 +1,15 @@
 .popout {
-	-fx-background-color: transparent; /* #00000033; */
 	-fx-font: 8pt "System";
-}
-.solid {
-	-fx-background-color: black;
-}
-
-.popout-title {
-	-fx-padding: 2px 0;
-	-fx-font-weight: bold;
-	-fx-cursor: move;
 }
 
 .button {
-	-fx-border-width: 0;
-	-fx-padding: 1px 3px 0 3px;
 	-fx-font: bold 10px "System"; /* multiplication of .popout and title */
-
-	-fx-background-color: transparent;
-	-fx-cursor: hand;
-	-fx-opacity: 0;
-	-fx-text-fill: white;
-}
-
-.combat-stats {
-    -fx-background-color: transparent;
-	-fx-border-width: 0;
-	-fx-padding: 5px;
-}
-
-.combat-stats .ps {
-    -fx-font-weight: bold;
-}
-
-.combat-stats .damage {
-	-fx-text-fill: maroon;
-}
-
-.combat-stats .damage2 {
-	-fx-text-fill: derive(red, +50%);
 }
 
 .combat-stats .bigger {
 	-fx-font: bold 20px "System";
 }
 
-.combat-stats .healing {
-	-fx-text-fill: DarkSeaGreen;
-}
-
-.combat-stats .healing-eff {
-	-fx-text-fill: LimeGreen;
-}
-
-.combat-stats .threat {
-	-fx-text-fill: Goldenrod;
-}
-
-.combat-stats .absorbed {
-	-fx-text-fill: #30cccd;
-}
-
-.combat-stats .crit {
-	-fx-text-fill: pink;
-}
-
-.combat-stats .apm .text {
-	-fx-fill: white;
-}
-
 .time {
 	-fx-font: 20px "System";
-}
-
-.outlined .text {
-	-fx-stroke: black;
-    -fx-stroke-width: 1px;
-    -fx-stroke-type: outside;
 }

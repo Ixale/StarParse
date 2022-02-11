@@ -1,14 +1,14 @@
 package com.ixale.starparse.timer;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ixale.starparse.domain.ConfigTimer;
 import com.ixale.starparse.domain.ConfigTimer.Condition;
+import com.ixale.starparse.domain.Event;
 import com.ixale.starparse.gui.SoundManager;
 import com.ixale.starparse.timer.TimerManager.RaidPullTimer;
-
 import javafx.scene.paint.Color;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CustomTimer extends BaseTimer {
 
@@ -16,30 +16,30 @@ public class CustomTimer extends BaseTimer {
 	private final List<ConfigTimer> nextTimers = new ArrayList<>(), cancelTimers = new ArrayList<>();
 	private final BaseTimer systemTimer;
 
-	private Long timeFrom;
 	private Integer countdownThreshold = null, soundThreshold = null;
 	private Long lastSample = null, lastSound = null;
 
-	public CustomTimer(final ConfigTimer timer) {
-		super(timer.getName(), null, (int) Math.round(timer.getInterval() * 1000),
-			timer.getRepeat() != null && timer.getRepeat() > 0 && timer.getInterval() > 0 ? (int) Math.round(timer.getInterval() * 1000) : null,
-			timer.getRepeat(),
-			timer.getCancel() != null && Condition.Type.COMBAT_END.equals(timer.getCancel().getType()) ? Scope.COMBAT : Scope.ANY);
+	public CustomTimer(final ConfigTimer timer, final Event e) {
+		super(getDisplayName(timer, e),
+				null, (int) Math.round(timer.getInterval() * 1000),
+				timer.getRepeat() != null && timer.getRepeat() > 0 && timer.getInterval() > 0 ? (int) Math.round(timer.getInterval() * 1000) : null,
+				timer.getRepeat(),
+				timer.getCancel() != null && Condition.Type.COMBAT_END.equals(timer.getCancel().getType()) ? Scope.COMBAT : Scope.ANY);
 
 		this.timer = timer;
 		this.systemTimer = null;
 	}
 
-	public CustomTimer(final ConfigTimer timer, final BaseTimer systemTimer) {
-		this(timer, systemTimer, null);
-	}
+//	public CustomTimer(final ConfigTimer timer, final BaseTimer systemTimer) {
+//		this(timer, systemTimer, null);
+//	}
 
 	public CustomTimer(final ConfigTimer timer, final BaseTimer systemTimer, final Integer interval) {
 		super(systemTimer.getName(), timer.getName(),
-			interval == null ? systemTimer.getFirstInterval() : interval,
-			systemTimer.getRepeatInterval(),
-			null, // MAX
-			systemTimer.getScope());
+				interval == null ? systemTimer.getFirstInterval() : interval,
+				systemTimer.getRepeatInterval(),
+				null, // MAX
+				systemTimer.getScope());
 
 		this.timer = timer;
 		this.systemTimer = systemTimer;
@@ -67,6 +67,7 @@ public class CustomTimer extends BaseTimer {
 		}
 	}
 
+	@SuppressWarnings("IntegerMultiplicationImplicitCastToLong")
 	@Override
 	protected void runningTick(long timeTo, long timeRemaining) {
 		if (countdownThreshold != null && countdownThreshold >= timeRemaining) {
@@ -74,7 +75,7 @@ public class CustomTimer extends BaseTimer {
 			if (sample > 0 && (lastSample == null || (timeTo - (sample * 1000)) > lastSample)) {
 				if (!TimerManager.isMuted() || Scope.ANY.equals(getScope())) {
 					SoundManager.play(sample, timer.getCountdownVoice(),
-						timer.getCountdownVolume() == null ? null : timer.getCountdownVolume() * 1.0);
+							timer.getCountdownVolume() == null ? null : timer.getCountdownVolume() * 1.0);
 				}
 
 				lastSample = timeTo - (sample * 1000); // endures random restarts from other threads etc
@@ -92,11 +93,11 @@ public class CustomTimer extends BaseTimer {
 	protected void expired(long timeTo) {
 		expiredRepeat(timeTo);
 
-		for (final ConfigTimer nextTimer: nextTimers) {
-			TimerManager.startTimer(nextTimer, getTimeTo());
+		for (final ConfigTimer nextTimer : nextTimers) {
+			TimerManager.startTimer(nextTimer, getTimeTo(), null);
 		}
-		for (final ConfigTimer cancelTimer: cancelTimers) {
-			TimerManager.stopTimer(cancelTimer.getName());
+		for (final ConfigTimer cancelTimer : cancelTimers) {
+			TimerManager.stopTimer(cancelTimer);
 		}
 	}
 
@@ -109,8 +110,9 @@ public class CustomTimer extends BaseTimer {
 		return timer.getColor();
 	}
 
-	public Long getTimeFrom() {
-		return timeFrom;
+	@Override
+	public ConfigTimer.Slot getSlot() {
+		return timer.getSlot() == null ? ConfigTimer.Slot.A : timer.getSlot();
 	}
 
 	public List<ConfigTimer> getNextTimers() {
@@ -129,4 +131,9 @@ public class CustomTimer extends BaseTimer {
 	public boolean doOverrideExpiringThreshold() {
 		return systemTimer != null && (systemTimer instanceof RaidPullTimer);
 	}
+
+	public static String getDisplayName(final ConfigTimer timer, final Event e) {
+		return (timer.isShowSource() && e != null && e.getSource() != null ? e.getSource().getName() + "\n" : "") + timer.getName();
+	}
+
 }

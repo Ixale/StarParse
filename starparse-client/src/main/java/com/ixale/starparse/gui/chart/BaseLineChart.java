@@ -1,13 +1,8 @@
 package com.ixale.starparse.gui.chart;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-
 import com.ixale.starparse.domain.EffectKey;
 import com.ixale.starparse.gui.Format;
 import com.ixale.starparse.service.impl.Context;
-
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -24,7 +19,10 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.StringConverter;
-import javafx.util.converter.NumberStringConverter;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public abstract class BaseLineChart extends BaseChart<LineChart<Number, Number>> {
 
@@ -37,12 +35,11 @@ public abstract class BaseLineChart extends BaseChart<LineChart<Number, Number>>
 	protected final NumberAxis xAxis = new NumberAxis();
 	protected final NumberAxis yAxis = new NumberAxis();
 
-	private LinkedHashMap<String, XYChart.Series<Number, Number>> series = new LinkedHashMap<String, XYChart.Series<Number, Number>>();
+	private final LinkedHashMap<String, XYChart.Series<Number, Number>> series = new LinkedHashMap<>();
 
 	private Integer lastTick = null;
 	private Long lastTickFrom = null, lastTickTo = null;
 
-	private int yUpperBoundDefault = 1000;
 	private int yTickUnitDefault = 500;
 	private Integer yLimit = null;
 	private String className;
@@ -53,7 +50,7 @@ public abstract class BaseLineChart extends BaseChart<LineChart<Number, Number>>
 	public BaseLineChart(Context context) {
 		super(context);
 
-		chart = new LineChart<Number, Number>(xAxis, yAxis);
+		chart = new LineChart<>(xAxis, yAxis);
 		chart.setCreateSymbols(false);
 		chart.setAnimated(false);
 		chart.setMaxHeight(100);
@@ -78,7 +75,6 @@ public abstract class BaseLineChart extends BaseChart<LineChart<Number, Number>>
 		yAxis.setMinorTickCount(0);
 		yAxis.setPrefWidth(Y_AXIS_WIDTH);
 
-		yAxis.setUpperBound(yUpperBoundDefault);
 		yAxis.setTickUnit(yTickUnitDefault);
 		yAxis.setTickLabelFormatter(new StringConverter<Number>() {
 			@Override
@@ -93,12 +89,10 @@ public abstract class BaseLineChart extends BaseChart<LineChart<Number, Number>>
 		});
 	}
 
-	protected void setBoundaries(int yUpperBoundDefault, int yTickUnitDefault, Integer yLimit) {
-		this.yUpperBoundDefault = yUpperBoundDefault;
+	protected void setBoundaries(int yTickUnitDefault, Integer yLimit) {
 		this.yTickUnitDefault = yTickUnitDefault;
 		this.yLimit = yLimit;
 
-		yAxis.setUpperBound(yUpperBoundDefault);
 		yAxis.setTickUnit(yTickUnitDefault);
 	}
 
@@ -135,9 +129,9 @@ public abstract class BaseLineChart extends BaseChart<LineChart<Number, Number>>
 	}
 
 	public void addData(int x, double... y) {
-		if (context.getTickFrom() != null && (lastTickFrom == null || !context.getTickFrom().equals(lastTickFrom))
+		if (context.getTickFrom() != null && (!context.getTickFrom().equals(lastTickFrom))
 			|| (context.getTickFrom() == null && lastTickFrom != null)
-			|| context.getTickTo() != null && (lastTickTo == null || !context.getTickTo().equals(lastTickTo))
+			|| context.getTickTo() != null && (!context.getTickTo().equals(lastTickTo))
 			|| (context.getTickTo() == null && lastTickTo != null)) {
 			resetData();
 		}
@@ -147,8 +141,8 @@ public abstract class BaseLineChart extends BaseChart<LineChart<Number, Number>>
 
 		if (lastTickFrom != null) {
 			x += (lastTickFrom / 1000);
-			if (xAxis.getLowerBound() < (lastTickFrom / 1000)) {
-				xAxis.setLowerBound((lastTickFrom / 1000));
+			if (xAxis.getLowerBound() < (lastTickFrom / 1000.0)) {
+				xAxis.setLowerBound(Math.round(lastTickFrom / 1000.0));
 			}
 		}
 
@@ -157,7 +151,7 @@ public abstract class BaseLineChart extends BaseChart<LineChart<Number, Number>>
 				if (series.get(serieTitle) != null) {
 					throw new RuntimeException("Serie " + serieTitle + " was not reset");
 				}
-				series.put(serieTitle, new XYChart.Series<Number, Number>());
+				series.put(serieTitle, new XYChart.Series<>());
 				series.get(serieTitle).setName(serieTitle);
 			}
 		}
@@ -172,10 +166,10 @@ public abstract class BaseLineChart extends BaseChart<LineChart<Number, Number>>
 		for (String serieTitle: series.keySet()) {
 			if (lastTick != null && lastTick.equals(x)) {
 				// update very last one
-				series.get(serieTitle).getData().set(series.get(serieTitle).getData().size() - 1, new XYChart.Data<Number, Number>(x, y[s]));
+				series.get(serieTitle).getData().set(series.get(serieTitle).getData().size() - 1, new XYChart.Data<>(x, y[s]));
 			} else {
 				// append new one
-				series.get(serieTitle).getData().add(new XYChart.Data<Number, Number>(x, y[s]));
+				series.get(serieTitle).getData().add(new XYChart.Data<>(x, y[s]));
 			}
 
 			if (yAxis.getUpperBound() < (y[s] * 1.05)) {
@@ -206,6 +200,7 @@ public abstract class BaseLineChart extends BaseChart<LineChart<Number, Number>>
 		chart.getData().clear();
 
 		if (!series.isEmpty()) {
+			//noinspection Java8MapApi
 			for (String serieTitle: series.keySet()) {
 				series.put(serieTitle, null);
 			}
@@ -213,8 +208,7 @@ public abstract class BaseLineChart extends BaseChart<LineChart<Number, Number>>
 		lastTick = null;
 		lastTickFrom = lastTickTo = null;
 
-		yAxis.setUpperBound(1);
-		yAxis.setUpperBound(yUpperBoundDefault);
+		yAxis.setUpperBound(yTickUnitDefault);
 		yAxis.setTickUnit(yTickUnitDefault);
 
 		xAxis.setLowerBound(0);
@@ -288,7 +282,7 @@ public abstract class BaseLineChart extends BaseChart<LineChart<Number, Number>>
 
 		final Double min = xAxis.getLowerBound();
 		final Double max = xAxis.getUpperBound();
-		Double from, to;
+		double from, to;
 		int i = 0, j = context.getSelectedEffects().size();
 
 		for (EffectKey effectKey: context.getSelectedEffects().keySet()) {
@@ -331,7 +325,7 @@ public abstract class BaseLineChart extends BaseChart<LineChart<Number, Number>>
 		getOverlayButtonNode().setVisible(j != 0);
 	}
 
-	final private static HashMap<EffectKey, String> overlayColors = new HashMap<EffectKey, String>();
+	final private static HashMap<EffectKey, String> overlayColors = new HashMap<>();
 
 	public static String getOverlayClass(EffectKey effectKey) {
 		if (!overlayColors.containsKey(effectKey)) {
@@ -349,7 +343,7 @@ public abstract class BaseLineChart extends BaseChart<LineChart<Number, Number>>
 	}
 
 	public void syncOverlaysClasses() {
-		final ArrayList<EffectKey> remove = new ArrayList<EffectKey>();
+		final ArrayList<EffectKey> remove = new ArrayList<>();
 
 		for (EffectKey effectKey: overlayColors.keySet()) {
 			if (!context.getSelectedEffects().containsKey(effectKey)) {

@@ -9,13 +9,14 @@ abstract public class Raid {
 	public enum Mode {
 		SM, HM, NiM
 	}
+
 	public enum Size {
 		Eight("8m"),
 		Sixteen("16m");
 
-		String name;
+		final String name;
 
-		private Size(String n) {
+		Size(String n) {
 			name = n;
 		}
 
@@ -48,12 +49,12 @@ abstract public class Raid {
 
 	protected void addChallenge(final RaidBossName bossName, final CombatChallenge challenge) {
 		if (!challenges.containsKey(bossName)) {
-			challenges.put(bossName, new ArrayList<CombatChallenge>());
+			challenges.put(bossName, new ArrayList<>());
 		}
 		challenges.get(bossName).add(challenge);
 	}
 
 	public List<CombatChallenge> getChallenges(final RaidBoss boss) {
-		return challenges.containsKey(boss.getRaidBossName()) ? challenges.get(boss.getRaidBossName()) : null;
+		return challenges.getOrDefault(boss.getRaidBossName(), null);
 	}
 }

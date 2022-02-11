@@ -1,25 +1,28 @@
 package com.ixale.starparse.service.impl;
 
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import com.ixale.starparse.domain.CharacterClass;
 import com.ixale.starparse.domain.CharacterDiscipline;
+import com.ixale.starparse.domain.Raid.Mode;
 import com.ixale.starparse.domain.RaidBoss;
 import com.ixale.starparse.domain.RaidBossName;
 import com.ixale.starparse.domain.RankClass;
 import com.ixale.starparse.domain.RankClass.Reason;
 import com.ixale.starparse.domain.Ranking;
-import com.ixale.starparse.domain.Raid.Mode;
 import com.ixale.starparse.domain.Ranking.Percentile;
 import com.ixale.starparse.gui.Marshaller;
 import com.ixale.starparse.service.RankService;
 import com.ixale.starparse.utils.FileDownloader;
+import javafx.application.Platform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 @Service("rankService")
 public class RankServiceImpl implements RankService {
@@ -30,40 +33,62 @@ public class RankServiceImpl implements RankService {
 
 	private String host;
 
+	private static ExecutorService rankingExecutor;
+
 	@Override
 	public void initialize(String host) {
 		this.host = host;
 	}
 
 	@Override
-	public RankClass getRank(final RaidBoss boss, final RankType type, final CharacterDiscipline discipline, int tick, int value) throws Exception {
-		final Ranking ranking = getRanking(boss, type, discipline);
-		if (ranking == null) {
-			logger.error("Ranking missing: " + boss + ", " + type + ", " + discipline);
-			throw new Exception("Unable to load ranking");
-		}
-		return getRank(ranking, tick, value);
+	public void getRank(final RaidBoss boss, final RankType type, final CharacterDiscipline discipline, int tick, int value,
+			Consumer<RankClass> callback) {
+		getRanking(boss, type, discipline, (ranking) -> {
+			callback.accept(getRank(ranking, tick, value));
+		});
 	}
 
-	private Ranking getRanking(final RaidBoss boss, final RankType type, final CharacterDiscipline discipline) throws Exception {
+	private void getRanking(final RaidBoss boss, final RankType type, final CharacterDiscipline discipline,
+			final Consumer<Ranking> callback) {
 		final String key = buildKey(boss, type, discipline);
 
 		if (!rankings.containsKey(key)) {
-			// build remote URL
-			final URL url = buildUrl(boss, host, key);
-			// fetch from remote
-			final String content = FileDownloader.fetchFile(url);
-			// parse
-			final Ranking ranking = readRanking(content);
-			// cache
-			rankings.put(key, ranking);
-
-			if (logger.isDebugEnabled()) {
-				logger.debug("Ranking fetched from remote (" + boss + ", " + type + ", " + discipline + "): " + ranking);
+			if (rankingExecutor == null) {
+				rankingExecutor = Executors.newSingleThreadExecutor(r -> {
+					final Thread worker = new Thread(r, "Ranking Worker");
+					worker.setDaemon(true);
+					return worker;
+				});
 			}
+			rankingExecutor.execute(() -> {
+				try {
+					// build remote URL
+					final URL url = buildUrl(boss, host, key);
+					// fetch from remote
+					final String content = FileDownloader.fetchFile(url);
+					// parse
+					final Ranking ranking = readRanking(content);
+					// cache
+					rankings.put(key, ranking);
+					Platform.runLater(() -> {
+						callback.accept(rankings.get(key));
+					});
+
+					if (logger.isDebugEnabled()) {
+						logger.debug("Ranking fetched from remote (" + boss + ", " + type + ", " + discipline + "): " + ranking);
+					}
+				} catch (Exception e) {
+					if (e.getMessage().equals("Read timed out")) {
+						// local issue, silently ignore
+						return;
+					}
+					logger.error("Failed to rank " + key + ": " + e.getMessage(), e);
+				}
+			});
+			return;
 		}
 
-		return rankings.get(key);
+		callback.accept(rankings.get(key));
 	}
 
 	public String buildKey(final RaidBoss boss, final RankType type, final CharacterDiscipline discipline) {
@@ -71,7 +96,7 @@ public class RankServiceImpl implements RankService {
 		sb.append(type.name().toLowerCase()).append("_");
 		sb.append(boss.getRaidBossName().name()).append("_");
 		if (Mode.NiM.equals(boss.getMode()) && !RaidBossName.HatefulEntity.equals(boss.getRaidBossName())) {
-			sb.append(Mode.HM.toString()).append("_"); // temporarily
+			sb.append(Mode.HM).append("_"); // temporarily
 		} else {
 			sb.append(boss.getMode().toString()).append("_");
 		}
@@ -84,6 +109,7 @@ public class RankServiceImpl implements RankService {
 		if (host == null || host.isEmpty()) {
 			throw new IllegalStateException("Host not set");
 		}
+		//noinspection HttpUrlsUsage
 		final URL ws = new URL("http://" + host);
 		return new URL(ws.getProtocol(), ws.getHost(), 80, "/" + RankService.RANK_URL + "/" + boss.getRaidBossName().name() + "/" + key + ".xml");
 	}
@@ -92,7 +118,7 @@ public class RankServiceImpl implements RankService {
 		if (content == null || content.isEmpty()) {
 			throw new IllegalArgumentException("Content is empty");
 		}
-		return (Ranking) Marshaller.loadFromString(content);
+		return Marshaller.loadFromString(content);
 	}
 
 	public RankClass getRank(final Ranking ranking, int tick, int value) {
@@ -112,7 +138,7 @@ public class RankServiceImpl implements RankService {
 		}
 
 		int pct = 0;
-		for (final Percentile p: ranking.getPercentiles()) {
+		for (final Percentile p : ranking.getPercentiles()) {
 			switch (ranking.getType()) {
 				case DTPS:
 					if (p.getValue() >= value && p.getPercent() > pct) {

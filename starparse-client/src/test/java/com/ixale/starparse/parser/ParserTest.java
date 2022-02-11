@@ -87,13 +87,19 @@ public class ParserTest {
 				LINE_COMBAT_EXIT_54 = "[17:35:01.116] [@Nôfretete] [@Nôfretete] [] [Event {836045448945472}: ExitCombat {836045448945490}] (XS Freighter)",
 				LINE_COMBAT_ENTER_54_OPS = "[21:56:15.395] [@Elidh] [@Elidh] [] [Event {836045448945472}: EnterCombat {836045448945489}] (Denova (8 Player Veteran))",
 				LINE_COMBAT_EXIT_54_OPS = "[22:53:17.980] [@Meirín] [@Meirín] [] [Event {836045448945472}: ExitCombat {836045448945490}] (The Dread Palace (8 Player Veteran))",
-				LINE_V7_ZONE_START = "[{665.733,0.100,473.200}] [21:17:38.776] [@Ixale#689786276957844] [Mercenary/Bodyguard] [HE600] [Imperial Fleet] (v7.0.0)",
-				LINE_V7_COMBAT_START = "[{-65.527,-0.142,-17.242}] [21:27:46.571] [@Ixale#689786276957844] [@Ixale#689786276957844] [] [Event {836045448945472}: EnterCombat {836045448945489}] (Ossus)",
-				LINE_V7_NPC = "[{-64.608,-0.142,-17.750}] [21:27:47.033] [Sith Juggernaut {4367530768465920}:2050000018583] [Master Sentinel {4367470638923776}:2050000018136] [Melee Attack {813445331025920}] [ApplyEffect {836045448945477}: Damage {836045448945501}] (0 -)",
-				LINE_V7_OTHER = "[{-0.264,-2.059,0.020}] [21:36:45.333] [@Majut#689190825945958] [@Majut#689190825945958] [Force Storm {808261305499648}] [Event {836045448945472}: AbilityCancel {836045448945481}] ()",
-				LINE_V7_COMBAT_EXIT = "[{-2.882,-4.228,-7.528}] [21:37:00.736] [@Ixale#689786276957844] [@Ixale#689786276957844] [] [Event {836045448945472}: ExitCombat {836045448945490}] (Korriban)",
-				LINE_V7_COMPANION = "[{672.570,0.101,473.084}] [21:37:59.599] [@Ixale#689786276957844/Lana Beniko {3600471084236800}:110033351885] [@Ixale#689786276957844/Lana Beniko {3600471084236800}:110033351885] [Safe Login {973870949466112}] [RemoveEffect {836045448945478}: Safe Login Immunity {973870949466372}] ()",
-				LINE_V7_IGNORED = "[] [21:10:55.317] [] [@Find'reela#689406079192276] [Karaggas Palace Level Sync {4308350414094336}] [ApplyEffect {836045448945477}: Level Lock {4308350414094914}] ()";
+				LINE_V7_ZONE_START = "[21:10:14.218] [@Lad Dominic#689199156848288|(63.84,1553.43,229.43,180.00)|(1/392212)] [] [] [AreaEntered {836045448953664}: Valley of the Machine Gods {833571547775765}] (HE600) <v7.0.0b>",
+				LINE_V7_OPS_START = "[21:10:14.248] [@Lad Dominic#689199156848288|(63.84,1553.43,229.43,180.00)|(392212/406515)] [] [] [AreaEntered {836045448953664}: Valley of the Machine Gods {833571547775765} 8 Player Veteran {836045448953652}] (HE600) <v7.0.0b>",
+				LINE_V7_COMBAT_START = "[21:11:27.222] [@Lad Dominic#689199156848288|(68.38,1562.25,229.28,-0.45)|(406515/406515)] [] [] [Event {836045448945472}: EnterCombat {836045448945489}]",
+				LINE_V7_DISCIPLINE_CHANGED = "[21:11:27.222] [@Lad Dominic#689199156848288|(68.38,1562.25,229.28,-0.45)|(406515/406515)] [] [] [DisciplineChanged {836045448953665}: Operative {16140905232405801950}/Medicine {2031339142381596}]",
+				LINE_V7_NPC = "[21:12:17.985] [Combat Droid {4077057835270144}:2869000006287|(810.47,1901.19,232.42,-85.42)|(372762/389913)] [@Notquiteenoughviable#689993934789570|(826.04,1899.97,231.97,81.90)|(92163/364564)] [Charged Rounds {1798822497878016}] [ApplyEffect {836045448945477}: Damage {836045448945501}] (8131 energy {836045448940874} -shield {836045448945509} (29098 absorbed {836045448945511})) <8131>",
+				LINE_V7_OTHER = "[21:12:21.817] [Combat Droid {4077057835270144}:2869000006199|(826.83,1901.74,232.10,23.94)|(149668/389913)] [@Notquiteenoughviable#689993934789570|(826.04,1899.97,231.97,86.26)|(0/364564)] [Armor Piercing Cell {828301622902784}] [ApplyEffect {836045448945477}: Armor Reduced {828301622903053}] (1 charges {836045448953667})",
+				LINE_V7_COMBAT_EXIT = "[21:13:05.214] [@Lad Dominic#689199156848288|(814.39,1892.66,232.42,-177.54)|(406515/406515)] [] [] [Event {836045448945472}: ExitCombat {836045448945490}]",
+				LINE_V7_COMPANION = "[21:52:51.302] [@Ixale#689198861050949/Lana Beniko {3600471084236800}:109012087183|(4783.91,4694.78,705.49,168.73)|(101072/105329)] [=] [ {4196681264398336}] [ApplyEffect {836045448945477}: Hunter's Boon {4196681264398649}]",
+				LINE_V7_DAMAGE = "[21:31:57.629] [@Lad Dominic#689199156848288|(816.61,2355.95,228.51,47.00)|(406515/406515)] [Lance {4078449404674048}:2869000269692|(821.28,2360.98,228.36,108.95)|(188742/233686)] [Rifle Shot {948041016147968}] [ApplyEffect {836045448945477}: Damage {836045448945501}] (2951 ~2952 energy {836045448940874}) <2951>",
+				LINE_V7_ABSORBED = "[21:31:59.247] [TYTH {4078423634870272}:2869000253855|(809.10,2366.34,228.51,160.73)|(14634918/18325876)] [@Notquiteenoughviable#689993934789570|(807.38,2371.25,228.51,-19.26)|(250049/364564)] [Melee Attack {4080283355709440}] [ApplyEffect {836045448945477}: Damage {836045448945501}] (13255 ~0 energy {836045448940874} -shield {836045448945509} (13255 absorbed {836045448945511})) <13255>",
+				LINE_V7_HEAL = "[21:32:00.522] [@Riku#689411359825172|(807.42,2351.52,228.51,-179.97)|(362091/371105)] [@Notquiteenoughviable#689993934789570|(807.38,2371.25,228.51,-19.26)|(267939/364564)] [Cure Mind {987851068014592}] [ApplyEffect {836045448945477}: Heal {836045448945500}] (6785 ~6786) <3053>",
+				LINE_V7_CHARGES = "[21:45:54.269] [@Ixale#689198861050949|(4740.13,4665.02,710.01,71.03)|(72122/72122)] [] [Power Barrier {3394793690365952}] [ModifyCharges {836045448953666}: Power Barrier {3394793690365952}] (2 charges {836045448953667})",
+				LINE_V7_DEATH = "[21:11:59.079] [] [@Dot#689199156849986|(60.93,1556.10,229.28,-75.43)|(0/403442)] [] [Event {836045448945472}: Death {836045448945493}]";
 
 		// setup combat to avoid "out of combat" errors
 		p.parseLogLine(LINE_COMBAT_ENTER);
@@ -284,25 +290,33 @@ public class ParserTest {
 		// v7
 		p.getContext().reset();
 		p.parseLogLine(LINE_V7_ZONE_START);
-		assertEquals("v7.0.0", p.getContext().getVersion());
-		e = p.getEvents().get(i-1 /* no increment */);
+		assertEquals("7.0.0b", p.getContext().getVersion());
+		e = p.getEvents().get(i - 1 /* no increment */);
+
+		p.parseLogLine(LINE_V7_OPS_START);
+		e = p.getEvents().get(i - 1 /* no increment */);
+
+		p.parseLogLine(LINE_V7_DISCIPLINE_CHANGED);
+		e = p.getEvents().get(i - 1 /* no increment */);
+		assertEquals(CharacterDiscipline.Medicine, p.getContext().getActor("Lad Dominic", Actor.Type.SELF).getDiscipline());
+
 		p.parseLogLine(LINE_V7_COMBAT_START);
 		e = p.getEvents().get(i++);
 //		assertEquals(CharacterDiscipline.Bodyguard, p.getCurrentCombat().getDiscipline());
 		p.parseLogLine(LINE_V7_OTHER);
 		e = p.getEvents().get(i++);
-		assertEquals("Majut", e.getSource().getName());
-		assertEquals("Majut", e.getTarget().getName());
+		assertEquals("Combat Droid", e.getSource().getName());
+		assertEquals("Notquiteenoughviable", e.getTarget().getName());
 		p.parseLogLine(LINE_V7_NPC);
 		e = p.getEvents().get(i++);
-		assertEquals("Sith Juggernaut", e.getSource().getName());
-		assertEquals("Master Sentinel", e.getTarget().getName());
+		assertEquals("Combat Droid", e.getSource().getName());
+		assertEquals("Notquiteenoughviable", e.getTarget().getName());
 		p.parseLogLine(LINE_V7_COMBAT_EXIT);
 		e = p.getEvents().get(i++);
 		p.parseLogLine(LINE_V7_COMPANION);
 		e = p.getEvents().get(i++);
 		assertEquals("Lana Beniko", e.getSource().getName());
-		p.parseLogLine(LINE_V7_IGNORED);
+//		p.parseLogLine(LINE_V7_IGNORED);
 		assertEquals(i, p.getEvents().size());
 	}
 
@@ -1110,29 +1124,6 @@ public class ParserTest {
 		assertEquals(i, p.getEvents().size());
 	}
 
-	@SuppressWarnings("deprecation")
-	@Test
-	public void testTimezone() {
-		String x = "10:01:02.123";
-		Pattern p = Pattern.compile("^(?<HH>\\d{2}):(?<MM>\\d{2}):(?<SS>\\d{2})\\.(?<MS>\\d{3})$");
-		Matcher m = p.matcher(x);
-		Calendar c = Calendar.getInstance();
-		c.setTimeInMillis(new Date(115, 4, 1).getTime()); // 2015-05-01
-		m.find();
-		c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(m.group("HH")));
-		c.set(Calendar.MINUTE, Integer.parseInt(m.group("MM")));
-		c.set(Calendar.SECOND, Integer.parseInt(m.group("SS")));
-		c.set(Calendar.MILLISECOND, Integer.parseInt(m.group("MS")));
-//		System.out.println(c);
-//		System.out.println(c.getTimeZone());
-//		System.out.println(new Date(c.getTimeInMillis()));
-//		TimeZone.setDefault(TimeZone.getTimeZone("GMT+09:30"));
-//		System.out.println(new Date(c.getTimeInMillis()));
-		TimeZone.setDefault(TimeZone.getTimeZone("Australia/Adelaide"));
-//		System.out.println(TimeZone.getDefault());
-//		System.out.println(new Date(TimeUtils.getCurrentTime()));
-	}
-
 	@Test
 	public void testDisciplines() throws Exception {
 
@@ -1140,13 +1131,13 @@ public class ParserTest {
 			for (long guid : discipline.getAbilities()) {
 				final Parser p = createParser();
 				p.parseLogLine("[14:14:35.306] [@Ixayly] [@Ixayly] [] [Event {836045448945472}: EnterCombat {836045448945489}] ()");
-				assertNull(p.getCurrentCombat().getDiscipline());
+				assertNull(p.getActorStates().get(p.getContext().getActor("Ixayly", Actor.Type.SELF)).discipline);
 				p.parseLogLine("[21:30:14.981] [@SomeoneElse] [@Ixayly] [FooBar {" + guid + "}] [Event {836045448945472}: AbilityActivate {836045448945479}] ()");
-				assertNull(p.getCurrentCombat().getDiscipline());
+				assertNull(p.getActorStates().get(p.getContext().getActor("Ixayly", Actor.Type.SELF)).discipline);
 				p.parseLogLine("[21:30:14.981] [@SomeoneElse] [@SomeoneElse] [FooBar {" + guid + "}] [Event {836045448945472}: AbilityActivate {836045448945479}] ()");
-				assertNull(p.getCurrentCombat().getDiscipline());
+				assertNull(p.getActorStates().get(p.getContext().getActor("Ixayly", Actor.Type.SELF)).discipline);
 				p.parseLogLine("[21:30:14.981] [@SomeoneElse] [@SomeoneElse] [FooBar {" + guid + "}] [Event {836045448945472}: AbilityActivate {836045448945479}] ()");
-				assertNull(p.getCurrentCombat().getDiscipline());
+				assertNull(p.getActorStates().get(p.getContext().getActor("Ixayly", Actor.Type.SELF)).discipline);
 				if (CharacterClass.Sentinel.equals(discipline.getCharacterClass())) {
 					p.parseLogLine("[04:41:22.825] [@Ixayly] [@Ixayly] [Centering {2528580391141376}] [ApplyEffect {836045448945477}: Centering {2528580391141376}] ()");
 				}
@@ -1154,7 +1145,7 @@ public class ParserTest {
 					p.parseLogLine("[04:41:22.825] [@Ixayly] [@Ixayly] [Fury {2515454971084800}] [ApplyEffect {836045448945477}: Fury {2515454971084800}] ()");
 				}
 				p.parseLogLine("[21:30:14.981] [@Ixayly] [@Ixayly] [FooBar {" + guid + "}] [Event {836045448945472}: AbilityActivate {836045448945479}] ()");
-				assertEquals("Failed to detect discipline", discipline, p.getCurrentCombat().getDiscipline());
+				assertEquals("Failed to detect discipline", discipline, p.getActorStates().get(p.getContext().getActor("Ixayly", Actor.Type.SELF)).discipline);
 			}
 		}
 	}

@@ -1,9 +1,12 @@
 package com.ixale.starparse.raid;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import com.ixale.starparse.domain.Event;
+import javafx.concurrent.Worker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +45,7 @@ public class RaidManager {
 
 	private RaidClient raidClient;
 
-	private String raidGroupName, characterName;
+	private String raidGroupName, characterName, lastCombatLogName;
 	private boolean isGroupAdmin = false;
 	private Integer lastEventId;
 	private boolean lastCombatRunning;
@@ -77,7 +80,7 @@ public class RaidManager {
 
 			isEnabled = false;
 			boolean tryAgain = (message == null
-				|| (!message.contains("Your version appears to be outdated")));
+					|| (!message.contains("Your version appears to be outdated")));
 
 			switch (state) {
 				case STOPPING:
@@ -119,7 +122,7 @@ public class RaidManager {
 		@Override
 		public void onClose(String message) {
 			boolean tryAgain = (message == null
-				|| !message.contains("You have joined the raid from another StarParse window"));
+					|| !message.contains("You have joined the raid from another StarParse window"));
 
 			if (tryAgain && (state == State.CONNECTING || state == State.RUNNING) && connectionAttempts++ < RECONNECT_ATTEMPTS) {
 				// try again
@@ -144,7 +147,7 @@ public class RaidManager {
 		public void onPlayerJoin(final String[] characterNames, String raidGroupName) {
 			if (!raidGroupName.equals(getRaidGroupName().toLowerCase())) {
 				logger.warn("Received player join for invalid group: " + Arrays.asList(characterNames) + " @ "
-					+ raidGroupName);
+						+ raidGroupName);
 				return;
 			}
 			fireOnPlayerJoin(characterNames);
@@ -154,7 +157,7 @@ public class RaidManager {
 		public void onPlayerQuit(final String[] characterNames, String raidGroupName) {
 			if (!raidGroupName.equals(getRaidGroupName().toLowerCase())) {
 				logger.warn("Received player quit for invalid group: " + Arrays.asList(characterNames) + " @ "
-					+ raidGroupName);
+						+ raidGroupName);
 				return;
 			}
 			fireOnPlayerQuit(characterNames);
@@ -169,7 +172,7 @@ public class RaidManager {
 		public void onRequestIncoming(final RaidRequestMessage message, final RequestIncomingCallback callback) {
 			fireOnRequestIncoming(message, callback);
 		}
-	};
+	}
 
 	public RaidManager(final Config config, final RaidListener listener) {
 		this.config = config;
@@ -179,7 +182,7 @@ public class RaidManager {
 	public void setRaidGroup(final String raidGroupName, final boolean isGroupAdmin) {
 
 		if (isEnabled && this.raidGroupName != null
-			&& (raidGroupName == null || !raidGroupName.equals(this.raidGroupName))) {
+				&& (raidGroupName == null || !raidGroupName.equals(this.raidGroupName))) {
 			stopRaid(true);
 		}
 
@@ -207,7 +210,7 @@ public class RaidManager {
 	public void setCharacterName(String characterName) {
 
 		if (isEnabled && this.characterName != null
-			&& (characterName == null || !characterName.equals(this.characterName))) {
+				&& (characterName == null || !characterName.equals(this.characterName))) {
 			stopRaid(true);
 		}
 
@@ -251,7 +254,9 @@ public class RaidManager {
 			return;
 		}
 
-		logger.debug("Attempting to start: " + characterName + " @ " + raidGroupName);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Attempting to start: " + characterName + " @ " + raidGroupName);
+		}
 
 		lastEventId = null;
 		lastCombatRunning = false;
@@ -275,19 +280,20 @@ public class RaidManager {
 		}
 
 		if (worker != null) {
-
-			logger.debug("Attempting to stop [" + (doWait ? "sync" : "async") + "]): " + characterName + " @ "
-				+ raidGroupName);
+			if (logger.isDebugEnabled()) {
+				logger.debug("Attempting to stop [" + (doWait ? "sync" : "async") + "]): " + characterName + " @ "
+						+ raidGroupName);
+			}
 
 			try {
 				raidingLatch.countDown();
-			} catch (Exception e) {
+			} catch (Exception ignored) {
 			} // might be gone
 
 			if (doWait) {
 				try {
 					worker.join();
-				} catch (Exception e) {
+				} catch (Exception ignored) {
 				} // might be gone
 			}
 		}
@@ -296,35 +302,89 @@ public class RaidManager {
 	}
 
 	public RaidCombatMessage sendCombatUpdate(final Combat combat,
-		final CombatStats combatStats,
-		final List<AbsorptionStats> absorptionStats,
-		final List<ChallengeStats> challengeStats,
-		final List<CombatEventStats> combatEventStats) {
+			final CombatStats combatStats,
+			final List<AbsorptionStats> absorptionStats,
+			final List<ChallengeStats> challengeStats,
+			final List<CombatEventStats> combatEventStats,
+			final String playerName) {
 
-		if (!isEnabled()) {
-			// should not happen
-			logger.debug("Trying to update combat while raiding inactive, ignoring");
-			return null;
+//		if (isEnabled()) {
+//			// should not happen
+//			logger.debug("Trying to update combat while raiding inactive, ignoring");
+//			return null;
+//		}
+
+//		if (!isRunning()) {
+//			logger.debug("Trying to update combat while raid client not ready (" + state + "), ignoring");
+//			return null;
+//		}
+
+		final boolean isFakeRaider = !playerName.equals(characterName);
+		if (!isFakeRaider) {
+			if (combat.getEventIdTo() != null) {
+				lastEventId = combat.getEventIdTo();
+			}
+			lastCombatRunning = combat.isRunning();
 		}
 
-		if (!isRunning()) {
-			logger.debug("Trying to update combat while raid client not ready (" + state + "), ignoring");
-			return null;
+		return updateCombat(combat, playerName, combatStats, absorptionStats, challengeStats, combatEventStats, isFakeRaider);
+	}
+
+	private RaidCombatMessage updateCombat(final Combat combat, final String characterName,
+			final CombatStats combatStats,
+			final List<AbsorptionStats> absorptionStats,
+			final List<ChallengeStats> challengeStats,
+			final List<CombatEventStats> combatEventStats,
+			final boolean isFakeRaider) {
+
+		if (challengeStats != null && !challengeStats.isEmpty()) {
+			// discard challenges with no value
+			challengeStats.removeIf(stats -> (stats.getDamage() == null || stats.getDamage() == 0)
+					&& (stats.getEffectiveHeal() == null || stats.getEffectiveHeal() == 0)
+					&& (stats.getHeal() == null || stats.getHeal() == 0));
 		}
 
-		if (combat.getEventIdTo() != null) {
-			lastEventId = combat.getEventIdTo();
+		// transform the very last event
+		Event.Type exitEvent = null;
+		List<CombatEventStats> combatEventStats2 = null;
+		final long timestamp = combat.getTimeFrom() + combatStats.getTick();
+		if (combatEventStats != null && !combatEventStats.isEmpty()) {
+			final CombatEventStats last = combatEventStats.get(combatEventStats.size() - 1);
+			if (last.getTimestamp() == timestamp) {
+				exitEvent = last.getType();
+				if (combatEventStats.size() > 1) {
+					combatEventStats2 = new ArrayList<>(combatEventStats.subList(0, combatEventStats.size() - 1));
+				}
+			} else {
+				combatEventStats2 = new ArrayList<>(combatEventStats);
+			}
 		}
-		lastCombatRunning = combat.isRunning();
 
-		return raidClient.updateCombat(combat, characterName, combatStats, absorptionStats, challengeStats, combatEventStats);
+		// fire and forget
+		final RaidCombatMessage message = new RaidCombatMessage(characterName,
+				combat.getTimeFrom(), combat.getTimeTo(),
+				combat.getBoss() != null ? combat.getBoss().getRaidBossName() : null,
+				combat.getBoss() != null ? combat.getBoss().getSize() : null,
+				combat.getBoss() != null ? combat.getBoss().getMode() : null,
+				combatStats, absorptionStats, challengeStats, combatEventStats2,
+				timestamp, // last event timestamp
+				combatStats.getDiscipline(),
+				exitEvent);
+
+		if (!isFakeRaider && isRunning()) {
+			raidClient.updateCombat(message);
+		}
+
+		return message;
 	}
 
 	public void sendRequest(final RaidRequest request, final RequestOutgoingCallback callback) {
 
 		if (!isEnabled() || !isRunning()) {
 			// should not happen
-			logger.debug("Trying to send request while raiding inactive, ignoring (" + request + ")");
+			if (logger.isDebugEnabled()) {
+				logger.debug("Trying to send request while raiding inactive, ignoring (" + request + ")");
+			}
 			callback.onResponseIncoming(new RaidResponseMessage(null, "No longer raiding"));
 			return;
 		}
@@ -340,15 +400,20 @@ public class RaidManager {
 		return isEnabled() && raidClient != null && state == State.RUNNING;
 	}
 
-	public boolean isUpdateNeeded(final Combat combat) {
-		if (!isRunning()) {
-			return false;
+	public boolean isUpdateNeeded(final Combat combat, final String combatLogName) {
+//		if (!isRunning()) {
+//			return false;
+//		}
+		if (!combatLogName.equals(lastCombatLogName)) {
+			lastEventId = 0;
+			lastCombatRunning = false;
+			lastCombatLogName = combatLogName;
 		}
 		// running or after last event ID recorded
 		return lastEventId == null
-			|| combat.getEventIdTo() == null
-			|| combat.getEventIdTo() > lastEventId
-			|| combat.isRunning() != lastCombatRunning;
+				|| combat.getEventIdTo() == null
+				|| combat.getEventIdTo() > lastEventId
+				|| combat.isRunning() != lastCombatRunning;
 	}
 
 	class Worker extends Thread {
@@ -358,8 +423,9 @@ public class RaidManager {
 		}
 
 		public void run() {
-
-			logger.debug("Starting raid: " + characterName + " @ " + raidGroupName);
+			if (logger.isDebugEnabled()) {
+				logger.debug("Starting raid: " + characterName + " @ " + raidGroupName);
+			}
 
 			state = RaidManager.State.CONNECTING;
 			raidClient.startRaiding(raidGroupName, characterName, config.isStoreDataOnServerEnabled());
@@ -369,12 +435,15 @@ public class RaidManager {
 				try {
 					raidingLatch.await();
 				} catch (Exception e) {
+					// ignore
 				}
 			}
 
 			if (state != RaidManager.State.CONNECTING && !raidClient.isClosed()) {
 
-				logger.debug("Stopping raid: " + characterName + " @ " + raidGroupName);
+				if (logger.isDebugEnabled()) {
+					logger.debug("Stopping raid: " + characterName + " @ " + raidGroupName);
+				}
 
 				state = RaidManager.State.STOPPING;
 				raidClient.stopRaiding(raidGroupName, characterName);
@@ -386,7 +455,7 @@ public class RaidManager {
 			// flood limit
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			} catch (InterruptedException ignored) {
 			}
 
 			if (!raidClient.isClosed()) {
@@ -397,7 +466,9 @@ public class RaidManager {
 			raidClient = null;
 			raidingLatch = null;
 
-			logger.debug("Raid stopped: " + characterName + " @ " + raidGroupName);
+			if (logger.isDebugEnabled()) {
+				logger.debug("Raid stopped: " + characterName + " @ " + raidGroupName);
+			}
 			fireOnRaidStopped();
 		}
 	}

@@ -1,6 +1,8 @@
 package com.ixale.starparse.domain;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class CombatChallenge {
 
@@ -12,10 +14,18 @@ public class CombatChallenge {
 	final private String phaseName;
 	final private Type type;
 
-	final private List<Object> args;
+	final private Map<String, ?> args;
 	final private String sql;
 
-	public CombatChallenge(RaidChallengeName challengeName, String phaseName, Type type, final List<Object> args, final String sql) {
+	public CombatChallenge(RaidChallengeName challengeName, String phaseName, Type type, final List<Long> targetIds) {
+		this.challengeName = challengeName;
+		this.phaseName = phaseName;
+		this.args = Collections.singletonMap(challengeName.name() + "TargetGuids", targetIds);
+		this.sql = "target_guid IN (:" + challengeName.name() + "TargetGuids" + ")";
+		this.type = type;
+	}
+
+	public CombatChallenge(RaidChallengeName challengeName, String phaseName, Type type, final Map<String, Object> args, final String sql) {
 		this.challengeName = challengeName;
 		this.phaseName = phaseName;
 		this.args = args;
@@ -35,7 +45,7 @@ public class CombatChallenge {
 		return type;
 	}
 
-	public List<Object> getArgs() {
+	public Map<String, ?> getArgs() {
 		return args;
 	}
 

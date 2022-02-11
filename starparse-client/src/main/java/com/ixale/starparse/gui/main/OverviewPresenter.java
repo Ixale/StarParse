@@ -1,29 +1,5 @@
 package com.ixale.starparse.gui.main;
 
-import java.net.URL;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.ResourceBundle;
-
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.fxml.FXML;
-import javafx.scene.Cursor;
-import javafx.scene.Node;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.SortType;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
-import javafx.util.Callback;
-
 import com.ixale.starparse.domain.Combat;
 import com.ixale.starparse.domain.Effect;
 import com.ixale.starparse.domain.EffectKey;
@@ -44,24 +20,47 @@ import com.ixale.starparse.gui.table.NumberCellFactory;
 import com.ixale.starparse.gui.table.TableResizer;
 import com.ixale.starparse.gui.table.TimeCellFactory;
 import com.ixale.starparse.gui.table.item.EffectItem;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.SortType;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
+import javafx.util.Callback;
 
-public class OverviewPresenter extends BaseStatsPresenter
-{
+import java.net.URL;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.ResourceBundle;
+
+public class OverviewPresenter extends BaseStatsPresenter {
 	@FXML
 	private StackPane dpsChartWrapper, hpsChartWrapper, dtpsChartWrapper;
 	@FXML
 	private GridPane mineEffectsWrapper, groupEffectsWrapper;
+	@SuppressWarnings("unused")
 	@FXML
 	private ScrollPane containerWrapper;
+	@FXML
+	private CheckBox mineEffects, groupEffects;
+	private Boolean wasMineEffects, wasGroupEffects;
 
 	@FXML
 	private TableView<EffectItem> procsTable, actTable, recTable, givTable;
 	@FXML
 	private TableColumn<EffectItem, String> procNameCol, actNameCol, recSourceCol, recNameCol, givTargetCol,
-		givNameCol;
+			givNameCol;
 	@FXML
 	private TableColumn<EffectItem, Integer> procCntCol, procDurCol, actCntCol, actDurCol, recCntCol, recDurCol,
-		givCntCol, givDurCol;
+			givCntCol, givDurCol;
 	@FXML
 	private TableColumn<EffectItem, Double> procPctCol, actPctCol, recPctCol, givPctCol;
 
@@ -73,10 +72,10 @@ public class OverviewPresenter extends BaseStatsPresenter
 	private DtpsChart dtpsChart = null;
 
 	final private LinkedHashMap<EffectKey, EffectItem>
-		procEffects = new LinkedHashMap<EffectKey, EffectItem>(),
-		actEffects = new LinkedHashMap<EffectKey, EffectItem>(),
-		recEffects = new LinkedHashMap<EffectKey, EffectItem>(),
-		givEffects = new LinkedHashMap<EffectKey, EffectItem>();
+			procEffects = new LinkedHashMap<>(),
+			actEffects = new LinkedHashMap<>(),
+			recEffects = new LinkedHashMap<>(),
+			givEffects = new LinkedHashMap<>();
 
 	class EffectCell extends TableCell<EffectItem, String> {
 		@Override
@@ -98,48 +97,48 @@ public class OverviewPresenter extends BaseStatsPresenter
 
 	@Override
 	public void initialize(final URL url, final ResourceBundle resourceBundle) {
-		recSourceCol.setCellValueFactory(new PropertyValueFactory<EffectItem, String>("source"));
-		givTargetCol.setCellValueFactory(new PropertyValueFactory<EffectItem, String>("target"));
+		recSourceCol.setCellValueFactory(new PropertyValueFactory<>("source"));
+		givTargetCol.setCellValueFactory(new PropertyValueFactory<>("target"));
 
-		procNameCol.setCellValueFactory(new PropertyValueFactory<EffectItem, String>("name"));
-		actNameCol.setCellValueFactory(new PropertyValueFactory<EffectItem, String>("name"));
-		recNameCol.setCellValueFactory(new PropertyValueFactory<EffectItem, String>("name"));
-		givNameCol.setCellValueFactory(new PropertyValueFactory<EffectItem, String>("name"));
+		procNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+		actNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+		recNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+		givNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-		procCntCol.setCellValueFactory(new PropertyValueFactory<EffectItem, Integer>("count"));
-		actCntCol.setCellValueFactory(new PropertyValueFactory<EffectItem, Integer>("count"));
-		recCntCol.setCellValueFactory(new PropertyValueFactory<EffectItem, Integer>("count"));
-		givCntCol.setCellValueFactory(new PropertyValueFactory<EffectItem, Integer>("count"));
+		procCntCol.setCellValueFactory(new PropertyValueFactory<>("count"));
+		actCntCol.setCellValueFactory(new PropertyValueFactory<>("count"));
+		recCntCol.setCellValueFactory(new PropertyValueFactory<>("count"));
+		givCntCol.setCellValueFactory(new PropertyValueFactory<>("count"));
 
-		procDurCol.setCellValueFactory(new PropertyValueFactory<EffectItem, Integer>("duration"));
-		actDurCol.setCellValueFactory(new PropertyValueFactory<EffectItem, Integer>("duration"));
-		recDurCol.setCellValueFactory(new PropertyValueFactory<EffectItem, Integer>("duration"));
-		givDurCol.setCellValueFactory(new PropertyValueFactory<EffectItem, Integer>("duration"));
+		procDurCol.setCellValueFactory(new PropertyValueFactory<>("duration"));
+		actDurCol.setCellValueFactory(new PropertyValueFactory<>("duration"));
+		recDurCol.setCellValueFactory(new PropertyValueFactory<>("duration"));
+		givDurCol.setCellValueFactory(new PropertyValueFactory<>("duration"));
 
-		procDurCol.setCellFactory(new TimeCellFactory<EffectItem>());
-		actDurCol.setCellFactory(new TimeCellFactory<EffectItem>());
-		recDurCol.setCellFactory(new TimeCellFactory<EffectItem>());
-		givDurCol.setCellFactory(new TimeCellFactory<EffectItem>());
+		procDurCol.setCellFactory(new TimeCellFactory<>());
+		actDurCol.setCellFactory(new TimeCellFactory<>());
+		recDurCol.setCellFactory(new TimeCellFactory<>());
+		givDurCol.setCellFactory(new TimeCellFactory<>());
 
-		procPctCol.setCellValueFactory(new PropertyValueFactory<EffectItem, Double>("pct"));
-		actPctCol.setCellValueFactory(new PropertyValueFactory<EffectItem, Double>("pct"));
-		recPctCol.setCellValueFactory(new PropertyValueFactory<EffectItem, Double>("pct"));
-		givPctCol.setCellValueFactory(new PropertyValueFactory<EffectItem, Double>("pct"));
+		procPctCol.setCellValueFactory(new PropertyValueFactory<>("pct"));
+		actPctCol.setCellValueFactory(new PropertyValueFactory<>("pct"));
+		recPctCol.setCellValueFactory(new PropertyValueFactory<>("pct"));
+		givPctCol.setCellValueFactory(new PropertyValueFactory<>("pct"));
 
-		procCntCol.setCellFactory(new NumberCellFactory<EffectItem>());
-		actCntCol.setCellFactory(new NumberCellFactory<EffectItem>());
-		recCntCol.setCellFactory(new NumberCellFactory<EffectItem>());
-		givCntCol.setCellFactory(new NumberCellFactory<EffectItem>());
+		procCntCol.setCellFactory(new NumberCellFactory<>());
+		actCntCol.setCellFactory(new NumberCellFactory<>());
+		recCntCol.setCellFactory(new NumberCellFactory<>());
+		givCntCol.setCellFactory(new NumberCellFactory<>());
 
-		procPctCol.setCellFactory(new FloatCellFactory<EffectItem>());
-		actPctCol.setCellFactory(new FloatCellFactory<EffectItem>());
-		recPctCol.setCellFactory(new FloatCellFactory<EffectItem>());
-		givPctCol.setCellFactory(new FloatCellFactory<EffectItem>());
+		procPctCol.setCellFactory(new FloatCellFactory<>());
+		actPctCol.setCellFactory(new FloatCellFactory<>());
+		recPctCol.setCellFactory(new FloatCellFactory<>());
+		givPctCol.setCellFactory(new FloatCellFactory<>());
 
-		procsTable.setColumnResizePolicy(new TableResizer(new TableColumn[] { procNameCol }, new double[] { 1 }));
-		actTable.setColumnResizePolicy(new TableResizer(new TableColumn[] { actNameCol }, new double[] { 1 }));
-		recTable.setColumnResizePolicy(new TableResizer(new TableColumn[] { recSourceCol, recNameCol }, new double[] { .4, .6 }));
-		givTable.setColumnResizePolicy(new TableResizer(new TableColumn[] { givTargetCol, givNameCol }, new double[] { .4, .6 }));
+		procsTable.setColumnResizePolicy(new TableResizer(new TableColumn[]{procNameCol}, new double[]{1}));
+		actTable.setColumnResizePolicy(new TableResizer(new TableColumn[]{actNameCol}, new double[]{1}));
+		recTable.setColumnResizePolicy(new TableResizer(new TableColumn[]{recSourceCol, recNameCol}, new double[]{.4, .6}));
+		givTable.setColumnResizePolicy(new TableResizer(new TableColumn[]{givTargetCol, givNameCol}, new double[]{.4, .6}));
 
 		procPctCol.setSortType(SortType.DESCENDING);
 		actPctCol.setSortType(SortType.DESCENDING);
@@ -152,31 +151,24 @@ public class OverviewPresenter extends BaseStatsPresenter
 		givTable.getSortOrder().add(actPctCol);
 
 		final Callback<TableColumn<EffectItem, String>, TableCell<EffectItem, String>> effectNameFactory =
-			new Callback<TableColumn<EffectItem, String>, TableCell<EffectItem, String>>() {
-
-				@Override
-				public TableCell<EffectItem, String> call(TableColumn<EffectItem, String> p) {
+				p -> {
 					final EffectCell c = new EffectCell();
 
-					c.setOnMouseClicked(new EventHandler<MouseEvent>() {
-						@Override
-						public void handle(MouseEvent me) {
-							updateEffectCellStyles(c, true);
-							me.consume();
-						}
+					c.setOnMouseClicked(me -> {
+						updateEffectCellStyles(c, true);
+						me.consume();
 					});
 
 					return c;
-				}
-			};
+				};
 
 		procNameCol.setCellFactory(effectNameFactory);
 		actNameCol.setCellFactory(effectNameFactory);
 		recNameCol.setCellFactory(effectNameFactory);
 		givNameCol.setCellFactory(effectNameFactory);
 
-		recSourceCol.setCellFactory(new EffectActorCellFactory<EffectItem>(Type.SOURCE));
-		givTargetCol.setCellFactory(new EffectActorCellFactory<EffectItem>(Type.TARGET));
+		recSourceCol.setCellFactory(new EffectActorCellFactory<>(Type.SOURCE));
+		givTargetCol.setCellFactory(new EffectActorCellFactory<>(Type.TARGET));
 
 		hpsChartWrapper.setVisible(false);
 		dtpsChartWrapper.setVisible(false);
@@ -206,16 +198,16 @@ public class OverviewPresenter extends BaseStatsPresenter
 	protected void refreshCombatStats(final Combat combat, final CombatStats stats) throws Exception {
 
 		boolean ticksNeeded = dpsChartWrapper.isVisible() || hpsChartWrapper.isVisible() || dtpsChartWrapper.isVisible()
-			|| mineEffectsWrapper.isVisible() || groupEffectsWrapper.isVisible();
+				|| mineEffectsWrapper.isVisible() || groupEffectsWrapper.isVisible();
 		final List<CombatTickStats> ticks;
 
 		if (ticksNeeded) {
-			ticks = eventService.getCombatTicks(combat, context.getCombatSelection());
+			ticks = eventService.getCombatTicks(combat, context.getCombatSelection(), context.getSelectedPlayer());
 		} else {
 			ticks = null;
 		}
 
-		if (ticks == null || (ticksNeeded && stats == null)) {
+		if (ticks == null || stats == null) {
 			// combat gone away
 			return;
 		}
@@ -262,33 +254,60 @@ public class OverviewPresenter extends BaseStatsPresenter
 			recTable.getItems().clear();
 			givTable.getItems().clear();
 		}
+
+		final boolean effectsDisabled = !Objects.equals(context.getSelectedPlayer(), context.getCharacterName());
+		try {
+			if (effectsDisabled) {
+				if (mineEffects.isSelected()) {
+					mineEffects.setSelected(false);
+					mineEffects.fireEvent(new ActionEvent(mineEffects, mineEffects));
+					wasMineEffects = true;
+				}
+				if (groupEffects.isSelected()) {
+					groupEffects.setSelected(false);
+					groupEffects.fireEvent(new ActionEvent(groupEffects, groupEffects));
+					wasGroupEffects = true;
+				}
+			} else {
+				if (Boolean.TRUE.equals(wasMineEffects)) {
+					mineEffects.setSelected(true);
+					mineEffects.fireEvent(new ActionEvent(mineEffects, mineEffects));
+					wasMineEffects = null;
+				}
+				if (Boolean.TRUE.equals(wasGroupEffects)) {
+					groupEffects.setSelected(true);
+					groupEffects.fireEvent(new ActionEvent(groupEffects, groupEffects));
+					wasGroupEffects = null;
+				}
+			}
+		} catch (Exception ignored) {
+
+		}
+		mineEffects.setDisable(effectsDisabled);
+		groupEffects.setDisable(effectsDisabled);
 	}
 
 	private void createCharts(final StackPane wrapper, final BaseLineChart... charts) {
 
-		for (int i = 0; i < charts.length; i++) {
-			wrapper.getChildren().add(charts[i].getChartNode());
+		for (final BaseLineChart chart : charts) {
+			wrapper.getChildren().add(chart.getChartNode());
 		}
 
 		wrapper.getChildren().add(BaseLineChart.getLegendNode(charts));
 		wrapper.getChildren().add(charts[charts.length - 1].getOverlayNode());
 		wrapper.getChildren().add(charts[charts.length - 1].getOverlayButtonNode());
 
-		charts[charts.length - 1].getOverlayButtonNode().pressedProperty().addListener(new ChangeListener<Boolean>() {
-			@SuppressWarnings("unchecked")
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-				updateEffectsInOverlays(true, procsTable, actTable, recTable, givTable);
-				refreshChartOverlay();
-			}
+		charts[charts.length - 1].getOverlayButtonNode().pressedProperty().addListener((arg0, arg1, arg2) -> {
+			updateEffectsInOverlays(true, procsTable, actTable, recTable, givTable);
+			refreshChartOverlay();
 		});
 	}
 
 	private void resetCharts(final BaseLineChart... charts) {
 
-		for (int i = 0; i < charts.length; i++) {
-			if (charts[i] != null) {
-				charts[i].resetData();
+		for (final BaseLineChart chart : charts) {
+			if (chart != null) {
+				chart.resetData();
 			}
 		}
 	}
@@ -305,7 +324,7 @@ public class OverviewPresenter extends BaseStatsPresenter
 			createCharts(dpsChartWrapper, dpsChart, damageChart);
 		}
 
-		for (final CombatTickStats tick: ticks) {
+		for (final CombatTickStats tick : ticks) {
 			damageChart.addData(tick.getTick(), tick.getDamage());
 			dpsChart.addData(tick.getTick(), tick.getDps());
 		}
@@ -323,7 +342,7 @@ public class OverviewPresenter extends BaseStatsPresenter
 			createCharts(hpsChartWrapper, hpsChart, healingChart);
 		}
 
-		for (final CombatTickStats tick: ticks) {
+		for (final CombatTickStats tick : ticks) {
 			healingChart.addData(tick.getTick(), tick.getEffectiveHeal());
 			hpsChart.addData(tick.getTick(), tick.getHps(), tick.getEhps());
 		}
@@ -341,13 +360,12 @@ public class OverviewPresenter extends BaseStatsPresenter
 			createCharts(dtpsChartWrapper, dtpsChart, damageTakenChart);
 		}
 
-		for (final CombatTickStats tick: ticks) {
+		for (final CombatTickStats tick : ticks) {
 			damageTakenChart.addData(tick.getTick(), tick.getHealthBalance(), tick.getEffectiveHealTaken(), tick.getDamageTaken());
 			dtpsChart.addData(tick.getTick(), tick.getDtps());
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void updateEffectsTables(final Combat combat, final CombatStats stats) throws Exception {
 
 		// assemble different tables and summaries
@@ -356,20 +374,20 @@ public class OverviewPresenter extends BaseStatsPresenter
 		recEffects.clear();
 		givEffects.clear();
 
-		for (Effect effect: eventService.getCombatEffects(combat, context.getCombatSelection())) {
+		for (Effect effect : eventService.getCombatEffects(combat, context.getCombatSelection())) {
 			switch (effect.getType()) {
-			case ACT:
-				addToEffectTableData(combat, stats, actEffects, effect);
-				break;
-			case PROC:
-				addToEffectTableData(combat, stats, procEffects, effect);
-				break;
-			case REC:
-				addToEffectTableData(combat, stats, recEffects, effect);
-				break;
-			case GIV:
-				addToEffectTableData(combat, stats, givEffects, effect);
-				break;
+				case ACT:
+					addToEffectTableData(combat, stats, actEffects, effect);
+					break;
+				case PROC:
+					addToEffectTableData(combat, stats, procEffects, effect);
+					break;
+				case REC:
+					addToEffectTableData(combat, stats, recEffects, effect);
+					break;
+				case GIV:
+					addToEffectTableData(combat, stats, givEffects, effect);
+					break;
 			}
 		}
 
@@ -388,16 +406,16 @@ public class OverviewPresenter extends BaseStatsPresenter
 	}
 
 	private void addToEffectTableData(final Combat combat, final CombatStats stats,
-		final LinkedHashMap<EffectKey, EffectItem> effects, final Effect effect) {
+			final LinkedHashMap<EffectKey, EffectItem> effects, final Effect effect) {
 
-		Long timeFrom = combat.getTimeFrom();
+		long timeFrom = combat.getTimeFrom();
 		if (context.getTickFrom() != null) {
 			timeFrom = combat.getTimeFrom() + context.getTickFrom();
 		}
 
 		int duration = effect.getTimeTo() == null ? 0
-			: (int) (Math.min(timeFrom + stats.getTick(), effect.getTimeTo())
-			- Math.max(timeFrom, effect.getTimeFrom()));
+				: (int) (Math.min(timeFrom + stats.getTick(), effect.getTimeTo())
+				- Math.max(timeFrom, effect.getTimeFrom()));
 
 		final EffectKey effectKey = new EffectKey(effect.getSource(), effect.getTarget(), effect.getEffect(), effect.getAbility());
 		final EffectItem e;
@@ -422,24 +440,25 @@ public class OverviewPresenter extends BaseStatsPresenter
 			}
 		}
 		e.addWindow(
-			effect.getTimeFrom() - combat.getTimeFrom(),
-			effect.getTimeTo() == null ? null : effect.getTimeTo() - combat.getTimeFrom());
+				effect.getTimeFrom() - combat.getTimeFrom(),
+				effect.getTimeTo() == null ? null : effect.getTimeTo() - combat.getTimeFrom());
 
 		if (duration > 0) {
 			e.pct.set(e.duration.get() * 100.0 / stats.getTick());
 		}
 	}
 
-	private void updateEffectsInOverlays(boolean doClear,
-		@SuppressWarnings("unchecked") final TableView<EffectItem>... effectTables) {
+	@SafeVarargs
+	private final void updateEffectsInOverlays(boolean doClear, final TableView<EffectItem>... effectTables) {
 
-		windows: for (EffectKey effectKey: context.getSelectedEffects().keySet()) {
-			for (TableView<EffectItem> effectTable: effectTables) {
-				for (EffectItem effectItem: effectTable.getItems()) {
+		windows:
+		for (EffectKey effectKey : context.getSelectedEffects().keySet()) {
+			for (TableView<EffectItem> effectTable : effectTables) {
+				for (EffectItem effectItem : effectTable.getItems()) {
 					if (effectKey.equals(effectItem.getEffectKey())) {
 						if (doClear) {
 							// found, remove
-							for (final Node n: effectTable.lookupAll("." + BaseLineChart.getOverlayClass(effectKey))) {
+							for (final Node n : effectTable.lookupAll("." + BaseLineChart.getOverlayClass(effectKey))) {
 								n.getStyleClass().clear();
 								n.getStyleClass().add("selected-overlay-none");
 							}

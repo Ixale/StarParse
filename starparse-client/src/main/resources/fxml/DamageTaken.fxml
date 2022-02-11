@@ -8,7 +8,6 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<?scenebuilder-stylesheet ../styles.css?>
 
 <VBox id="overviewRoot" fx:id="root" fillWidth="true" prefHeight="-1.0" prefWidth="540.0" spacing="0.0" styleClass="content" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.ixale.starparse.gui.main.DamageTakenPresenter">
   <children>

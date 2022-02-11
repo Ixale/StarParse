@@ -7,6 +7,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,15 +81,11 @@ public class Marshaller {
 	}
 
 	public static boolean storeToFile(final Serializable object, String fileName) {
+		final File f = new File(fileName + ".tmp");
 
-		final File f = new File(fileName);
-		ByteArrayOutputStream stream = null;
-		OutputStreamWriter writer = null;
-		FileOutputStream fos = null;
-		try {
-			stream = new ByteArrayOutputStream();
-			writer = new OutputStreamWriter(stream, "UTF-8");
-			fos = new FileOutputStream(f);
+		try (ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			 OutputStreamWriter writer = new OutputStreamWriter(stream, StandardCharsets.UTF_8);
+			 FileOutputStream fos = new FileOutputStream(f)) {
 
 			if (object instanceof SerializeCallback) {
 				((SerializeCallback) object).beforeSerialize();
@@ -92,6 +93,13 @@ public class Marshaller {
 			xmlReader.marshal(object, new PrettyPrintWriter(writer));
 
 			stream.writeTo(fos);
+			stream.close();
+			fos.close();
+
+			try {
+				Files.move(f.toPath(), new File(fileName).toPath(), StandardCopyOption.REPLACE_EXISTING);
+			} catch (Exception ignored) {
+			}
 
 			if (logger.isDebugEnabled()) {
 				logger.debug("Data from " + object + " saved into " + fileName);
@@ -110,19 +118,17 @@ public class Marshaller {
 			logger.error("Unable save " + object + " into " + fileName + ": " + e.getMessage(), e);
 			return false;
 
-		} finally {
-			try {
-				fos.close();
-			} catch (Exception ignore) {
+		}
+	}
+
+	public static String storeToString(final Serializable object) throws Exception {
+		try (StringWriter writer = new StringWriter()) {
+			if (object instanceof SerializeCallback) {
+				((SerializeCallback) object).beforeSerialize();
 			}
-			try {
-				writer.close();
-			} catch (Exception ignore) {
-			}
-			try {
-				stream.close();
-			} catch (Exception ignore) {
-			}
+			xmlReader.marshal(object, new PrettyPrintWriter(writer));
+
+			return writer.toString();
 		}
 	}
 

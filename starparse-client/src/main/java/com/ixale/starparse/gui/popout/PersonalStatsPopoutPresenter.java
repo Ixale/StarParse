@@ -88,7 +88,7 @@ public class PersonalStatsPopoutPresenter extends BasePopoutPresenter {
 		}
 
 		currentChallenge = null;
-		availableChallengeStats = eventService.getCombatChallengeStats(combat, context.getCombatSelection());
+		availableChallengeStats = eventService.getCombatChallengeStats(combat, context.getCombatSelection(), context.getSelectedPlayer());
 		if (availableChallengeStats != null && !availableChallengeStats.isEmpty()) {
 			// try to map
 			for (final ChallengeStats chStats: availableChallengeStats) {
@@ -167,7 +167,7 @@ public class PersonalStatsPopoutPresenter extends BasePopoutPresenter {
 		dps2.setText(Format.formatAdaptive(stats.getDps()));
 		damage2.setText(Format.formatAdaptive(stats.getDamage()));
 
-		final DamageDealtStats dds = eventService.getDamageDealtStatsSimple(combat, context.getCombatSelection()).get(0);
+		final DamageDealtStats dds = eventService.getDamageDealtStatsSimple(combat, context.getCombatSelection(), context.getSelectedPlayer()).get(0);
 		critTotal2.setText(Format.formatNumber(dds.getTotalNormal() > 0
 			? ((dds.getTotalCrit() * 100.0) / (dds.getTotalNormal() + dds.getTotalCrit()))
 			: (dds.getTotalCrit() > 0 ? 100 : 0)) + " %");

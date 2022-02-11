@@ -81,26 +81,18 @@ public class Iokath extends Raid {
 
 	@Override
 	public String getNewPhaseName(final Event e, final Combat c, final String currentPhaseName) {
-
-		if (c.getBoss() == null) {
-			return null;
-		}
-
 		switch (c.getBoss().getRaidBossName()) {
 			case Tyth:
 				return getNewPhaseNameForTyth(e, c, currentPhaseName);
+			case Nahut:
+				return getNewPhaseNameForNahut(e, c, currentPhaseName);
 			default:
 				return null;
 		}
 	}
 
 	private String getNewPhaseNameForTyth(final Event e, final Combat c, final String currentPhaseName) {
-
-		switch (c.getBoss().getMode()) {
-			case SM:
-				// only HM/NiM
-				return null;
-		}
+		if (c.getBoss().getMode() == Mode.SM) return null; // only HM/NiM
 
 		// dummy phases
 		if (currentPhaseName == null) {
@@ -108,12 +100,12 @@ public class Iokath extends Raid {
 			phaseTimers.put(TYTH_PHASE_INVERSION + "1", c.getTimeFrom());
 
 			// setup timers
-			TimerManager.startTimer(TythInversionTimer.class, c.getTimeFrom() - 11000);  // first @ 26.5s
+			TimerManager.startTimer(TythInversionTimer.class, c.getTimeFrom() - 11000); // first @ 26.5s
 
 			return TYTH_PHASE_OPENING;
 		}
 
-		if (Helpers.isAbilityEqual(e, 4071117895499776L) && Helpers.isActionApply(e)) { // Inversion
+		if (Helpers.isAbilityEqual(e, 4071117895499776L) && Helpers.isActionApply(e) && Helpers.isTargetThisPlayer(e)) { // Inversion
 			if (Helpers.isEffectEqual(e, 4071117895500098L) || Helpers.isEffectEqual(e, 4071117895500102L)) { // Short/Long Wave
 				TimerManager.stopTimer(TythInversionTimer.class);
 				TimerManager.startTimer(TythInversionTimer.class, e.getTimestamp());
@@ -134,10 +126,28 @@ public class Iokath extends Raid {
 		return null;
 	}
 
-	public static class TythInversionTimer extends BaseTimer {
+	private String getNewPhaseNameForNahut(final Event e, final Combat c, final String currentPhaseName) {
 
+		// ------------------ Timers ------------------
+
+		if (Helpers.isAbilityEqual(e, 4137075708264448L) && Helpers.isEffectAbilityActivate(e)) { // Energized Slice
+			TimerManager.stopTimer(NahutSliceTimer.class);
+			TimerManager.startTimer(NahutSliceTimer.class, e.getTimestamp());
+		}
+
+		return null;
+	}
+
+	public static class TythInversionTimer extends BaseTimer {
 		public TythInversionTimer() {
 			super("Inversion", "Tyth Inversion", 37500);
+			setColor(0);
+		}
+	}
+
+	public static class NahutSliceTimer extends BaseTimer {
+		public NahutSliceTimer() {
+			super("Slice", "Nahut Slice", 12000);
 			setColor(0);
 		}
 	}

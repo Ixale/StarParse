@@ -1,6 +1,8 @@
 package com.ixale.starparse.domain.ops;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.ixale.starparse.domain.Combat;
 import com.ixale.starparse.domain.CombatChallenge;
@@ -14,9 +16,9 @@ import com.ixale.starparse.domain.RaidChallengeName;
 public class ExplosiveConflict extends Raid {
 
 	public static final long KEPHESS_WALKER_SM_8M = 2794185463693312L,
-		KEPHESS_WALKER_SM_16M = 2876562936430592L,
-		KEPHESS_WALKER_HM_8M = 2876532871659520L,
-		KEPHESS_WALKER_HM_16M = 2876593001201664L;
+			KEPHESS_WALKER_SM_16M = 2876562936430592L,
+			KEPHESS_WALKER_HM_8M = 2876532871659520L,
+			KEPHESS_WALKER_HM_16M = 2876593001201664L;
 
 //	public static final String KEPHESS_PHASE_DROIDS = "Siege Droids",
 //		KEPHESS_PHASE_WALKER = "Walker",
@@ -29,58 +31,59 @@ public class ExplosiveConflict extends Raid {
 		super("Explosive Conflict");
 
 		RaidBoss.add(this, RaidBossName.ZornAndToth,
-			new long[]{2788331423268864L, 2788335718236160L}, // SM 8m
-			new long[]{2860770341683200L, 2860766046715904L}, // SM 16m
-			new long[]{2857544821243904L, 2857549116211200L}, // HM 8m
-			new long[]{2861388816973824L, 2861384522006528L}, // HM 16m
-			new BossUpgradeCallback() {
-				@Override
-				public RaidBoss upgradeByAbility(final long guid, final long effectGuid, final Integer value, final RaidBoss nimBoss) {
-					if (guid == 3004561551785984L || guid == 3004587321589760L) { // Baradium Poisoning 8m / 16m - size already set anyway
-						return nimBoss;
+				new long[]{2788331423268864L, 2788335718236160L}, // SM 8m
+				new long[]{2860770341683200L, 2860766046715904L}, // SM 16m
+				new long[]{2857544821243904L, 2857549116211200L}, // HM 8m
+				new long[]{2861388816973824L, 2861384522006528L}, // HM 16m
+				new BossUpgradeCallback() {
+					@Override
+					public RaidBoss upgradeByAbility(final long guid, final long effectGuid, final Integer value, final RaidBoss nimBoss) {
+						if (guid == 3004561551785984L || guid == 3004587321589760L) { // Baradium Poisoning 8m / 16m - size already set anyway
+							return nimBoss;
+						}
+						return null;
 					}
-					return null;
-				}
-				@Override
-				public RaidBoss upgradeByNpc(long guid, RaidBoss boss) {
-					return null;
-				}
-			});
+
+					@Override
+					public RaidBoss upgradeByNpc(long guid, RaidBoss boss) {
+						return null;
+					}
+				});
 
 		RaidBoss.add(this, RaidBossName.FirebrandAndStormcaller,
-			new long[]{2808827007205376L, 2808831302172672L},
-			new long[]{2876459857215488L, 2876464152182784L},
-			new long[]{2876434087411712L, 2876438382379008L},
-			new long[]{2876481332051968L, 2876485627019264L},
-			null);
+				new long[]{2808827007205376L, 2808831302172672L},
+				new long[]{2876459857215488L, 2876464152182784L},
+				new long[]{2876434087411712L, 2876438382379008L},
+				new long[]{2876481332051968L, 2876485627019264L},
+				null);
 
 		RaidBoss.add(this, RaidBossName.ColonelVorgath,
-			new long[]{2783478110224384L, 2813182104043520L}, // Demolitions Probe, Vorgath
-			new long[]{2854156092047360L, 2854224811524096L},
-			new long[]{2854151797080064L, 2854117437341696L},
-			new long[]{2854160387014656L, 2854229106491392L},
-			null);
+				new long[]{2783478110224384L, 2813182104043520L}, // Demolitions Probe, Vorgath
+				new long[]{2854156092047360L, 2854224811524096L},
+				new long[]{2854151797080064L, 2854117437341696L},
+				new long[]{2854160387014656L, 2854229106491392L},
+				null);
 
 		RaidBoss.add(this, RaidBossName.WarlordKephess,
-			new long[]{2802491930443776L, KEPHESS_WALKER_SM_8M, 2800357331697664L}, // Siege Droid, Battlewalker, Kephess
-			new long[]{2876545756561408L, KEPHESS_WALKER_SM_16M, 2876550051528704L},
-			new long[]{2876515691790336L, KEPHESS_WALKER_HM_8M, 2876528576692224L},
-			new long[]{2876575821332480L, KEPHESS_WALKER_HM_16M, 2876588706234368L},
-			new BossUpgradeCallback() {
+				new long[]{2802491930443776L, KEPHESS_WALKER_SM_8M, 2800357331697664L}, // Siege Droid, Battlewalker, Kephess
+				new long[]{2876545756561408L, KEPHESS_WALKER_SM_16M, 2876550051528704L},
+				new long[]{2876515691790336L, KEPHESS_WALKER_HM_8M, 2876528576692224L},
+				new long[]{2876575821332480L, KEPHESS_WALKER_HM_16M, 2876588706234368L},
+				new BossUpgradeCallback() {
 
-				@Override
-				public RaidBoss upgradeByNpc(long guid, RaidBoss boss) {
-					return null;
-				}
-
-				@Override
-				public RaidBoss upgradeByAbility(long guid, long effectGuid, Integer value, RaidBoss nimBoss) {
-					if (guid == 3006764870008832L) { // Nightmare of the Masters wipe
-						return nimBoss;
+					@Override
+					public RaidBoss upgradeByNpc(long guid, RaidBoss boss) {
+						return null;
 					}
-					return null;
-				}
-			});
+
+					@Override
+					public RaidBoss upgradeByAbility(long guid, long effectGuid, Integer value, RaidBoss nimBoss) {
+						if (guid == 3006764870008832L) { // Nightmare of the Masters wipe
+							return nimBoss;
+						}
+						return null;
+					}
+				});
 
 		addChallenge(RaidBossName.WarlordKephess, new KephessWalkerChallenge());
 		addChallenge(RaidBossName.FirebrandAndStormcaller, new TanksShieldChallenge());
@@ -88,11 +91,6 @@ public class ExplosiveConflict extends Raid {
 
 	@Override
 	public String getNewPhaseName(final Event e, final Combat c, final String currentPhaseName) {
-
-		if (c.getBoss() == null) {
-			return null;
-		}
-
 		switch (c.getBoss().getRaidBossName()) {
 			case WarlordKephess:
 				return getNewPhaseNameForKephess(e, c, currentPhaseName);
@@ -156,20 +154,20 @@ public class ExplosiveConflict extends Raid {
 	public static class KephessWalkerChallenge extends CombatChallenge {
 		public KephessWalkerChallenge() {
 			super(RaidChallengeName.KephessWalker,
-				RaidBossName.WarlordKephess.getFullName()/* KEPHESS_PHASE_WALKER */, CombatChallenge.Type.DAMAGE,
-				Arrays.asList(new Object[]{KEPHESS_WALKER_SM_8M, KEPHESS_WALKER_SM_16M, KEPHESS_WALKER_HM_8M, KEPHESS_WALKER_HM_16M}),
-				"target_guid IN (?, ?, ?, ?)");
+					RaidBossName.WarlordKephess.getFullName()/* KEPHESS_PHASE_WALKER */, CombatChallenge.Type.DAMAGE,
+					Arrays.asList(KEPHESS_WALKER_SM_8M, KEPHESS_WALKER_SM_16M, KEPHESS_WALKER_HM_8M, KEPHESS_WALKER_HM_16M));
 		}
 	}
 
 	public static class TanksShieldChallenge extends CombatChallenge {
 		public TanksShieldChallenge() {
 			super(RaidChallengeName.TanksShield,
-				RaidBossName.FirebrandAndStormcaller.getFullName(), CombatChallenge.Type.FRIENDLY,
-				Arrays.asList(new Object[]{
-						2876425497477120L, 2876429792444416L, 2876477037084672L, 2876489921986560L, // 8/16 shields
-						2876678900547584L, 2923889181065216L, 2923897770999808L, 2876885058977792L}), // 8/16 volley (+ ultimate)
-				"target_guid IN (?, ?, ?, ?) AND ability_guid NOT IN (?, ?, ?, ?)");
+					RaidBossName.FirebrandAndStormcaller.getFullName(), CombatChallenge.Type.FRIENDLY,
+					Stream.of(new Object[][]{
+							{"TanksShieldChallengeTargetGuids", Arrays.asList(2876425497477120L, 2876429792444416L, 2876477037084672L, 2876489921986560L)}, // 8/16 shields
+							{"TanksShieldChallengeAbilityGuids", Arrays.asList(2876678900547584L, 2923889181065216L, 2923897770999808L, 2876885058977792L)}, // 8/16 volley (+ ultimate)
+					}).collect(Collectors.toMap(data -> (String) data[0], data -> data[1])),
+					"target_guid IN (:TanksShieldChallengeTargetGuids) AND ability_guid NOT IN (:TanksShieldChallengeAbilityGuids)");
 		}
 	}
 }

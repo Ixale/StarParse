@@ -2,22 +2,22 @@ package com.ixale.starparse.domain.stats;
 
 public class CombatTickStats {
 
-	private int tick;
+	private final int tick;
 
-	private int damage;
-	private int dps;
+	private final int damage;
+	private final int dps;
 
-	private int heal;
-	private int hps;
-	private int effectiveHeal;
-	private int ehps;
+	private final int heal;
+	private final int hps;
+	private final int effectiveHeal;
+	private final int ehps;
 
-	private int damageTaken;
-	private int dtps;
+	private final int damageTaken;
+	private final int dtps;
 	
-	private int effectiveHealTaken;
+	private final int effectiveHealTaken;
 
-	private int healthBalance;
+	private final int healthBalance;
 
 	public CombatTickStats(int tick, int damage, int dps,
 			int heal, int hps, int effectiveHeal, int ehps,

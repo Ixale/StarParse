@@ -224,21 +224,25 @@ public class Event implements Serializable {
 	}
 
 	public String getTs() {
-		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.ENGLISH).format(timestamp);
+		return formatTs(timestamp);
+	}
+
+	public static String formatTs(long timestamp) {
+		return new SimpleDateFormat("HH:mm:ss.SSS", Locale.ENGLISH).format(timestamp);
 	}
 
 	public String toString()
 	{
-		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.ENGLISH).format(timestamp)
+		return formatTs(timestamp)
 			+ ": [" + source + "] on [" + target + "]"
 			+ " casted [" + ability + "] causing [" + action + "] of [" + effect + "]"
-			+ (value != null ? " for [" + value + "] critted [" + isCrit + "]" : "")
-			+ (effectiveHeal != null ? " effective [" + effectiveHeal + "]" : "")
+			+ (value != null ? " for [" + (isCrit ? '*' : "") + value + "]" : "")
+			+ (effectiveHeal != null ? " ~[" + effectiveHeal + "]" : "")
 			+ (damage != null ? " damage [" + damage + "]" : "")
 			+ (reflect != null ? " reflect [" + reflect + "]" : "")
 			+ (mitigation != null ? " mitigation [" + mitigation + "]" : "")
 			+ (absorbtion != null ? " absorbed [" + absorbtion + "] for [" + absorbed + "]" : "")
-			+ (threat != null ? " causing [" + threat + "]" : "")
-			+ " while guarded [" + guardState + "]";
+			+ (threat != null ? " <" + threat + ">" : "")
+			+ (guardState != null && guardState > 0 ? " while guarded [" + guardState + "]" : "");
 	}
 }

@@ -1,5 +1,23 @@
 package com.ixale.starparse.timer;
 
+import com.ixale.starparse.domain.ConfigPopoutDefault;
+import com.ixale.starparse.domain.ConfigTimer;
+import com.ixale.starparse.domain.ConfigTimer.Condition;
+import com.ixale.starparse.domain.Event;
+import com.ixale.starparse.domain.ops.DreadPalace;
+import com.ixale.starparse.domain.ops.Dxun;
+import com.ixale.starparse.domain.ops.Iokath;
+import com.ixale.starparse.domain.ops.Ravagers;
+import com.ixale.starparse.domain.ops.ScumAndVillainy;
+import com.ixale.starparse.domain.ops.TempleOfSacrifice;
+import com.ixale.starparse.domain.ops.TerrorFromBeyond;
+import com.ixale.starparse.domain.ops.WorldBoss;
+import com.ixale.starparse.gui.Config;
+import com.ixale.starparse.time.TimeUtils;
+import javafx.scene.paint.Color;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
@@ -7,23 +25,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.ixale.starparse.domain.ConfigPopoutDefault;
-import com.ixale.starparse.domain.ConfigTimer;
-import com.ixale.starparse.domain.ConfigTimer.Condition;
-import com.ixale.starparse.domain.ops.DreadPalace;
-import com.ixale.starparse.domain.ops.Iokath;
-import com.ixale.starparse.domain.ops.Ravagers;
-import com.ixale.starparse.domain.ops.ScumAndVillainy;
-import com.ixale.starparse.domain.ops.TempleOfSacrifice;
-import com.ixale.starparse.domain.ops.WorldBoss;
-import com.ixale.starparse.gui.Config;
-import com.ixale.starparse.time.TimeUtils;
-
-import javafx.scene.paint.Color;
 
 public class TimerManager {
 
@@ -35,8 +36,8 @@ public class TimerManager {
 	private static Config config;
 	private static Worker worker = null;
 
-	private static final ArrayList<BaseTimer> timers = new ArrayList<BaseTimer>();
-	private static final ArrayList<TimerListener> listeners = new ArrayList<TimerListener>();
+	private static final ArrayList<BaseTimer> timers = new ArrayList<>();
+	private static final ArrayList<TimerListener> listeners = new ArrayList<>();
 
 	private static Long startTime = null;
 
@@ -60,8 +61,8 @@ public class TimerManager {
 		}
 		try {
 			// lookup enclosing configuration
-			for (final String raidName: systemTimers.keySet()) {
-				for (final BaseTimer systemTimer: systemTimers.get(raidName).keySet()) {
+			for (final String raidName : systemTimers.keySet()) {
+				for (final BaseTimer systemTimer : systemTimers.get(raidName).keySet()) {
 					if (systemTimer.getClass() == clazz) {
 						final ConfigTimer configTimer = systemTimers.get(raidName).get(systemTimer);
 						if (!configTimer.isEnabled()) {
@@ -69,7 +70,7 @@ public class TimerManager {
 							return;
 						}
 						if (configTimer.isSystemModified() || interval != null) {
-							if (interval != null && isAlreadyRunning(configTimer, timeFrom)) {
+							if (interval != null && isAlreadyRunning(configTimer, timeFrom, null)) {
 								return;
 							}
 							// use this instead
@@ -88,27 +89,27 @@ public class TimerManager {
 		}
 	}
 
-	public static void startTimer(final ConfigTimer configTimer, final long timeFrom) {
+	public static void startTimer(final ConfigTimer configTimer, final long timeFrom, final Event e) {
 
 		if (startTime == null || timeFrom < startTime) {
 			return;
 		}
 
-		if (isAlreadyRunning(configTimer, timeFrom)) {
+		if (isAlreadyRunning(configTimer, timeFrom, e)) {
 			return;
 		}
 
-		final CustomTimer timer = new CustomTimer(configTimer);
+		final CustomTimer timer = new CustomTimer(configTimer, e);
 
 		// any parallel / next timers?
-		for (final ConfigTimer otherTimer: config.getConfigTimers().getTimers()) {
+		for (final ConfigTimer otherTimer : config.getConfigTimers().getTimers()) {
 			if (otherTimer.isSystem()) {
 				continue;
 			}
 			if (otherTimer.getTrigger() != null && otherTimer.getTrigger().getType().equals(Condition.Type.TIMER_STARTED)) {
 				if (otherTimer.getTrigger().getTimer().equals(configTimer.getName())) {
 					// start the timer together with this one
-					startTimer(otherTimer, timeFrom);
+					startTimer(otherTimer, timeFrom, e);
 				}
 			}
 			if (otherTimer.getTrigger() != null && otherTimer.getTrigger().getType().equals(Condition.Type.TIMER_FINISHED)) {
@@ -120,7 +121,7 @@ public class TimerManager {
 			if (otherTimer.getCancel() != null && otherTimer.getCancel().getType().equals(Condition.Type.TIMER_STARTED)) {
 				if (otherTimer.getCancel().getTimer().equals(configTimer.getName())) {
 					// cancel the timer as this one started
-					TimerManager.stopTimer(otherTimer.getName());
+					TimerManager.stopTimer(otherTimer);
 				}
 			}
 			if (otherTimer.getCancel() != null && otherTimer.getCancel().getType().equals(Condition.Type.TIMER_FINISHED)) {
@@ -144,32 +145,29 @@ public class TimerManager {
 		timers.add(timer);
 	}
 
-	private static boolean isAlreadyRunning(final ConfigTimer configTimer, final long timeFrom) {
+	private static boolean isAlreadyRunning(final ConfigTimer configTimer, final long timeFrom, final Event e) {
 		// running already?
-		final BaseTimer running = getTimer(configTimer.getName());
-		if (running != null) {
+		final List<BaseTimer> running = getTimers(configTimer, e);
+		for (BaseTimer timer : running) {
 			if (configTimer.isIgnoreRepeated()) {
 				// keep running, nothing to do
 			} else {
 				// restart
-				running.start(timeFrom);
+				timer.start(timeFrom);
 			}
-			return true;
 		}
-		return false;
+		return !running.isEmpty();
 	}
 
 	public static BaseTimer getTimer(final Class<? extends BaseTimer> clazz) {
-		final Iterator<BaseTimer> iterator = timers.iterator();
-		while (iterator.hasNext()) {
-			final BaseTimer timer = iterator.next();
+		for (final BaseTimer timer : timers) {
 			if (timer != null) {
 				if (timer.getClass() == clazz) {
 					return timer;
 				}
 				if (timer instanceof CustomTimer
-					&& ((CustomTimer) timer).getSystemTimer() != null
-					&& ((CustomTimer) timer).getSystemTimer().getClass() == clazz) {
+						&& ((CustomTimer) timer).getSystemTimer() != null
+						&& ((CustomTimer) timer).getSystemTimer().getClass() == clazz) {
 					return timer;
 				}
 			}
@@ -184,28 +182,28 @@ public class TimerManager {
 		}
 	}
 
-	public static BaseTimer getTimer(final String name) {
-		final Iterator<BaseTimer> iterator = timers.iterator();
-		while (iterator.hasNext()) {
-			final BaseTimer timer = iterator.next();
-			if (timer != null && (name.equals(timer.getName()) || name.equals(timer.getFullName()))) {
-				return timer;
+	public static List<BaseTimer> getTimers(final ConfigTimer configTimer, final Event e) {
+		final List<BaseTimer> found = new ArrayList<>();
+		for (final BaseTimer timer : timers) {
+			if (timer != null && (configTimer.getName().equals(timer.getName())
+					|| configTimer.getName().equals(timer.getFullName())
+					|| (e != null && configTimer.isShowSource() && CustomTimer.getDisplayName(configTimer, e).equals(timer.getName()))
+					|| (e == null && configTimer.isShowSource() && timer.getName().endsWith("\n" + configTimer.getName()))
+			)) {
+				found.add(timer);
 			}
 		}
-		return null;
+		return found;
 	}
 
-	public static void stopTimer(final String name) {
-		final BaseTimer timer = getTimer(name);
-		if (timer != null) {
+	public static void stopTimer(final ConfigTimer configTimer) {
+		for (final BaseTimer timer : getTimers(configTimer, null)) {
 			timer.cancel();
 		}
 	}
 
 	public static void stopAllTimers(final BaseTimer.Scope scope) {
-		final Iterator<BaseTimer> iterator = timers.iterator();
-		while (iterator.hasNext()) {
-			final BaseTimer timer = iterator.next();
+		for (final BaseTimer timer : timers) {
 			if (timer != null && timer.getScope().equals(scope)) {
 				timer.cancel();
 			}
@@ -213,8 +211,9 @@ public class TimerManager {
 	}
 
 	public static void start() {
-
-		logger.debug("Enabled");
+		if (logger.isDebugEnabled()) {
+			logger.debug("Enabled");
+		}
 
 		startTime = TimeUtils.getCurrentTime();
 
@@ -226,8 +225,9 @@ public class TimerManager {
 	}
 
 	public static void stop() {
-
-		logger.debug("Disabled");
+		if (logger.isDebugEnabled()) {
+			logger.debug("Disabled");
+		}
 
 		startTime = null;
 
@@ -240,7 +240,7 @@ public class TimerManager {
 			worker.interrupt();
 			try {
 				worker.join();
-			} catch (InterruptedException e) {
+			} catch (InterruptedException ignored) {
 			}
 
 			worker = null;
@@ -256,25 +256,25 @@ public class TimerManager {
 	}
 
 	private static void fireTimerUpdated(final BaseTimer timer) {
-		for (TimerListener listener: listeners) {
+		for (TimerListener listener : listeners) {
 			listener.onTimerUpdated(timer);
 		}
 	}
 
 	private static void fireTimerFinished(final BaseTimer timer) {
-		for (TimerListener listener: listeners) {
+		for (TimerListener listener : listeners) {
 			listener.onTimerFinished(timer);
 		}
 	}
 
 	private static void fireTimersReset() {
-		for (TimerListener listener: listeners) {
+		for (TimerListener listener : listeners) {
 			listener.onTimersReset();
 		}
 	}
 
 	private static void fireTimersTick() {
-		for (TimerListener listener: listeners) {
+		for (TimerListener listener : listeners) {
 			listener.onTimersTick();
 		}
 	}
@@ -286,8 +286,9 @@ public class TimerManager {
 		}
 
 		public void run() {
-
-			logger.debug("Started");
+			if (logger.isDebugEnabled()) {
+				logger.debug("Started");
+			}
 
 			while (!isInterrupted()) {
 				try {
@@ -315,6 +316,7 @@ public class TimerManager {
 						}
 					}
 
+					//noinspection BusyWait
 					Thread.sleep(POLLING);
 
 				} catch (InterruptedException e) {
@@ -326,7 +328,9 @@ public class TimerManager {
 				}
 			}
 
-			logger.debug("Finished");
+			if (logger.isDebugEnabled()) {
+				logger.debug("Finished");
+			}
 		}
 
 		private void processTimer(final Iterator<BaseTimer> iterator, final BaseTimer timer) {
@@ -347,6 +351,7 @@ public class TimerManager {
 
 	private static final Map<String, Map<BaseTimer, ConfigTimer>> systemTimers = new HashMap<>();
 	private static final List<Color> timerColors = new ArrayList<>();
+
 	static {
 		timerColors.add(ConfigPopoutDefault.DEFAULT_TIMER1);
 		timerColors.add(ConfigPopoutDefault.DEFAULT_TIMER2);
@@ -359,22 +364,33 @@ public class TimerManager {
 		final Map<BaseTimer, ConfigTimer> savTimers = new HashMap<>();
 		savTimers.put(new ScumAndVillainy.StyrakKnockbackTimer(), null);
 		systemTimers.put("Scum & Villainy", savTimers);
+
+		// TFB
+		final Map<BaseTimer, ConfigTimer> tfbTimers = new HashMap<>();
+		tfbTimers.put(new TerrorFromBeyond.TFBSlamTimer(), null);
+		tfbTimers.put(new TerrorFromBeyond.TFBFirstSlamTimer(), null);
+		systemTimers.put("Terror From Beyond", tfbTimers);
+
 		// DP
 		final Map<BaseTimer, ConfigTimer> dpTimers = new HashMap<>();
 		dpTimers.put(new DreadPalace.BestiaBossActivatesTimer(), null);
 		dpTimers.put(new DreadPalace.BestiaLastMonsterTimer(), null);
 		dpTimers.put(new DreadPalace.BestiaSoftEnrageTimer(), null);
+		dpTimers.put(new DreadPalace.BestiaDespairTimer(), null);
 		dpTimers.put(new DreadPalace.CouncilTyransDmP1Timer(), null);
 		dpTimers.put(new DreadPalace.CouncilTyransTpP1Timer(), null);
 		dpTimers.put(new DreadPalace.CouncilBrontesTpTimer(), null);
 		dpTimers.put(new DreadPalace.CouncilTyransDmP3Timer(), null);
+		dpTimers.put(new DreadPalace.CouncilBestiaKickTimer(), null);
 		systemTimers.put("Dread Palace", dpTimers);
+
 		// RAV
 		final Map<BaseTimer, ConfigTimer> ravTimers = new HashMap<>();
 		ravTimers.put(new Ravagers.TorqueRageTimer(), null);
 		ravTimers.put(new Ravagers.TorqueEnrageTimer(), null);
 		ravTimers.put(new Ravagers.RuugarEnrageTimer(), null);
 		systemTimers.put("Ravagers", ravTimers);
+
 		// TOS
 		final Map<BaseTimer, ConfigTimer> tosTimers = new HashMap<>();
 		tosTimers.put(new TempleOfSacrifice.SwordSquadronShieldTimer(), null);
@@ -386,13 +402,27 @@ public class TimerManager {
 		tosTimers.put(new TempleOfSacrifice.RevanPullTimer(), null);
 		tosTimers.put(new TempleOfSacrifice.RevanPushTimer(), null);
 		systemTimers.put("Temple of Sacrifice", tosTimers);
+
 		// GOTM
 		final Map<BaseTimer, ConfigTimer> gotmTimers = new HashMap<>();
 		gotmTimers.put(new Iokath.TythInversionTimer(), null);
+		gotmTimers.put(new Iokath.NahutSliceTimer(), null);
 		systemTimers.put("Gods of the Machine", gotmTimers);
+
+		// DXUN
+		final Map<BaseTimer, ConfigTimer> dxunTimers = new HashMap<>();
+		dxunTimers.put(new Dxun.BreachFlareTimer(), null);
+		dxunTimers.put(new Dxun.ApexFlareTimer(), null);
+		dxunTimers.put(new Dxun.ApexFlareBuildTimer(), null);
+		dxunTimers.put(new Dxun.ApexContagionTimer(), null);
+		dxunTimers.put(new Dxun.ApexAcidBlastTimer(), null);
+		dxunTimers.put(new Dxun.ApexRocketsTimer(), null);
+		dxunTimers.put(new Dxun.ApexMassTargetLockTimer(), null);
+		systemTimers.put("The Nature of Progress", dxunTimers);
 
 		// WB
 		final Map<BaseTimer, ConfigTimer> wbTimers = new HashMap<>();
+		wbTimers.put(new WorldBoss.MonolithBiteWoundsTimer(), null);
 		wbTimers.put(new WorldBoss.QueenRoyalSummonsGuardsTimer(), null);
 		wbTimers.put(new WorldBoss.QueenRoyalSummonsCausticTimer(), null);
 		systemTimers.put("World Bosses", wbTimers);
@@ -414,11 +444,11 @@ public class TimerManager {
 			}
 		}
 
-		for (final String raidName: systemTimers.keySet()) {
-			for (final BaseTimer systemTimer: systemTimers.get(raidName).keySet()) {
+		for (final String raidName : systemTimers.keySet()) {
+			for (final BaseTimer systemTimer : systemTimers.get(raidName).keySet()) {
 				// already there?
 				ConfigTimer configTimer = null;
-				for (final ConfigTimer timer: timers) {
+				for (final ConfigTimer timer : timers) {
 					if (timer.isSystem() && timer.getName().equals(systemTimer.getFullName())) {
 						// found, link
 						configTimer = timer;
@@ -442,8 +472,8 @@ public class TimerManager {
 	}
 
 	public static BaseTimer getSystemTimer(final ConfigTimer timer) {
-		for (final String raidName: systemTimers.keySet()) {
-			for (final BaseTimer systemTimer: systemTimers.get(raidName).keySet()) {
+		for (final String raidName : systemTimers.keySet()) {
+			for (final BaseTimer systemTimer : systemTimers.get(raidName).keySet()) {
 				if (systemTimers.get(raidName).get(systemTimer) == timer) {
 					return systemTimer;
 				}

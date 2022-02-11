@@ -54,7 +54,7 @@ public class TimerServiceImpl implements TimerService {
 					continue;
 				}
 				if (isTimerTriggered(combat, e, timer)) {
-					TimerManager.startTimer(timer, e.getTimestamp());
+					TimerManager.startTimer(timer, e.getTimestamp(), e);
 				}
 			}
 		}
@@ -75,7 +75,10 @@ public class TimerServiceImpl implements TimerService {
 			return isEffectExitCombat(e) && isBossEligible(combat, e, trigger);
 
 		case ABILITY_ACTIVATED:
-			return isBossEligible(combat, e, trigger) && isEffectAbilityActivate(e) && isAbilityEligible(e, trigger);
+			return isBossEligible(combat, e, trigger)
+					&& isEffectAbilityActivate(e)
+					&& isSourceEligible(e, trigger)
+					&& isAbilityEligible(e, trigger);
 
 		case DAMAGE:
 		case HEAL:

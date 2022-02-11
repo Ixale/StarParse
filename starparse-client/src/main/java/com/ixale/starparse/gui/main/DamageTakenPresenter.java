@@ -72,12 +72,12 @@ public class DamageTakenPresenter extends BaseStatsPresenter
 
 		nameCol.setCellFactory(new DamageAbilityNameCellFactory<DamageTakenItem>());
 
-		absorbedCol.setCellFactory(new NumberCellFactory<DamageTakenItem>(false, "0x30cccd"));
+		absorbedCol.setCellFactory(new NumberCellFactory<DamageTakenItem>(false, "absorbed"));
 		ticksCol.setCellFactory(new NumberCellFactory<DamageTakenItem>());
-		totalCol.setCellFactory(new NumberCellFactory<DamageTakenItem>(false, "maroon"));
+		totalCol.setCellFactory(new NumberCellFactory<DamageTakenItem>(false, "damage-dealt"));
 
 		avgNormalCol.setCellFactory(new NumberCellFactory<DamageTakenItem>());
-		dtpsCol.setCellFactory(new NumberCellFactory<DamageTakenItem>(false, "maroon"));
+		dtpsCol.setCellFactory(new NumberCellFactory<DamageTakenItem>(false, "damage-dealt"));
 
 		pctShieldCol.setCellFactory(new FloatCellFactory<DamageTakenItem>());
 		pctMissCol.setCellFactory(new FloatCellFactory<DamageTakenItem>());
@@ -178,7 +178,7 @@ public class DamageTakenPresenter extends BaseStatsPresenter
 		}
 
 		// mitigation overview
-		final CombatMitigationStats mitiStats = eventService.getCombatMitigationStats(combat, context.getCombatSelection());
+		final CombatMitigationStats mitiStats = eventService.getCombatMitigationStats(combat, context.getCombatSelection(), context.getSelectedPlayer());
 
 		if (mitiStats == null) {
 			// combat gone away
@@ -195,7 +195,7 @@ public class DamageTakenPresenter extends BaseStatsPresenter
 		int ftTotal = 0, mrTotal = 0, total = 0;
 		List<DamageTakenStats> dtStats = eventService.getDamageTakenStats(combat,
 			sourceTypeButton.isSelected(), sourceInstanceButton.isSelected(), true,
-			context.getCombatSelection());
+			context.getCombatSelection(), context.getSelectedPlayer());
 		for (final DamageTakenStats dts: dtStats) {
 			total += dts.getTotal();
 			if (dts.getGuid() > 0 && context.getAttacks().containsKey(dts.getGuid())) {
@@ -230,7 +230,7 @@ public class DamageTakenPresenter extends BaseStatsPresenter
 		if (!abilityButton.isSelected()) {
 			dtStats = eventService.getDamageTakenStats(combat,
 				sourceTypeButton.isSelected(), sourceInstanceButton.isSelected(), abilityButton.isSelected(),
-				context.getCombatSelection());
+				context.getCombatSelection(), context.getSelectedPlayer());
 		}
 		for (final DamageTakenStats dts: dtStats) {
 			final DamageTakenItem a = new DamageTakenItem();

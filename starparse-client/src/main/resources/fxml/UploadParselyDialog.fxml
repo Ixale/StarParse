@@ -1,21 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import javafx.collections.*?>
 <?import javafx.geometry.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.control.CheckMenuItem?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.paint.*?>
-<?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
-<?scenebuilder-stylesheet ../styles.css?>
 
-<VBox fx:id="dialogRoot" minHeight="-Infinity" minWidth="-Infinity" prefHeight="220.0" prefWidth="300.0" spacing="5.0" styleClass="modal-text" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.ixale.starparse.gui.dialog.UploadParselyDialogPresenter">
+<VBox fx:id="dialogRoot" minHeight="-Infinity" minWidth="-Infinity" prefHeight="220.0" prefWidth="300.0" spacing="5.0" styleClass="modal-text" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ixale.starparse.gui.dialog.UploadParselyDialogPresenter">
   <children>
     <Label fx:id="uploadLabel" alignment="TOP_LEFT" minHeight="-Infinity" prefHeight="32.0" prefWidth="290.0" text="You are about to upload the whole combat log to Parsely abc def." wrapText="true" VBox.vgrow="NEVER">
       <VBox.margin>
@@ -24,10 +14,32 @@
     </Label>
     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Optional Note:" VBox.vgrow="NEVER" />
     <TextArea fx:id="uploadNote" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="40.0" prefRowCount="10" prefWidth="-1.0" wrapText="true" VBox.vgrow="NEVER" />
-    <CheckBox fx:id="uploadPublic" mnemonicParsing="false" text="Make it public" VBox.vgrow="NEVER" />
+    <HBox alignment="TOP_LEFT" fillHeight="false" VBox.vgrow="NEVER">
+    <children>
+      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Log visibility" />
+        <RadioButton fx:id="visibilityPublic" mnemonicParsing="false" selected="true" text="Public">
+        <toggleGroup>
+          <ToggleGroup fx:id="logVisibility" />
+        </toggleGroup>
+        <HBox.margin>
+          <Insets left="5.0" />
+        </HBox.margin>
+      </RadioButton>
+      <RadioButton fx:id="visibilityGuildOnly" mnemonicParsing="false" text="Guild only" toggleGroup="$logVisibility">
+        <HBox.margin>
+          <Insets left="5.0" />
+        </HBox.margin>
+      </RadioButton>
+      <RadioButton fx:id="visibilityPrivate" mnemonicParsing="false" text="Private" toggleGroup="$logVisibility">
+        <HBox.margin>
+          <Insets left="5.0" />
+        </HBox.margin>
+      </RadioButton>
+    </children>
+    </HBox>
     <AnchorPane prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <children>
-        <Label fx:id="settingsLabel" alignment="TOP_LEFT" prefHeight="60.0" prefWidth="217.0" text="Using timezone GMT, server Harbinger, guild Zorz., Parsely account Ixale." wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+        <Label fx:id="settingsLabel" alignment="TOP_LEFT" prefHeight="50.0" prefWidth="217.0" text="Using timezone GMT, server Harbinger, guild Zorz., Parsely account Ixale." wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
         <Button fx:id="settingsButton" onAction="#handleUploadSettings" text="Settings" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       </children>
     </AnchorPane>

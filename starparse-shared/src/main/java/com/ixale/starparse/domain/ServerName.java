@@ -1,5 +1,7 @@
 package com.ixale.starparse.domain;
 
+import java.util.Objects;
+
 public enum ServerName {
 	TheHarbinger("US", "The Harbinger", "the-harbinger"),
 	TheBastion("US", "The Bastion", "the-bastion"),
@@ -19,18 +21,23 @@ public enum ServerName {
 	MantleOfTheForce("EU", "Mantle Of The Force", "mantle-of-the-force"),
 	TheRedEclipse("EU", "The Red Eclipse", "the-red-eclipse"),
 	//
-	StarForge("US", "Star Forge", "star-forge"),
-	SateleShan("US", "Satele Shan", "satele-shan"),
-	TulakHord("EU", "Tulak Hord", "tulak-hord"),
-	DarthMalgus("EU", "Darth Malgus", "darth-malgus"),
-	TheLeviathan("EU", "The Leviathan", "the-leviathan");
+	StarForge("US", "Star Forge", "star-forge", "he3000"),
+	SateleShan("US", "Satele Shan", "satele-shan", "he3001"),
+	TulakHord("EU", "Tulak Hord", "tulak-hord", "he4001"),
+	DarthMalgus("EU", "Darth Malgus", "darth-malgus", "he4000"),
+	TheLeviathan("EU", "The Leviathan", "the-leviathan", "he4002");
 
-	final String region, name, webalized;
+	final String region, name, webalized, code;
 
-	private ServerName(String region, String name, String webalized) {
+	ServerName(String region, String name, String webalized) {
+		this(region, name, webalized, null);
+	}
+
+	ServerName(String region, String name, String webalized, String code) {
 		this.region = region;
 		this.name = name;
 		this.webalized = webalized;
+		this.code = code;
 	}
 
 	public String getName() {
@@ -74,7 +81,7 @@ public enum ServerName {
 	public static String getWebalized(final String serverName) {
 		for (ServerName sn : values()) {
 			if (sn.name.equals(serverName)) {
-				return sn.webalized;
+				return sn.code == null ? sn.webalized : sn.code;
 			}
 		}
 		return null;
@@ -88,4 +95,21 @@ public enum ServerName {
 		}
 		return null;
 	}
+
+	public static String getTitleFromCode(final String code) {
+		if ("HE600".equalsIgnoreCase(code)) {
+			return "PTS";
+		}
+		for (ServerName sn : values()) {
+			if (code.equalsIgnoreCase(sn.code)) {
+				return sn.name;
+			}
+		}
+		return null;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
 }

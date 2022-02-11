@@ -1,5 +1,10 @@
 package com.ixale.starparse.log;
 
+import com.ixale.starparse.gui.FlashMessage;
+import com.ixale.starparse.parser.ParserException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,15 +19,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.ixale.starparse.gui.FlashMessage;
-import com.ixale.starparse.parser.ParserException;
-
-public class LogWatcher extends Thread
-{
-	private static final String LOG_CHARSET = "ISO-8859-15";
+public class LogWatcher extends Thread {
+	private static final String LOG_CHARSET = "WINDOWS-1252";
 	private static final char LOG_EOL = '\n';
 	private static final int LINES_LIMIT = 300000, MAX_ERROR_COUNT = 20;
 
@@ -43,7 +41,7 @@ public class LogWatcher extends Thread
 	/**
 	 * Set of listeners
 	 */
-	private final HashSet<LogWatcherListener> listeners = new HashSet<LogWatcherListener>();
+	private final HashSet<LogWatcherListener> listeners = new HashSet<>();
 
 	public LogWatcher(final File parent, Integer polling, boolean isFile) {
 		this.parent = parent;
@@ -57,9 +55,10 @@ public class LogWatcher extends Thread
 		listeners.add(l);
 	}
 
-	public void removeTailerListener(final LogWatcherListener l) {
-		listeners.remove(l);
-	}
+//
+//	public void removeTailerListener(final LogWatcherListener l) {
+//		listeners.remove(l);
+//	}
 
 	public void doFileCheck() {
 		doFileCheck = true;
@@ -67,20 +66,24 @@ public class LogWatcher extends Thread
 
 	public void run() {
 
-		logger.debug("Started for " + parent);
+		final long parsingStart = System.currentTimeMillis();
+		if (logger.isDebugEnabled()) {
+			logger.debug("Started for " + parent);
+		}
 
 		File file = null;
 		String lastFileName = null;
 		long filePosition = 0;
+		long fileSize = -1;
 
 		FileInputStream in = null;
 		FileChannel ch = null;
 
 		final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4096);
-		CharBuffer charBuffer = null;
+		CharBuffer charBuffer;
 		Charset cs = Charset.forName(LOG_CHARSET);
 
-		int lines = 0, pos, offset, len;
+		int lines, pos, offset, len;
 
 		do {
 			try {
@@ -97,14 +100,23 @@ public class LogWatcher extends Thread
 						break;
 					}
 					file = parent;
+					fileSize = parent.length();
 
 				} else {
 					file = getNewestFile();
 					if (file == null) {
-						logger.debug("Waiting for a valid file");
-						sleep(polling);
+						if (logger.isDebugEnabled()) {
+							logger.debug("Waiting for a valid file");
+						}
+						if (polling != null) {
+							//noinspection BusyWait
+							sleep(polling);
+						}
 						continue;
 						// NOTREACHED
+					}
+					if (fileSize < 0) {
+						fileSize = file.length(); // so far
 					}
 				}
 
@@ -128,10 +140,11 @@ public class LogWatcher extends Thread
 				}
 
 				// compare the length of the file to the file pointer
-				for (int i = 0; ch.size() == filePosition && i < 20; i++) { // max 4s
+				for (int i = 0; ch != null && ch.size() == filePosition && i < 20; i++) { // max 4s
+					//noinspection BusyWait
 					Thread.sleep(200);
 				}
-				if (ch.size() > filePosition) {
+				if (ch != null && ch.size() > filePosition) {
 					lines = 0;
 					// load into buffer
 					while ((len = ch.read(byteBuffer, filePosition)) != -1) {
@@ -140,18 +153,19 @@ public class LogWatcher extends Thread
 						charBuffer = cs.decode(byteBuffer);
 
 						// search for \n
+						boolean doFlush = false;
 						for (pos = 0, offset = 0; pos < len; pos++) {
 							if (charBuffer.get(pos) == LOG_EOL) {
 								// full line
 								try {
-									fireNewLine(String.valueOf(charBuffer.subSequence(offset, pos - 1)));
+									doFlush = fireNewLine(String.valueOf(charBuffer.subSequence(offset, pos - 1)));
 									errorCount = 0;
 									isParseable = true;
 
 								} catch (Exception e) {
 									if (lastFiredLine != null && (lastFiredLine.contains("2280674878816256")
-										|| lastFiredLine.contains("Manka-Katz")
-										|| lastFiredLine.contains("Aktiviert den Tobus-Hetzer"))) {
+											|| lastFiredLine.contains("Manka-Katz")
+											|| lastFiredLine.contains("Aktiviert den Tobus-Hetzer"))) {
 										// FIXME: German client fails to log Manka Cat or ... something ... , just move on and give it bit more room
 										errorCount = -20;
 
@@ -171,11 +185,15 @@ public class LogWatcher extends Thread
 
 								offset = pos + 1;
 								lines++;
+								if (doFlush) {
+									// enforce onNewEventsAction fired after _each_ combat (e.g. to populate raid tab)
+									break;
+								}
 							}
 						}
 
 						byteBuffer.clear();
-						if (lines == 0 || lines > LINES_LIMIT) {
+						if (doFlush || lines == 0 || lines > LINES_LIMIT) {
 							// no complete line found, avoid loop
 							break;
 						}
@@ -186,19 +204,20 @@ public class LogWatcher extends Thread
 					}
 
 					if (lines > 0) {
-						fireReadComplete();
+						fireReadComplete(fileSize > 0 ? (filePosition <= 0 ? 0 : (int) Math.round(filePosition * 100.0 / fileSize)) : null);
+						if (fileSize > 0 && filePosition >= fileSize) {
+							// surpassed original size
+							fileSize = 0;
+						}
 					}
 				}
 
-			} catch (ClosedByInterruptException e) {
-				// stop
-				break;
-
-			} catch (InterruptedException e) {
+			} catch (ClosedByInterruptException | InterruptedException e) {
 				// stop
 				break;
 
 			} catch (ParserException e) {
+				assert file != null;
 				final String err = "Unable to parse combat log [" + file.getAbsolutePath() + "][" + (lastFiredLine == null ? "empty" : lastFiredLine) + "]: " + e.getMessage();
 				if (!isParseable) {
 					// not a single positive hit
@@ -216,20 +235,22 @@ public class LogWatcher extends Thread
 				break;
 
 			} catch (IOException e) {
+				assert file != null;
 				logger.warn("Unable to read combat log file [" + file.getAbsolutePath() + "][" + (lastFiredLine == null ? "empty" : lastFiredLine) + "]: " + e.getMessage(), e);
 				fireError("Problem reading combat log file: " + e.getMessage());
 
 			} catch (Exception e) {
 				if (e.getMessage() != null) {
 					if (lastFiredLine != null && (
-						e.getMessage().contains("Table \"LOGS\" not found")
-							|| e.getMessage().contains("Table \"COMBATS\" not found")
-							|| e.getMessage().contains("Table \"PHASES\" not found")
-							|| e.getMessage().contains("The database has been closed"))) {
+							e.getMessage().contains("Table \"LOGS\" not found")
+									|| e.getMessage().contains("Table \"COMBATS\" not found")
+									|| e.getMessage().contains("Table \"PHASES\" not found")
+									|| e.getMessage().contains("The database has been closed"))) {
 						// probably shutting down
 						break;
 					}
 				}
+				assert file != null;
 				if (!file.isFile() || !file.canRead()) {
 					logger.warn("Unable to read combat log file [" + file.getAbsolutePath() + "][" + (lastFiredLine == null ? "empty" : lastFiredLine) + "]: " + e.getMessage(), e);
 					fireError("Problem reading combat log file: " + e.getMessage());
@@ -262,24 +283,15 @@ public class LogWatcher extends Thread
 					logger.error("Firing 'file completed' event failed", e);
 				}
 			}
+			if (logger.isDebugEnabled()) {
+				logger.info("Parsing done in " + ((System.currentTimeMillis() - parsingStart) * 0.001));
+			}
 		}
-
-		logger.debug("Done");
 	}
 
-	private static final FilenameFilter combatLogFilter = new FilenameFilter() {
-		@Override
-		public boolean accept(File dir, String name) {
-			return name.startsWith("combat");
-		}
-	};
+	private static final FilenameFilter combatLogFilter = (dir, name) -> name.startsWith("combat");
 
-	private static final Comparator<File> combatLogComparator = new Comparator<File>() {
-		public int compare(File f1, File f2)
-		{
-			return String.valueOf(f2.getName()).compareTo(f1.getName());
-		}
-	};
+	private static final Comparator<File> combatLogComparator = (f1, f2) -> f2.getName().compareTo(f1.getName());
 
 	private File getNewestFile() {
 
@@ -308,14 +320,14 @@ public class LogWatcher extends Thread
 
 		final File[] logs = parent.listFiles(combatLogFilter);
 
-		if (!(logs.length > 0)) {
+		if (logs == null || !(logs.length > 0)) {
 			logger.debug("No combat logs found");
 			return null;
 		}
 
 		Arrays.sort(logs, combatLogComparator);
 
-		if (lastFile == null || !logs[0].equals(lastFile)) {
+		if (!logs[0].equals(lastFile)) {
 			if (logs[0].length() == 0) { // not ready yet
 				return lastFile;
 			}
@@ -328,10 +340,10 @@ public class LogWatcher extends Thread
 		if (doFileCheck) {
 			if (logs.length > 200) {
 				long t = 0;
-				for (File f: logs) {
+				for (File f : logs) {
 					t += f.length();
 				}
-				fireInfo("There are over " + logs.length + " files in your combat log folder (" + Math.round(t / 1024 / 1024) + " MB), you may consider deleting some");
+				fireInfo("There are over " + logs.length + " files in your combat log folder (" + Math.round(t * 1.0 / 1024 / 1024) + " MB), you may consider deleting some");
 			}
 			doFileCheck = false;
 		}
@@ -351,38 +363,40 @@ public class LogWatcher extends Thread
 	}
 
 	private void fireNewFile(final File file) throws Exception {
-		for (LogWatcherListener l: listeners) {
+		for (LogWatcherListener l : listeners) {
 			l.onNewFile(file);
 		}
 	}
 
-	private void fireNewLine(final String line) throws Exception {
+	private boolean fireNewLine(final String line) throws Exception {
 		lastFiredLine = line;
-		for (LogWatcherListener l: listeners) {
-			l.onNewLine(line);
+		boolean doFlush = false;
+		for (LogWatcherListener l : listeners) {
+			doFlush |= l.onNewLine(line);
 		}
+		return doFlush;
 	}
 
-	private void fireReadComplete() throws Exception {
-		for (LogWatcherListener l: listeners) {
-			l.onReadComplete();
+	private void fireReadComplete(Integer percent) throws Exception {
+		for (LogWatcherListener l : listeners) {
+			l.onReadComplete(percent);
 		}
 	}
 
 	private void fireFileComplete() throws Exception {
-		for (LogWatcherListener l: listeners) {
+		for (LogWatcherListener l : listeners) {
 			l.onFileComplete();
 		}
 	}
 
 	private void fireError(final String message) {
-		for (LogWatcherListener l: listeners) {
+		for (LogWatcherListener l : listeners) {
 			l.onFlashMessage(message, FlashMessage.Type.ERROR);
 		}
 	}
 
 	private void fireInfo(final String message) {
-		for (LogWatcherListener l: listeners) {
+		for (LogWatcherListener l : listeners) {
 			l.onFlashMessage(message, FlashMessage.Type.INFO);
 		}
 	}

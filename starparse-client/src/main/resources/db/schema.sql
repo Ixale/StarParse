@@ -98,6 +98,24 @@ CREATE TABLE combats (
 
 	is_running BOOLEAN NOT NULL DEFAULT TRUE,
 
+	is_pvp BOOLEAN NULL,
+ 
+	PRIMARY KEY (combat_id)
+);
+
+
+CREATE TABLE combat_stats (
+	combat_id INT NOT NULL,
+	player_name VARCHAR(50) NOT NULL,
+
+	time_from TIMESTAMP NOT NULL,
+	time_to TIMESTAMP NULL,
+
+	event_id_from INT NOT NULL,
+	event_id_to INT NULL,
+
+	discipline VARCHAR(255) NULL,
+
 	-- aggregated
 	actions INT NULL,
 	apm DOUBLE NULL,
@@ -126,10 +144,9 @@ CREATE TABLE combats (
 	threat_positive INT NULL,
 	tps DOUBLE NULL,
 
-	is_pvp BOOLEAN NULL,
- 
-	PRIMARY KEY (combat_id)
+	PRIMARY KEY (combat_id, player_name)
 );
+
 
 CREATE TABLE phases (
 	phase_id INT NOT NULL,

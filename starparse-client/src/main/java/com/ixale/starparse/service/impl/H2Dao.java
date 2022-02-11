@@ -1,26 +1,28 @@
 package com.ixale.starparse.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.PreparedStatementCallback;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-
 public class H2Dao {
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcTemplateImpl jdbcTemplate;
 
 	private static boolean isSchemaCreated = false;
 
 	@Autowired
-	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+	public void setJdbcTemplate(JdbcTemplateImpl jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	protected JdbcTemplate getJdbcTemplate() throws Exception {
+	protected JdbcTemplateImpl getJdbcTemplate() throws Exception {
 		if (!isSchemaCreated) {
 			InputStream in = getClass().getClassLoader().getResourceAsStream("db/schema.sql");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));

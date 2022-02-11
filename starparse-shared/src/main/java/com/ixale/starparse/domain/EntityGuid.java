@@ -1,66 +1,78 @@
 package com.ixale.starparse.domain;
 
-import static com.ixale.starparse.domain.EntityGroup.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.ixale.starparse.domain.EntityGroup.ABSORPTION;
+import static com.ixale.starparse.domain.EntityGroup.DROP;
+import static com.ixale.starparse.domain.EntityGroup.EFFECT;
+import static com.ixale.starparse.domain.EntityGroup.GENERIC;
+import static com.ixale.starparse.domain.EntityGroup.GUARD;
+import static com.ixale.starparse.domain.EntityGroup.NONREDUCED_THREAT;
+import static com.ixale.starparse.domain.EntityGroup.addGuid;
 
 public enum EntityGuid {
 
 	// actions
-	ApplyEffect(836045448945477l),
-	RemoveEffect(836045448945478l),
-	Event(836045448945472l),
-	Restore(836045448945476l),
-	Spend(836045448945473l),
+	ApplyEffect(836045448945477L),
+	RemoveEffect(836045448945478L),
+	Event(836045448945472L),
+	Restore(836045448945476L),
+	Spend(836045448945473L),
 
 	// effects
-	AbilityActivate(836045448945479l),
-	AbilityDeactivate(836045448945480l),
-	AbilityCancel(836045448945481l),
-	AbilityInterrupt(836045448945482l),
+	AbilityActivate(836045448945479L),
+	AbilityDeactivate(836045448945480L),
+	AbilityCancel(836045448945481L),
+	AbilityInterrupt(836045448945482L),
 
-	Heal(836045448945500l),
-	Damage(836045448945501l),
-	FallingDamage(836045448945484l),
+	Heal(836045448945500L),
+	Damage(836045448945501L),
+	FallingDamage(836045448945484L),
 
-	EnterCombat(836045448945489l),
-	ExitCombat(836045448945490l),
-	SafeLoginImmunity(973870949466372l, GENERIC),
+	EnterCombat(836045448945489L),
+	ExitCombat(836045448945490L),
+	SafeLoginImmunity(973870949466372L, GENERIC),
 
-	Death(836045448945493l),
-	Revived(836045448945494l),
+	Death(836045448945493L),
+	Revived(836045448945494L),
 
-	ModifyThreat(836045448945483l),
-	Taunt(836045448945488l),
+	ModifyThreat(836045448945483L),
+	Taunt(836045448945488L),
 	NoLongerSuspicious(836045448945498L),
 
 	Crouch(807028649885696L),
 	LeaveCover(836045448945486L),
 
-	FailedEffect(836045448945499l, EFFECT),
+	FailedEffect(836045448945499L, EFFECT),
 
 	// spend / restore
 	HealthPoint(836045448938504L),
 
 	// damage types
-	Energy(836045448940874l),
-	Kinetic(836045448940873l),
-	Elemental(836045448940875l),
-	Internal(836045448940876l),
+	Energy(836045448940874L),
+	Kinetic(836045448940873L),
+	Elemental(836045448940875L),
+	Internal(836045448940876L),
 
 	// mitigations
-	Shield(836045448945509l),
-	Parry(836045448945503l),
-	Resist(836045448945507l),
-	Miss(836045448945502l),
-	Deflect(836045448945508l),
-	Dodge(836045448945505l),
-	Immune(836045448945506l),
+	Shield(836045448945509L),
+	Parry(836045448945503L),
+	Resist(836045448945507L),
+	Miss(836045448945502L),
+	Deflect(836045448945508L),
+	Dodge(836045448945505L),
+	Immune(836045448945506L),
 
 	// absorb abilities
-	ForceArmor(812736661422080l, ABSORPTION, NONREDUCED_THREAT),
-	StaticBarrier(808201175957504l, ABSORPTION, NONREDUCED_THREAT), // removed 3.0?
+	ForceArmor(812736661422080L, ABSORPTION, NONREDUCED_THREAT),
+	StaticBarrier(808201175957504L, ABSORPTION, NONREDUCED_THREAT), // removed 3.0?
 	StaticBarrier30(3411286364782592L, ABSORPTION, NONREDUCED_THREAT),
-	BladeBarrier(2308467612188672l, ABSORPTION),
-	SonicBarrier(2308471907155968l, ABSORPTION),
+	StaticBarrier1(3411286364782957L, ABSORPTION),
+	StaticBarrier2(3411286364782959L, ABSORPTION),
+	StaticBarrier3(3411286364782955L, ABSORPTION),
+	BladeBarrier(2308467612188672L, ABSORPTION),
+	SonicBarrier(2308471907155968L, ABSORPTION),
 	BallisticDampersSmuggler(2139439174254592L, ABSORPTION),
 	BallisticDampersSmuggler30(3404298452992000L, ABSORPTION),
 	BallisticDampersAgent(2139752706867200L, ABSORPTION),
@@ -71,37 +83,60 @@ public enum EntityGuid {
 	ShieldProbe30(784716294782976L, ABSORPTION, NONREDUCED_THREAT),
 	SaberWardWarrior(807793154064384L, ABSORPTION),
 	SaberWardKnight(812169725739008L, ABSORPTION),
+	ZealousDefenseWarrior(4470962170888192L, ABSORPTION),
+	ZealousDefenseKnight(4468780327501824L, ABSORPTION),
 	Guardianship(3430016717160448L, ABSORPTION),
 	SonicWall(3426550678552576L, ABSORPTION),
 	EnduringBastion(3120895035965741L, ABSORPTION, NONREDUCED_THREAT),
-	ChaffFlare(316558417068032L, ABSORPTION),
-	EnergyRedoubt(3182695320387849L, ABSORPTION),
-	ReactiveWardingDreadForged(3302731066376192L, ABSORPTION, ABSORPTION_BROKEN), // 1360
-	ReactiveWardingDreadMaster(3366988072091648L, ABSORPTION, ABSORPTION_BROKEN), // 1480
-	ReactiveWardingRuusan(3405621302919168L, ABSORPTION, ABSORPTION_BROKEN), // 1520
-	ReactiveWardingResurrected(3417599966707712L, ABSORPTION, ABSORPTION_BROKEN), // 1580
-	ReactiveWardingRevanite(3417565606969344L, ABSORPTION, ABSORPTION_BROKEN), // 1620
-	ReactiveWardingCynosure(3728710217760768L, ABSORPTION, ABSORPTION_BROKEN), // 1715
-	ReactiveWardingOutlander(3655631349219328L, ABSORPTION, ABSORPTION_BROKEN), // 2030
-	ReactiveWardingOutlanderMK5(3647664184885248L, ABSORPTION, ABSORPTION_BROKEN), // 1940
-	ReactiveWardingExemplar(3728714512728064L, ABSORPTION, ABSORPTION_BROKEN), // 2030
-	ReactiveWardingDefiant(3706488056971264L, ABSORPTION, ABSORPTION_BROKEN), // 2570
-	ReactiveWardingExarch(3706483762003968L, ABSORPTION, ABSORPTION_BROKEN), // 2840
-	ReactiveWardingUltimateExarch(3647032824692736L, ABSORPTION, ABSORPTION_BROKEN), // 3110
+	EnduringBastion70(3120899330933056L, ABSORPTION, NONREDUCED_THREAT),
+	EnduringBastionSorcerer1(3120895035965733L, ABSORPTION),
+	EnduringBastionSorcerer2(3120895035965737L, ABSORPTION),
+	EnduringBastionSorcerer3(3120895035965741L, ABSORPTION),
+	EnduringBastionSorcerer4(3120895035965745L, ABSORPTION),
+	EnduringBastionSage1(3120899330933026L, ABSORPTION),
+	EnduringBastionSage2(3120899330933056L, ABSORPTION),
+	EnduringBastionSage3(3120899330933058L, ABSORPTION),
+	EnduringBastionSage4(3120899330933060L, ABSORPTION),
+	DecoyCommando(3165584170680320L, ABSORPTION),
+	DecoyCommando70(801273393709344L, ABSORPTION),
+	DecoyBountyHunter(814192655335739L, ABSORPTION),
+	DecoyBountyHunter70(3169672979546112L, ABSORPTION),
+	TraumaShieldBountyHunter(999516199190834L, ABSORPTION),
+	TraumaShieldTrooper(4561689060048896L, ABSORPTION),
+	ShellShield(985226842997040L, ABSORPTION),
+	ShellShield70(4498402716942602L, ABSORPTION),
+	EnergyRedoubtBountyHunter(3182695320387849L, ABSORPTION), // Energy Rebounder {3182695320387584}
+	EnergyRedoubtBountyHunter30(3394840935006476L, ABSORPTION), // Energy Rebounder {3394840935006208}
+	ReflexiveShield(3174264299585801L, ABSORPTION),
+	EnergyRedoubtTrooper30(3413631416926473L, ABSORPTION), // Reflexive Shield {3413631416926208}
+	EnergyRedoubtTrooper(3174264299585801L, ABSORPTION), // Reflexive Shield {3174264299585536}
+	SeethingDefense(4499652552425472L, ABSORPTION), // XXX
+	SeethingDefenseWarrior(4490306703589376L, ABSORPTION),
+	EmergencyShieldGenerator(870894813577216L, ABSORPTION),
+	PortableDeflectorShield(870869043773440L, ABSORPTION),
+	AbsorbAdrenal(1001L, ABSORPTION), // virtual
+	AbsorbRelic(1002L, ABSORPTION), // virtual
+	// set bonuses
+	MiniShield(4307220837695488L, ABSORPTION),
+	MiniShield70(4307220837695785L, ABSORPTION),
+	EmergencyPower(4511704230658308L, ABSORPTION),
+	EmergencyPower70(4364455571882266L, ABSORPTION),
+	Multibarrier(4374866572607488L, ABSORPTION),
+	Multibarrier70(4374866572607773L, ABSORPTION),
 
 	// combat drop abilities
-	DisappearingAct(2276212407795712l, DROP),
-	ShadowForceCloak(2271612497821696l, DROP),
-	AssassinForceCloak(2271329029980160l, DROP),
-	CloakingScreen(2278037768896512l, DROP),
+	DisappearingAct(2276212407795712L, DROP),
+	ShadowForceCloak(2271612497821696L, DROP),
+	AssassinForceCloak(2271329029980160L, DROP),
+	CloakingScreen(2278037768896512L, DROP),
 
 	// guard abilities
-	GuardianGuard(1780044900859904l, GUARD),
-	ShadowGuard(1780006246154240l, GUARD),
-	VanguardGuard(1775934617157632l, GUARD),
-	BountyHunterGuard(1776136480620544l, GUARD),
-	JuggernautGuard(1780032015958016l, GUARD),
-	AssassinGuard(1780023426023424l, GUARD),
+	GuardianGuard(1780044900859904L, GUARD),
+	ShadowGuard(1780006246154240L, GUARD),
+	VanguardGuard(1775934617157632L, GUARD),
+	BountyHunterGuard(1776136480620544L, GUARD),
+	JuggernautGuard(1780032015958016L, GUARD),
+	AssassinGuard(1780023426023424L, GUARD),
 
 	// signature abilities - healers
 //	KoltoWavesSmuggler(3406411576901632L), // scoundrel
@@ -123,7 +158,7 @@ public enum EntityGuid {
 	PrototypeAdvancedMedpac(2471470211006464L, NONREDUCED_THREAT),
 	UltimateMedpac(1481411529801728L, NONREDUCED_THREAT),
 	PrototypeUltimateMedpac(2471474505973760L, NONREDUCED_THREAT),
-	ImpeccableMedpac(836045448945499l, NONREDUCED_THREAT),
+	ImpeccableMedpac(836045448945499L, NONREDUCED_THREAT),
 	RakataMedpac(2628395431100416L, NONREDUCED_THREAT),
 	PrototypeImpeccableMedpac(3149890360180736L, NONREDUCED_THREAT),
 	ReusableImpeccableMedpac(3149821640704000L, NONREDUCED_THREAT),
@@ -145,27 +180,27 @@ public enum EntityGuid {
 	PrototypePolybioticMedpac(3827503055503360L, NONREDUCED_THREAT),
 	PrototypePolybioticMedpac5(3871552240091136L, NONREDUCED_THREAT),
 
-	PsychicSuffusion(1005593577914368l, NONREDUCED_THREAT), // sage
+	PsychicSuffusion(1005593577914368L, NONREDUCED_THREAT), // sage
 	PsychicSuffusion30(3413927769669632L, NONREDUCED_THREAT), // sage
 	ForceSuffusion(1005632232620032L, NONREDUCED_THREAT), // sorcerer
 	ForceSuffusion30(3411252005044225L, NONREDUCED_THREAT), // sorcerer
-	PreventativeMedicine(2040994228862976l, NONREDUCED_THREAT), // commando
+	PreventativeMedicine(2040994228862976L, NONREDUCED_THREAT), // commando
 	ProactiveMedicine(987305607168260L, NONREDUCED_THREAT), // mercenary
-	PsychAid(2275984774529024l, NONREDUCED_THREAT), // commando
+	PsychAid(2275984774529024L, NONREDUCED_THREAT), // commando
 	CureMind(987851068014592L, NONREDUCED_THREAT), // mercenary
 	KoltoWave(3169277842554880L, NONREDUCED_THREAT), // commando
 	KoltoJets(3163934903238656L, NONREDUCED_THREAT), // mercenary
 	PsychMeds(982263315562496L, NONREDUCED_THREAT), // scoundrel
 	ToxScreen(2280447245549568L, NONREDUCED_THREAT), // operative
-	MendWounds(953182092001280l, NONREDUCED_THREAT), // sage
+	MendWounds(953182092001280L, NONREDUCED_THREAT), // sage
 	SithPurity(987632024682496L, NONREDUCED_THREAT), // sorcerer
 	ForceMend(3030524629090304L, NONREDUCED_THREAT), // sage
 	UnnaturalPreservation(3031100154707968L, NONREDUCED_THREAT), // sorcerer
 	ForceEmpowerment(3429041759584256L, NONREDUCED_THREAT), // sage
 	UnlimitedPower(3415495432732672L, NONREDUCED_THREAT), // sorcerer
-	ForceBarrierSage(3120895035965440l, NONREDUCED_THREAT), // sage
+	ForceBarrierSage(3120895035965440L, NONREDUCED_THREAT), // sage
 	ForceBarrierSorcerer(3120899330932736L, NONREDUCED_THREAT), // sorcerer
-	AdrenalineRush(801251918872576l, NONREDUCED_THREAT), // trooper
+	AdrenalineRush(801251918872576L, NONREDUCED_THREAT), // trooper
 	KoltoOverload(2264285283614720L, NONREDUCED_THREAT), // bounty hunter
 	ShadowsShelter(3774395784888320L, NONREDUCED_THREAT), // shadow
 	AssasinsShelter(3771947653529600L, NONREDUCED_THREAT), // assassin
@@ -197,10 +232,10 @@ public enum EntityGuid {
 	EnragedDefense(2793644297814016L), // juggernaut
 
 	// class buffs (abilities, not effects - they actually differ for each class)
-	ForceMight(1781496599805952l, GENERIC),
-	LuckyShots(939154728812544l, GENERIC),
-	ForceValor(875503313485824l, GENERIC),
-	Fortification(1781488009871360l, GENERIC),
+	ForceMight(1781496599805952L, GENERIC),
+	LuckyShots(939154728812544L, GENERIC),
+	ForceValor(875503313485824L, GENERIC),
+	Fortification(1781488009871360L, GENERIC),
 
 	UnnaturalMight(1781509484707840L, GENERIC),
 	Coordination(881945764429824L, GENERIC),
@@ -236,20 +271,23 @@ public enum EntityGuid {
 	// PVP
 	LingeringTrauma(632923560607744L),
 	Trauma(632919265640448L),
+	PvpHeal(813707324030976L),
 
 	// HOTS tracking
 	KoltoProbe(814832605462528L),
 	SurgicalProbe(815240627355648L),
+	KoltoInfusion(1014376786034688L),
 	SlowReleaseMedpac(3406415871868928L),
 	EmergencyMedpac(807518276157440L),
 	KoltoShell(985226842996736L),
+	KoltoPack(3470823201439744L),
 	TraumaProbe(999516199190528L),
 
 	// miscellaneous and generic
-	Sprint(810670782152704l, GENERIC),
+	Sprint(810670782152704L, GENERIC),
 
-	UnshakableSmuggler(807028649886091l, GENERIC),
-	UnshakableKnight(812139660968471l, GENERIC),
+	UnshakableSmuggler(807028649886091L, GENERIC),
+	UnshakableKnight(812139660968471L, GENERIC),
 
 	UnshakableAssasin(808252715565429L, GENERIC),
 	UnshakableWarrior(1261367470326274L, GENERIC),
@@ -257,20 +295,32 @@ public enum EntityGuid {
 	PhaseWalkConsular(3200416355450880L, GENERIC),
 	PhaseWalkInquisitor(3200459305123840L, GENERIC),
 
-	//ReadyForAnything(3204762862354432l, GENERIC),
-	//CoolUnderPressure(2303227752087552l, GENERIC),
+	//ReadyForAnything(3204762862354432L, GENERIC),
+	//CoolUnderPressure(2303227752087552L, GENERIC),
 
-	TacticalMarkerDamage(3322956067373056l, GENERIC),
-	TacticalMarkerHeal(3322968952274944l, GENERIC),
-	TacticalMarkerTank(3322943182471168l, GENERIC),
+	TacticalMarkerDamage(3322956067373056L, GENERIC),
+	TacticalMarkerHeal(3322968952274944L, GENERIC),
+	TacticalMarkerTank(3322943182471168L, GENERIC),
 
 	CommunicationBreakdown(2940764107571466L, GENERIC),
 
 	Bolster(3403718632407040L, GENERIC),
 
-	UnknownMitigation(-1l),;
+	TargetSet(836045448953668L, GENERIC),
+	TargetCleared(836045448953669L, GENERIC),
+	ModifyCharges(836045448953666L, GENERIC),
 
-	private long guid;
+	UnknownMitigation(-1L),
+	;
+
+	private final long guid;
+
+	private static final Map<Long, EntityGuid> guids = new HashMap<>();
+	static {
+		for (final EntityGuid eg : values()) {
+			guids.put(eg.guid, eg);
+		}
+	}
 
 	EntityGuid(long guid) {
 		this.guid = guid;
@@ -278,7 +328,7 @@ public enum EntityGuid {
 
 	EntityGuid(long guid, final EntityGroup... groups) {
 		this.guid = guid;
-		for (EntityGroup g: groups) {
+		for (EntityGroup g : groups) {
 			addGuid(g, guid);
 		}
 	}
@@ -292,12 +342,48 @@ public enum EntityGuid {
 	}
 
 	public static EntityGuid fromGuid(long guid) {
-		for (final EntityGuid eg: values()) {
-			if (eg.guid == guid) {
-				return eg;
-			}
+		return fromGuid(guid, null);
+	}
+
+	public static EntityGuid fromGuid(long guid, final String name) {
+		final EntityGuid eg = guids.get(guid);
+		if (eg != null || name == null) {
+			return eg;
 		}
+		if (isEffectAbsorbAdrenal(name)) {
+			return EntityGuid.AbsorbAdrenal;
+		}
+		if (isEffectAbsorbRelic(name)) {
+			return EntityGuid.AbsorbRelic;
+		}
+
 		return null;
+	}
+
+	public static boolean isEffectAbsorbAdrenal(final String effectName) {
+		if (effectName == null) {
+			return false;
+		}
+		return effectName.contains("Shield Adrenal")
+				|| effectName.contains("Schildaufputscher")
+				|| effectName.contains("Dopant de bouclier");
+	}
+
+	public static boolean isEffectAbsorbRelic(final String effectName) {
+		if (effectName == null) {
+			return false;
+		}
+		return effectName.contains("Reactive Warding")
+				|| effectName.contains("des Reaktivschutzes")
+				|| effectName.contains("de la rage réactive")
+				//
+				|| effectName.contains("Absorb Shield")
+				|| effectName.contains("Absorptionsschild")
+				|| effectName.contains("Bouclier absorbant")
+				//
+				|| effectName.contains("Shield Defense")
+				|| effectName.contains("Schildverteidigung")
+				|| effectName.contains("Défense bouclier");
 	}
 
 	// generated list of F/T and M/R attacks

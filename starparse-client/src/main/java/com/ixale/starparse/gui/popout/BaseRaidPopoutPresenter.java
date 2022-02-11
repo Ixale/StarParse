@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
@@ -40,27 +41,19 @@ abstract public class BaseRaidPopoutPresenter extends BasePopoutPresenter implem
 		protected AnchorPane totalPane;
 		protected Integer maxValueTotal = 0, sumValueTotal = 0, sumValuePerSecond = 0;
 
-		protected final HashMap<String, AnchorPane> items = new HashMap<String, AnchorPane>();
+		protected final HashMap<String, AnchorPane> items = new HashMap<>();
 	}
 
 	protected final LinkedHashMap<ValueType, Set> sets = new LinkedHashMap<>();
+
+	private final Map<Integer, List<String>> realPlayerNamesPerCombat = new HashMap<>();
 
 	protected Combat streamedCombat = null;
 
 	//@Inject
 	protected RaidPresenter raidPresenter;
 
-	private final Comparator<AnchorPane> itemsComparator = new Comparator<AnchorPane>() {
-		public int compare(final AnchorPane o1, final AnchorPane o2) {
-			if (getValueTotal(o1) > getValueTotal(o2)) {
-				return -1;
-			} else if (getValueTotal(o1) < getValueTotal(o2)) {
-				return 1;
-			} else {
-				return 0;
-			}
-		}
-	};
+	private final Comparator<AnchorPane> itemsComparator = (o1, o2) -> getValueTotal(o2).compareTo(getValueTotal(o1));
 
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 		super.initialize(url, resourceBundle);
@@ -89,6 +82,18 @@ abstract public class BaseRaidPopoutPresenter extends BasePopoutPresenter implem
 
 		final ValueType setKey = getSetKey(message);
 		final AnchorPane pane;
+
+		final String playerName = getItemKey(message);
+		if (Format.isFakePlayerName(playerName)) {
+			if (sets.get(setKey).items.containsKey(Format.getRealNameEvenForFakePlayer(playerName))) {
+				sets.get(setKey).items.remove(playerName);
+				// no longer needed
+				return;
+			}
+		} else {
+			// replace fake
+			sets.get(setKey).items.remove(Format.formatFakePlayerName(playerName));
+		}
 
 		if (!sets.get(setKey).items.containsKey(getItemKey(message))) {
 
@@ -132,16 +137,14 @@ abstract public class BaseRaidPopoutPresenter extends BasePopoutPresenter implem
 
 		final List<AnchorPane> items = new ArrayList<>();
 		for (final Set set: sets.values()) {
-			final List<AnchorPane> list = new LinkedList<AnchorPane>(set.items.values());
+			final List<AnchorPane> list = new LinkedList<>(set.items.values());
 
-			Collections.sort(list, itemsComparator);
+			list.sort(itemsComparator);
 
-			for (final Iterator<AnchorPane> it = list.iterator(); it.hasNext();) {
-				final AnchorPane pane = it.next();
-
+			for (final AnchorPane pane : list) {
 				if (this.bars) {
 					((Rectangle) pane.getChildren().get(1)).setWidth(!(set.maxValueTotal > 0) ? 0 : ITEM_WIDTH
-						* getValueTotal(pane) / set.maxValueTotal);
+							* (getValueTotal(pane) * 1.0 / set.maxValueTotal));
 				}
 				((Label) pane.getChildren().get(3)).setText(Format.formatThousands(getValueTotal(pane)));
 				((Label) pane.getChildren().get(4)).setText(Format.formatAdaptive(getValuePerSecond(pane)));

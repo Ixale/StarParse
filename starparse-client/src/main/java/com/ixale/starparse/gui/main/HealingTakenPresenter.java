@@ -64,12 +64,12 @@ public class HealingTakenPresenter extends BaseStatsPresenter
 
 		avgNormalCol.setCellFactory(new NumberCellFactory<HealingTakenItem>());
 		avgCritCol.setCellFactory(new NumberCellFactory<HealingTakenItem>());
-		htpsCol.setCellFactory(new NumberCellFactory<HealingTakenItem>(false, "DarkSeaGreen"));
-		ehtpsCol.setCellFactory(new NumberCellFactory<HealingTakenItem>(false, "Limegreen"));
-		totalCol.setCellFactory(new NumberCellFactory<HealingTakenItem>(false, "Limegreen"));
+		htpsCol.setCellFactory(new NumberCellFactory<HealingTakenItem>(false, "healing-done"));
+		ehtpsCol.setCellFactory(new NumberCellFactory<HealingTakenItem>(false, "healing-eff-done"));
+		totalCol.setCellFactory(new NumberCellFactory<HealingTakenItem>(false, "healing-eff-done"));
 
-		apsCol.setCellFactory(new NumberCellFactory<HealingTakenItem>(true, "0x30cccd"));
-		absorbedCol.setCellFactory(new NumberCellFactory<HealingTakenItem>(true, "0x30cccd"));
+		apsCol.setCellFactory(new NumberCellFactory<HealingTakenItem>(true, "absorbed"));
+		absorbedCol.setCellFactory(new NumberCellFactory<HealingTakenItem>(true, "absorbed"));
 
 		pctCritCol.setCellFactory(new FloatCellFactory<HealingTakenItem>());
 		pctEffectiveCol.setCellFactory(new FloatCellFactory<HealingTakenItem>());
@@ -100,7 +100,7 @@ public class HealingTakenPresenter extends BaseStatsPresenter
 
 		final List<HealingTakenItem> items = new ArrayList<>();
 		for (HealingTakenStats hts: eventService.getHealingTakenStats(combat, sourceButton.isSelected(), abilityButton.isSelected(),
-			context.getCombatSelection())) {
+			context.getCombatSelection(), context.getSelectedPlayer())) {
 			final HealingTakenItem a = new HealingTakenItem();
 
 			a.guid = hts.getGuid();

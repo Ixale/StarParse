@@ -5,13 +5,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import com.ixale.starparse.domain.CombatInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,7 +136,7 @@ public class FileLoader {
 	}
 
 	// TODO: decouple & move somewhere else?
-	public static String extractCombats(final String fileName,
+	public static byte[] extractCombats(final String fileName,
 		final List<Combat> allCombats, final List<Combat> selectedCombats,
 		final List<ParselyCombatInfo> combatsInfo, final Context context)
 			throws Exception {
@@ -149,13 +154,14 @@ public class FileLoader {
 				logger.debug("Returning whole combat log file " + f);
 			}
 			fillParselyCombatsInfo(allCombats, combatsInfo, context);
-			return extractPortion(f, null, null);
+			return Files.readAllBytes(f.toPath());
 		}
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("Slicing combat log file " + f + ": " + selectedCombats.size() + " / " + allCombats.size());
 		}
 
+		final Set<String> areaEnteredLines = new HashSet<>();
 		Long from = null, to = null;
 		try {
 			// selected combats
@@ -177,7 +183,12 @@ public class FileLoader {
 						if (logger.isDebugEnabled()) {
 							logger.debug("Extracting combat [" + i + "][" + from + "][" + to + "]: " + combat);
 						}
-						sb.append(extractPortion(f, from != null ? "[" + sdf.format(from) : null, to != null ? "[" + sdf.format(to) : null));
+						final ExtractedCombat ec = extractPortion(f, from != null ? "[" + sdf.format(from) : null, to != null ? "[" + sdf.format(to) : null);
+						if (ec.lastAreaEntered != null && !areaEnteredLines.contains(ec.lastAreaEntered)) {
+							sb.append(ec.lastAreaEntered).append("\r\n");
+							areaEnteredLines.add(ec.lastAreaEntered);
+						}
+						sb.append(ec.sb);
 					}
 				}
 
@@ -190,7 +201,7 @@ public class FileLoader {
 			}
 
 			fillParselyCombatsInfo(selectedCombats, combatsInfo, context);
-			return sb.toString();
+			return sb.toString().getBytes();
 
 		} catch (NullPointerException e) {
 			throw new Exception("NPE: [" + from + ", " + to + "], all: " + Arrays.asList(allCombats) + ", sel: " + Arrays.asList(selectedCombats));
@@ -212,11 +223,17 @@ public class FileLoader {
 				info.to = c.getTimeTo();
 				info.raidBoss = c.getBoss();
 				if (info.raidBoss != null && Raid.Mode.NiM.equals(info.raidBoss.getMode())) {
-					for (final CombatEventStats e: context.getCombatEvents(c.getCombatId())) {
+					for (final CombatEventStats e: context.getCombatEvents(c.getCombatId(), context.getSelectedPlayer())) {
 						if (Event.Type.NIM_CRYSTAL.equals(e.getType())) {
 							info.isNiMCrystal = true;
+							break;
 						}
 					}
+				}
+				final CombatInfo combatInfo = context.getCombatInfo().get(c.getCombatId());
+				if (combatInfo != null) {
+					info.instanceName = combatInfo.getInstanceName();
+					info.instanceGuid = combatInfo.getInstanceGuid();
 				}
 				combatsInfo.add(info);
 			}
@@ -225,29 +242,35 @@ public class FileLoader {
 		}
 	}
 
-	public static String extractPortion(final File file, final String from, final String to) throws Exception {
+	public static class ExtractedCombat {
+		final public StringBuilder sb = new StringBuilder();
+		public String lastAreaEntered = null;
+	}
 
-		final StringBuilder sb = new StringBuilder();
+	public static ExtractedCombat extractPortion(final File file, final String from, final String to) throws Exception {
 
-		BufferedReader br = null;
-		try {
-			br = new BufferedReader(new FileReader(file));
+		final ExtractedCombat ec = new ExtractedCombat();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 
 			String line;
 			boolean isReading = (from == null);
 			while ((line = br.readLine()) != null) {
 				if (isReading) {
 					if (to != null && line.startsWith(to)) {
-						// exclusive, i.e. do no read last line
+						// exclusive, i.e. do not read last line
 						// were done
 						break;
 					}
 
 					// append
-					sb.append(line).append("\r\n"); // TODO: always?
+					ec.sb.append(line).append("\r\n");
+
+				} else if (line.contains("836045448953664")) { // AreaEntered (>= 7.0.0b)
+					ec.lastAreaEntered = line;
 				}
 
-				if (!isReading && (from == null || line.startsWith(from))) {
+				if (!isReading && line.startsWith(from)) {
 					// exclusive, i.e. do no read first line
 					isReading = true;
 				}
@@ -256,15 +279,7 @@ public class FileLoader {
 		} catch (Exception e) {
 			throw new Exception("Unable to extract: " + e.getMessage(), e);
 
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (Exception ignored) {
-
-				}
-			}
 		}
-		return sb.toString();
+		return ec;
 	}
 }

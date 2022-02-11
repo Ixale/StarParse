@@ -8,7 +8,6 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<?scenebuilder-stylesheet ../styles.css?>
 
 <VBox id="overviewRoot" fx:id="root" fillWidth="true" prefHeight="-1.0" prefWidth="-1.0" spacing="0.0" styleClass="content" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ixale.starparse.gui.main.RaidPresenter">
   <children>
@@ -70,35 +69,35 @@
         <TableColumn fx:id="nameCol" editable="false" minWidth="55.0" prefWidth="55.0" resizable="false" text="Name" />
         <TableColumn editable="false" resizable="false" text="Damage Dealt">
           <columns>
-            <TableColumn fx:id="damageCol" editable="false" maxWidth="45.0" minWidth="45.0" prefWidth="45.0" resizable="false" text="Total" />
-            <TableColumn fx:id="dpsCol" editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="DPS" />
+            <TableColumn fx:id="damageCol" editable="false" maxWidth="60.0" minWidth="45.0" prefWidth="60.0" resizable="false" text="Total" />
+            <TableColumn fx:id="dpsCol" editable="false" maxWidth="60.0" minWidth="40.0" prefWidth="60.0" resizable="false" text="DPS" />
           </columns>
         </TableColumn>
         <TableColumn editable="false" resizable="false" text="Threat">
           <columns>
-            <TableColumn fx:id="raidThreatCol" editable="false" maxWidth="45.0" minWidth="45.0" prefWidth="45.0" resizable="false" text="Total" />
-            <TableColumn fx:id="tpsCol" editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="TPS" />
+            <TableColumn fx:id="raidThreatCol" editable="false" maxWidth="60.0" minWidth="45.0" prefWidth="60.0" resizable="false" text="Total" />
+            <TableColumn fx:id="tpsCol" editable="false" maxWidth="60.0" minWidth="40.0" prefWidth="60.0" resizable="false" text="TPS" />
           </columns>
         </TableColumn>
         <TableColumn editable="false" resizable="false" text="Damage Taken">
           <columns>
-            <TableColumn fx:id="damageTakenCol" editable="false" maxWidth="45.0" minWidth="45.0" prefWidth="45.0" resizable="false" text="Total" />
-            <TableColumn fx:id="dtpsCol" editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="DTPS" />
-            <TableColumn fx:id="apsCol" editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="APS" />
+            <TableColumn fx:id="damageTakenCol" editable="false" maxWidth="60.0" minWidth="45.0" prefWidth="60.0" resizable="false" text="Total" />
+            <TableColumn fx:id="dtpsCol" editable="false" maxWidth="6.0" minWidth="40.0" prefWidth="60.0" resizable="false" text="DTPS" />
+            <TableColumn fx:id="apsCol" editable="false" maxWidth="60.0" minWidth="40.0" prefWidth="60.0" resizable="false" text="APS" />
           </columns>
         </TableColumn>
         <TableColumn editable="false" resizable="false" text="Healing">
           <columns>
-            <TableColumn fx:id="healingCol" editable="false" maxWidth="45.0" minWidth="45.0" prefWidth="45.0" resizable="false" text="Total" />
-            <TableColumn fx:id="hpsCol" editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="HPS" />
+            <TableColumn fx:id="healingCol" editable="false" maxWidth="60.0" minWidth="45.0" prefWidth="60.0" resizable="false" text="Total" />
+            <TableColumn fx:id="hpsCol" editable="false" maxWidth="60.0" minWidth="40.0" prefWidth="60.0" resizable="false" text="HPS" />
             <TableColumn fx:id="pctEffCol" editable="false" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" text="\%" />
-            <TableColumn fx:id="ehpsCol" editable="false" maxWidth="35.0" minWidth="35.0" prefWidth="35.0" resizable="false" text="EHPS" />
+            <TableColumn fx:id="ehpsCol" editable="false" maxWidth="60.0" minWidth="35.0" prefWidth="60.0" resizable="false" text="EHPS" />
           </columns>
         </TableColumn>
-        <TableColumn editable="false" resizable="false" text="Shielding">
+        <TableColumn editable="false" resizable="false" text="Shielding Done">
           <columns>
-            <TableColumn fx:id="shieldingCol" editable="false" maxWidth="45.0" minWidth="45.0" prefWidth="45.0" resizable="false" text="Total" />
-          	<TableColumn fx:id="spsCol" editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="APS" />
+            <TableColumn fx:id="shieldingCol" editable="false" maxWidth="60.0" minWidth="45.0" prefWidth="60.0" resizable="false" text="Total" />
+          	<TableColumn fx:id="spsCol" editable="false" maxWidth="60.0" minWidth="40.0" prefWidth="60.0" resizable="false" text="APS" />
           </columns>
         </TableColumn>
         <TableColumn fx:id="raidTimeCol" editable="false" maxWidth="35.0" minWidth="35.0" prefWidth="35.0" resizable="false" text="Time" />

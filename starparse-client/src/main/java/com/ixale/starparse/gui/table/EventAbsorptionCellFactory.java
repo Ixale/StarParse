@@ -16,14 +16,14 @@ public class EventAbsorptionCellFactory<T extends EventItem> extends NumberCellF
 
 	@Override
 	public TableCell<T, Integer> call(TableColumn<T, Integer> p) {
-		return new Cell(Paint.valueOf("0x30cccd"));
+		return new Cell();
 	}
 
 	class Cell extends TableCell<T, Integer> {
 
-		public Cell(Paint color) {
-			setTextFill(color);
+		public Cell() {
 			setAlignment(Pos.CENTER_RIGHT);
+			getStyleClass().add("absorbed");
 		}
 
 		@Override

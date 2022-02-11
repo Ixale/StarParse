@@ -6,8 +6,9 @@ public class HealingDoneStats {
 	private final long guid;
 
 	private final int actions,
-		ticks, ticksNormal, ticksCrit, 
+		ticks, ticksNormal, ticksCrit,
 		total, max, totalNormal, totalCrit, totalEffective,
+		aps, absorbed,
 		hps, ehps;
 
 	private final double percentTotal,
@@ -21,6 +22,7 @@ public class HealingDoneStats {
 			int totalNormal, int totalCrit, int totalEffective, int hps, int ehps,
 			double percentTotal, double averageNormal, double averageCrit,
 			double percentCrit, double percentEffective,
+			int aps, int absorbed,
 			Long timeFrom, Long timeTo) {
 		super();
 		this.target = target;
@@ -42,6 +44,10 @@ public class HealingDoneStats {
 		this.averageCrit = averageCrit;
 		this.percentCrit = percentCrit;
 		this.percentEffective = percentEffective;
+
+		this.aps = aps;
+		this.absorbed = absorbed;
+
 		this.timeFrom = timeFrom;
 		this.timeTo = timeTo;
 	}
@@ -120,6 +126,14 @@ public class HealingDoneStats {
 
 	public double getPercentEffective() {
 		return percentEffective;
+	}
+
+	public int getAps() {
+		return aps;
+	}
+
+	public int getAbsorbed() {
+		return absorbed;
 	}
 
 	public Long getTimeFrom() {

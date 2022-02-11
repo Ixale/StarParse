@@ -1,14 +1,5 @@
 package com.ixale.starparse.gui.popout;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.ixale.starparse.domain.Combat;
 import com.ixale.starparse.domain.ConfigPopout;
 import com.ixale.starparse.domain.ConfigPopoutDefault;
@@ -18,7 +9,6 @@ import com.ixale.starparse.gui.Config;
 import com.ixale.starparse.gui.Popout;
 import com.ixale.starparse.service.EventService;
 import com.ixale.starparse.service.impl.Context;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -29,12 +19,20 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 abstract public class BasePopoutPresenter implements Initializable {
 
 	// set in FXML
 	final static protected int TITLE_HEIGHT = 20;
-	final static protected int FOOTER_HEIGHT = 10;
+	//	final static protected int FOOTER_HEIGHT = 10;
 	final static protected int ITEM_GAP = 1;
 	final static protected int ITEM_HEIGHT = 18;
 	final static protected int ITEM_COUNT = 8;
@@ -65,9 +63,9 @@ abstract public class BasePopoutPresenter implements Initializable {
 	protected double scale = 1.0, opacity = Config.DEFAULT_POPOUT_OPACITY;
 	protected boolean bars = true, mouseTransparent = false, solid = false, hideBackground = false, freeform = false;
 	protected Color backgroundColor = ConfigPopoutDefault.DEFAULT_BACKGROUND,
-		textColor = ConfigPopoutDefault.DEFAULT_TEXT;
+			textColor = ConfigPopoutDefault.DEFAULT_TEXT;
 
-	public class Mode {
+	public static class Mode {
 		public final static String DEFAULT = "default";
 
 		String mode;
@@ -95,6 +93,7 @@ abstract public class BasePopoutPresenter implements Initializable {
 	private final List<Mode> modes = new ArrayList<>();
 
 	protected static final HashMap<ValueType, Color> barColors = new HashMap<>();
+
 	static {
 		barColors.put(ValueType.DAMAGE, ConfigPopoutDefault.DEFAULT_DAMAGE);
 		barColors.put(ValueType.HEAL, ConfigPopoutDefault.DEFAULT_HEALING);
@@ -164,10 +163,10 @@ abstract public class BasePopoutPresenter implements Initializable {
 	protected Popout getPopout() {
 		if (popout == null) {
 			popout = new Popout(this, config,
-				width, height, offsetX, offsetY,
-				resizeStepW, minW, maxW,
-				resizeStepH, minH, maxH,
-				mouseTransparent, solid, opacity, hideBackground, freeform);
+					width, height, offsetX, offsetY,
+					resizeStepW, minW, maxW,
+					resizeStepH, minH, maxH,
+					mouseTransparent, solid, opacity, hideBackground, freeform);
 		}
 		return popout;
 	}
@@ -206,10 +205,12 @@ abstract public class BasePopoutPresenter implements Initializable {
 		}
 		setBackgroundColor(config.getPopoutDefault().getBackgroundColor());
 		setTextColor(config.getPopoutDefault().getTextColor());
-		setBarColors(config.getPopoutDefault().getDamageColor(),
-			config.getPopoutDefault().getHealingColor(),
-			config.getPopoutDefault().getThreatColor(),
-			config.getPopoutDefault().getFriendlyColor());
+		setBarColors(
+				config.getPopoutDefault().getDamageColor(),
+				config.getPopoutDefault().getHealingColor(),
+				config.getPopoutDefault().getThreatColor(),
+				config.getPopoutDefault().getFriendlyColor()
+		);
 
 		getPopout().show();
 
@@ -266,7 +267,7 @@ abstract public class BasePopoutPresenter implements Initializable {
 			}
 			popoutBackground.setFill(color);
 		}
-		if (popoutTitleBackground != null) {
+		if (popoutTitleBackground != null && popoutTitle.isVisible()) {
 			popoutTitleBackground.setFill(color);
 		}
 	}
@@ -357,10 +358,10 @@ abstract public class BasePopoutPresenter implements Initializable {
 	abstract public void resetCombatStats();
 
 	public interface ShowingListener {
-		public void onPopoutShowing(final BasePopoutPresenter popoutPres);
+		void onPopoutShowing(final BasePopoutPresenter popoutPres);
 	}
 
-	public void handleClose(final ActionEvent event) {
+	public void handleClose(@SuppressWarnings("unused") final ActionEvent event) {
 		setEnabled(false);
 		parentMenuItem.setSelected(false);
 		hidePopout();
@@ -391,7 +392,7 @@ abstract public class BasePopoutPresenter implements Initializable {
 		defaultConfig().setBars(bars);
 	}
 
-	public void handleToggleMode(final ActionEvent event) {
+	public void handleToggleMode(@SuppressWarnings("unused") final ActionEvent event) {
 		for (int i = 0; i < modes.size(); i++) {
 			if (modes.get(i).equals(mode)) {
 				if (i + 1 < modes.size()) {
@@ -411,7 +412,7 @@ abstract public class BasePopoutPresenter implements Initializable {
 	}
 
 	public void setMode(String mode) {
-		for (Mode m: modes) {
+		for (Mode m : modes) {
 			if (m.mode.equals(mode)) {
 				setMode(m);
 				return;
@@ -426,7 +427,7 @@ abstract public class BasePopoutPresenter implements Initializable {
 		}
 		this.mode = mode;
 
-		for (Mode m: modes) {
+		for (Mode m : modes) {
 			if (m.wrapper == null) {
 				continue;
 			}
@@ -470,7 +471,7 @@ abstract public class BasePopoutPresenter implements Initializable {
 			this.mode = mode;
 		}
 		if (!popoutModes.containsKey(getName())) {
-			popoutModes.put(getName(), new ArrayList<Mode>());
+			popoutModes.put(getName(), new ArrayList<>());
 		}
 		popoutModes.get(getName()).add(mode);
 	}

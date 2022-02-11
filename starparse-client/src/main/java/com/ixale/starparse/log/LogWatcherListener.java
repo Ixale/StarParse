@@ -8,9 +8,9 @@ public interface LogWatcherListener {
 
 	void onNewFile(File logFile) throws Exception;
 
-	void onNewLine(String line) throws Exception;
+	boolean onNewLine(String line) throws Exception;
 
-	void onReadComplete() throws Exception;
+	void onReadComplete(Integer percent) throws Exception;
 
 	void onFileComplete() throws Exception;
 

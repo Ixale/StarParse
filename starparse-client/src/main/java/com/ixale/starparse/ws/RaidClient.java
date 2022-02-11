@@ -68,55 +68,8 @@ public class RaidClient extends BaseClient {
 		sendMessage(new RaidPlayerMessage(RaidPlayerMessage.Action.QUIT, raidGroup, characterName, null), true);
 	}
 
-	public RaidCombatMessage updateCombat(final Combat combat, final String characterName,
-		final CombatStats combatStats,
-		final List<AbsorptionStats> absorptionStats,
-		final List<ChallengeStats> challengeStats,
-		final List<CombatEventStats> combatEventStats) {
-
-		if (challengeStats != null && !challengeStats.isEmpty()) {
-			// discard challenges with no value
-			final Iterator<ChallengeStats> iter = challengeStats.iterator();
-			while (iter.hasNext()) {
-				ChallengeStats stats = iter.next();
-				if ((stats.getDamage() == null || stats.getDamage() == 0)
-					&& (stats.getEffectiveHeal() == null || stats.getEffectiveHeal() == 0)
-					&& (stats.getHeal() == null || stats.getHeal() == 0)) {
-					iter.remove();
-				}
-			}
-		}
-
-		// transform the very last event
-		Event.Type exitEvent = null;
-		List<CombatEventStats> combatEventStats2 = null;
-		final long timestamp = combat.getTimeFrom() + combatStats.getTick();
-		if (combatEventStats != null && !combatEventStats.isEmpty()) {
-			final CombatEventStats last = combatEventStats.get(combatEventStats.size() - 1);
-			if (last.getTimestamp() == timestamp) {
-				exitEvent = last.getType();
-				if (combatEventStats.size() > 1) {
-					combatEventStats2 = new ArrayList<>(combatEventStats.subList(0, combatEventStats.size() - 1));
-				}
-			} else {
-				combatEventStats2 = new ArrayList<>(combatEventStats);
-			}
-		}
-
-		// fire and forget
-		final RaidCombatMessage message = new RaidCombatMessage(characterName,
-			combat.getTimeFrom(), combat.getTimeTo(),
-			combat.getBoss() != null ? combat.getBoss().getRaidBossName() : null,
-			combat.getBoss() != null ? combat.getBoss().getSize() : null,
-			combat.getBoss() != null ? combat.getBoss().getMode() : null,
-			combatStats, absorptionStats, challengeStats, combatEventStats2,
-			timestamp, // last event timestamp
-			combat.getDiscipline(),
-			exitEvent);
-
-		sendMessage(message, false);
-
-		return message;
+	public void updateCombat(final BaseMessage message) {
+		this.sendMessage(message, false);
 	}
 
 	public void sendRequest(final RaidRequest request, final RequestOutgoingCallback callback) {
@@ -139,6 +92,7 @@ public class RaidClient extends BaseClient {
 				try {
 					timedOut = !responseLatch.await(25, TimeUnit.SECONDS);
 				} catch (InterruptedException e) {
+					// ignored
 				}
 
 				if (timedOut) {
@@ -147,8 +101,10 @@ public class RaidClient extends BaseClient {
 					}
 					callback.onResponseIncoming(new RaidResponseMessage(guid, "Request timed out, server might be busy"));
 				}
-				pendingRequests.remove(responseLatch);
-			};
+				pendingTimeouts.remove(guid);
+			}
+
+			;
 		};
 		timeout.setDaemon(true);
 		timeout.start();
@@ -225,7 +181,7 @@ public class RaidClient extends BaseClient {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Handling response: " + message);
 			}
-			pendingRequests.remove(callback);
+			pendingRequests.remove(message.getGuid());
 		} else {
 			// too bad, discard
 			logger.warn("Discarding unknown response: " + message);

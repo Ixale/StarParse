@@ -48,6 +48,9 @@ public class ConfigTimers implements Serializable, SerializeCallback {
 	public void beforeSerialize() {
 		timers.clear();
 		for (ConfigTimer timer: allTimers) {
+			if (Boolean.TRUE.equals(timer.getIsPreview())) {
+				continue;
+			}
 			if (timer.isSystem()) {
 				// save only if anything changed
 				if (timer.isEnabled() && !timer.isSystemModified()) {

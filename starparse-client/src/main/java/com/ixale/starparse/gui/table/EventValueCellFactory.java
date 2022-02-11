@@ -25,7 +25,7 @@ public class EventValueCellFactory<T extends EventItem> extends NumberCellFactor
 
 		public Cell() {
 			setAlignment(Pos.CENTER_RIGHT);
-			setTextFill(Color.BLACK);
+			getStyleClass().set(0, "table-cell");
 		}
 
 		@Override
@@ -43,14 +43,14 @@ public class EventValueCellFactory<T extends EventItem> extends NumberCellFactor
 			final Event e = getTableView().getItems().get(getIndex()).getEvent();
 			if (Helpers.isEffectDamage(e)) {
 				if (e.getMitigation() != null) {
-					setTextFill(Color.PURPLE);
+					getStyleClass().set(0, "mitigated");
 				} else {
-					setTextFill(Color.MAROON);
+					getStyleClass().set(0, "damage-dealt");
 				}
 			} else if (Helpers.isEffectHeal(e)) {
-				setTextFill(Color.LIMEGREEN);
+				getStyleClass().set(0, "healing-eff-done");
 			} else {
-				setTextFill(Color.BLACK);
+				getStyleClass().set(0, "table-cell");
 			}
 		}
 	};

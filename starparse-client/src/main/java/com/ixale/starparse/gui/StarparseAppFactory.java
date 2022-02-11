@@ -27,6 +27,8 @@ import com.ixale.starparse.gui.popout.RaidNotesPopoutPresenter;
 import com.ixale.starparse.gui.popout.RaidTpsPopoutPresenter;
 import com.ixale.starparse.gui.popout.TimersCenterPopoutPresenter;
 import com.ixale.starparse.gui.popout.TimersPopoutPresenter;
+import com.ixale.starparse.gui.popout.TimersBPopoutPresenter;
+import com.ixale.starparse.gui.popout.TimersCPopoutPresenter;
 
 import javafx.fxml.FXMLLoader;
 
@@ -85,7 +87,19 @@ public class StarparseAppFactory
 	@Bean
 	public TimersPopoutPresenter timersPopoutPresenter()
 	{
-		return loadPresenter("/fxml/TimersPopout.fxml");
+		return loadPresenter("/fxml/TimersPopout.fxml", new TimersPopoutPresenter());
+	}
+
+	@Bean
+	public TimersBPopoutPresenter timersBPopoutPresenter()
+	{
+		return loadPresenter("/fxml/TimersPopout.fxml", new TimersBPopoutPresenter());
+	}
+
+	@Bean
+	public TimersCPopoutPresenter timersCPopoutPresenter()
+	{
+		return loadPresenter("/fxml/TimersPopout.fxml", new TimersCPopoutPresenter());
 	}
 
 	@Bean
@@ -154,17 +168,28 @@ public class StarparseAppFactory
 		return loadPresenter("/fxml/HotsPopout.fxml");
 	}
 
-	@SuppressWarnings("unchecked")
-	private <T> T loadPresenter(String fxmlFile)
+	private <T> T loadPresenter(String fxmlFile) {
+		return loadPresenter(fxmlFile, null);
+	}
+
+	private <T> T loadPresenter(String fxmlFile, final T forcedPresenter)
 	{
 		InputStream fxmlStream = null;
 		try
 		{
 			fxmlStream = getClass().getResourceAsStream(fxmlFile);
 
-			FXMLLoader loader = new FXMLLoader(Class.class.getResource("/fxml/"));
-			loader.load(fxmlStream);
-			return (T) loader.getController();
+			FXMLLoader loader = new FXMLLoader(this.getClass().getResource("/fxml/"));
+			if (forcedPresenter != null) {
+				loader.setController(forcedPresenter);
+				loader.load(fxmlStream);
+				return forcedPresenter;
+			} else {
+				loader.load(fxmlStream);
+				//noinspection unchecked
+				return (T) loader.getController();
+			}
+
 		} catch (IOException e)
 		{
 			throw new RuntimeException(String.format("Unable to load FXML file '%s'", fxmlFile), e);

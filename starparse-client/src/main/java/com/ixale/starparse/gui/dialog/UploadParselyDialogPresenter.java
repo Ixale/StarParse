@@ -1,5 +1,24 @@
 package com.ixale.starparse.gui.dialog;
 
+import com.ixale.starparse.domain.Combat;
+import com.ixale.starparse.domain.CombatLog;
+import com.ixale.starparse.domain.ServerName;
+import com.ixale.starparse.gui.Config;
+import com.ixale.starparse.gui.FlashMessage.Type;
+import com.ixale.starparse.service.ParselyService;
+import com.ixale.starparse.service.ParselyService.ParselyCombatInfo;
+import com.ixale.starparse.service.impl.Context;
+import com.ixale.starparse.utils.FileLoader;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.VBox;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -7,26 +26,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.VBox;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.ixale.starparse.domain.Combat;
-import com.ixale.starparse.domain.CombatLog;
-import com.ixale.starparse.gui.Config;
-import com.ixale.starparse.gui.FlashMessage.Type;
-import com.ixale.starparse.service.ParselyService;
-import com.ixale.starparse.service.ParselyService.ParselyCombatInfo;
-import com.ixale.starparse.service.impl.Context;
-import com.ixale.starparse.utils.FileLoader;
 
 public class UploadParselyDialogPresenter extends BaseDialogPresenter {
 
@@ -40,7 +39,7 @@ public class UploadParselyDialogPresenter extends BaseDialogPresenter {
 	private TextArea uploadNote;
 
 	@FXML
-	private CheckBox uploadPublic;
+	private RadioButton visibilityPrivate, visibilityGuildOnly, visibilityPublic;
 
 	@FXML
 	private Button settingsButton, saveButton, cancelButton;
@@ -94,7 +93,7 @@ public class UploadParselyDialogPresenter extends BaseDialogPresenter {
 		this.selectedCombats = null;
 
 		this.uploadNote.setText("");
-		this.uploadPublic.setSelected(true);
+		this.visibilityPublic.setSelected(true);
 		clearFlash();
 		disable(false);
 	}
@@ -118,7 +117,9 @@ public class UploadParselyDialogPresenter extends BaseDialogPresenter {
 
 		final StringBuilder sb = new StringBuilder();
 		sb.append("Using timezone ").append(config.getTimezone());
-		if (config.getCurrentCharacter().getServer() != null) {
+		if (context.getServerId() != null) {
+			sb.append(", log server ").append(ServerName.getTitleFromCode(context.getServerId()));
+		} else if (config.getCurrentCharacter().getServer() != null) {
 			sb.append(", server ").append(config.getCurrentCharacter().getServer());
 		} else {
 			sb.append(", no server");
@@ -168,14 +169,14 @@ public class UploadParselyDialogPresenter extends BaseDialogPresenter {
 			return;
 		}
 
-		if (combatLog == null || allCombats == null || allCombats.isEmpty()) {
+		if (allCombats == null || allCombats.isEmpty()) {
 			setFlash("No combats to upload");
 			return;
 		}
 
 		if (selectedCombats != null && !selectedCombats.isEmpty()) {
 			boolean found = false;
-			for (final Combat c: selectedCombats) {
+			for (final Combat c : selectedCombats) {
 				if (c != null) {
 					found = true;
 					break;
@@ -188,7 +189,7 @@ public class UploadParselyDialogPresenter extends BaseDialogPresenter {
 		}
 
 		// 1) slice the log
-		final String content;
+		final byte[] content;
 		final List<ParselyCombatInfo> combatsInfo = new ArrayList<>();
 		try {
 			content = FileLoader.extractCombats(combatLog.getFileName(), allCombats, selectedCombats, combatsInfo, context);
@@ -207,12 +208,16 @@ public class UploadParselyDialogPresenter extends BaseDialogPresenter {
 				String link = null;
 				String error = null;
 				try {
-					link = parselyService.uploadLog(parselyService.createParams(config,
-						uploadPublic.isSelected(),
-						!uploadNote.getText().isEmpty() ? uploadNote.getText() : null), 
-						combatLog.getFileName(), 
-						content.getBytes(),
-						combatsInfo);
+					link = parselyService.uploadLog(
+							parselyService.createParams(
+									config,
+									visibilityPrivate.isSelected() ? 0 : (visibilityGuildOnly.isSelected() ? 2 : 1 /* public */),
+									!uploadNote.getText().isEmpty() ? uploadNote.getText() : null,
+									context
+							),
+							combatLog.getFileName(),
+							content,
+							combatsInfo);
 
 				} catch (Exception e) {
 					final String m = "Unable to upload to Parsely: " + e.getMessage();
@@ -232,19 +237,16 @@ public class UploadParselyDialogPresenter extends BaseDialogPresenter {
 				final String l = link;
 				final String e = error;
 
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						disable(false);
-						if (e != null) {
-							setFlash(e);
-							return;
-						}
-						if (listener != null) {
-							listener.onUploadSaved(l);
-						}
-						handleClose(event);
+				Platform.runLater(() -> {
+					disable(false);
+					if (e != null) {
+						setFlash(e);
+						return;
 					}
+					if (listener != null) {
+						listener.onUploadSaved(l);
+					}
+					handleClose(event);
 				});
 
 			}
@@ -255,7 +257,9 @@ public class UploadParselyDialogPresenter extends BaseDialogPresenter {
 		saveButton.setDisable(disabled);
 		cancelButton.setDisable(disabled);
 		settingsButton.setDisable(disabled);
-		uploadPublic.setDisable(disabled);
+		visibilityPublic.setDisable(disabled);
+		visibilityGuildOnly.setDisable(disabled);
+		visibilityPublic.setDisable(disabled);
 		uploadNote.setDisable(disabled);
 	}
 

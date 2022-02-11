@@ -7,9 +7,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static junit.framework.Assert.*;
 
+import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,32 +32,30 @@ import com.ixale.starparse.service.impl.Context;
 @ContextConfiguration("/spring-context.xml")
 public class LogWatcherTest {
 
-	private Parser parser;
-	private LogWatcher tailer;
 	@Autowired
 	private Context context;
 
 	@Rule
 	public TemporaryFolder testFolder = new TemporaryFolder();
 
-	@Before
-	public void setUp() {
-		parser = new Parser(context);
-	}
-
 	@Test
 	public void testTailingIncremental() throws Exception {
 
 		final int POLLING = 200;
 
-		final ArrayList<String> tempLines = new ArrayList<String>(), flushedLines = new ArrayList<String>();
+		final ArrayList<String> tempLines = new ArrayList<>(), flushedLines = new ArrayList<>();
 
 		// load test source file & temporary fake log
 		String n = "combat_2014-01-26_22_01_13_435268.txt";
-		final File sourceLog = new File(getClass().getClassLoader().getResource(n).toURI()), tempLog = testFolder.newFile(n);
+		final File sourceLog = new File(Objects.requireNonNull(getClass().getClassLoader().getResource(n)).toURI()), tempLog = testFolder.newFile(n);
 
 		// prepare tailer
-		tailer = new LogWatcher(testFolder.getRoot(), POLLING, false);
+		final Parser parser = new Parser(context);
+		final LogWatcher tailer = new LogWatcher(testFolder.getRoot(), POLLING, false);
+
+		int[] sizes = {20, 100, 0, 5, 1500, 133, 0, 0, 1, 0};
+		CountDownLatch l = new CountDownLatch(sizes.length * 2);
+
 		tailer.addLogWatcherListener(new LogWatcherListener() {
 			@Override
 			public void onNewFile(File logFile) throws Exception {
@@ -61,14 +63,24 @@ public class LogWatcherTest {
 			}
 
 			@Override
-			public void onNewLine(String line) throws Exception {
-				parser.parseLogLine(line);
+			public boolean onNewLine(String line) throws Exception {
+				final boolean doFlush = parser.parseLogLine(line);
 				tempLines.add(line);
+				return doFlush;
 			}
 
 			@Override
-			public void onReadComplete() {
+			public void onReadComplete(Integer percent) {
 				flushedLines.addAll(tempLines);
+				l.countDown();
+
+				try {
+					if (l.await(POLLING + 1000, TimeUnit.MILLISECONDS)) {
+						Assert.fail("Read complete timed out at " + tempLines.size());
+					}
+				} catch (Exception ignored) {
+
+				}
 			}
 
 			@Override
@@ -102,8 +114,6 @@ public class LogWatcherTest {
 			fw = new FileWriter(tempLog);
 			bw = new BufferedWriter(fw);
 
-			int[] sizes = { 100, 0, 5, 1500, 133, 0, 0, 1, 0 };
-
 			for (int s = 0; s < sizes.length; s++) {
 				for (int i = 0; i < sizes[s]; i++) {
 					bw.write(br.readLine());
@@ -113,7 +123,10 @@ public class LogWatcherTest {
 				bw.flush();
 
 				// ... now wait (polling + 200ms extra for processing)
-				Thread.sleep(POLLING + 200);
+//				Thread.sleep(POLLING);
+				if (l.await(POLLING + 1000, TimeUnit.MILLISECONDS)) {
+					Assert.fail("Cycle " + s + " timed out");
+				}
 
 				assertEquals("Cycle " + s, sizes[s], tempLines.size());
 				assertEquals("Cycle " + s, linesTotal, flushedLines.size());
@@ -217,7 +230,7 @@ public class LogWatcherTest {
 		final File sourceLog = new File(getClass().getClassLoader().getResource(n).toURI()), tempLog = testFolder.newFile(n);
 
 		int lines = 0;
-		final int[] result = new int[] { 0, 0, 0 };
+		final int[] result = new int[]{0, 0, 0};
 
 		// fill in complete log
 		FileReader fr = null;
@@ -263,7 +276,7 @@ public class LogWatcherTest {
 		}
 
 		// prepare tailer
-		tailer = new LogWatcher(testFolder.getRoot(), POLLING, false);
+		final LogWatcher tailer = new LogWatcher(testFolder.getRoot(), POLLING, false);
 		tailer.addLogWatcherListener(new LogWatcherListener() {
 			@Override
 			public void onNewFile(File logFile) throws Exception {
@@ -271,12 +284,13 @@ public class LogWatcherTest {
 			}
 
 			@Override
-			public void onNewLine(String line) throws Exception {
+			public boolean onNewLine(String line) throws Exception {
 				result[1]++;
+				return false;
 			}
 
 			@Override
-			public void onReadComplete() {
+			public void onReadComplete(Integer percent) {
 				result[2]++;
 			}
 
@@ -320,7 +334,7 @@ public class LogWatcherTest {
 		final File sourceLog = new File(getClass().getClassLoader().getResource(n).toURI()), tempLog = testFolder.newFile(n);
 
 		int lines = 0;
-		final int[] result = new int[] { 0, 0, 0 };
+		final int[] result = new int[]{0, 0, 0};
 
 		// fill in complete log
 		FileReader fr = null;
@@ -366,7 +380,8 @@ public class LogWatcherTest {
 		}
 
 		// prepare tailer
-		tailer = new LogWatcher(testFolder.getRoot(), POLLING, false);
+		final Parser parser = new Parser(context);
+		final LogWatcher tailer = new LogWatcher(testFolder.getRoot(), POLLING, false);
 		tailer.addLogWatcherListener(new LogWatcherListener() {
 			@Override
 			public void onNewFile(File logFile) throws Exception {
@@ -375,13 +390,13 @@ public class LogWatcherTest {
 			}
 
 			@Override
-			public void onNewLine(String line) throws Exception {
+			public boolean onNewLine(String line) throws Exception {
 				result[1]++;
-				parser.parseLogLine(line);
+				return parser.parseLogLine(line);
 			}
 
 			@Override
-			public void onReadComplete() {
+			public void onReadComplete(Integer percent) {
 				result[2]++;
 			}
 

@@ -1,33 +1,25 @@
 package com.ixale.starparse.gui.popout;
 
-import java.net.URL;
-import java.util.Objects;
-import java.util.ResourceBundle;
-
 import com.ixale.starparse.domain.Combat;
 import com.ixale.starparse.domain.stats.CombatStats;
-import com.ixale.starparse.gui.main.RaidPresenter;
-
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-public class RaidNotesPopoutPresenter extends BasePopoutPresenter {
+import java.net.URL;
+import java.util.Objects;
+import java.util.ResourceBundle;
 
-	@FXML
-	private VBox statsGrid;
+public class RaidNotesPopoutPresenter extends BasePopoutPresenter {
 
 	@FXML
 	private TextFlow raidNotes;
@@ -35,13 +27,7 @@ public class RaidNotesPopoutPresenter extends BasePopoutPresenter {
 	@FXML
 	private ScrollPane notesWrapper;
 
-	protected RaidPresenter raidPresenter;
-
 	private String currentNote;
-
-	public void setRaidPresenter(final RaidPresenter raidPresenter) {
-		this.raidPresenter = raidPresenter;
-	}
 
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -55,20 +41,8 @@ public class RaidNotesPopoutPresenter extends BasePopoutPresenter {
 		minH = 114;
 		maxH = 3 * height;
 
-		notesWrapper.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
-		notesWrapper.setBorder(Border.EMPTY);
-		notesWrapper.setOnMouseEntered(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				notesWrapper.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
-			}
-		});
-		notesWrapper.setOnMouseExited(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				notesWrapper.setVbarPolicy(ScrollBarPolicy.NEVER);
-			}
-		});
+		notesWrapper.setOnMouseEntered(event -> notesWrapper.setVbarPolicy(ScrollBarPolicy.AS_NEEDED));
+		notesWrapper.setOnMouseExited(event -> notesWrapper.setVbarPolicy(ScrollBarPolicy.NEVER));
 
 		raidNotes.setPadding(new Insets(5));
 

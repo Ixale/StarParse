@@ -1,24 +1,8 @@
 package com.ixale.starparse.parser;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Locale;
-
-import static junit.framework.Assert.*;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import com.ixale.starparse.domain.Actor;
-import com.ixale.starparse.domain.Effect;
 import com.ixale.starparse.domain.Combat;
+import com.ixale.starparse.domain.Effect;
 import com.ixale.starparse.domain.stats.CombatMitigationStats;
 import com.ixale.starparse.domain.stats.CombatStats;
 import com.ixale.starparse.domain.stats.DamageDealtStats;
@@ -27,9 +11,27 @@ import com.ixale.starparse.domain.stats.HealingTakenStats;
 import com.ixale.starparse.service.EventService;
 import com.ixale.starparse.service.impl.Context;
 import com.ixale.starparse.utils.FileLoader;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)  
-@ContextConfiguration("/spring-context.xml") 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Locale;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("/spring-context.xml")
 public class EventServiceTest {
 
 	@Autowired
@@ -70,21 +72,29 @@ public class EventServiceTest {
 				parser.parseLogLine(line);
 				if (++i % 3000 == 0) {
 					eventService.flushEvents(parser.getEvents(),
-						parser.getCombats(), parser.getCurrentCombat(),
-						parser.getEffects(), parser.getCurrentEffects(),
-						parser.getPhases(), parser.getCurrentPhase(),
-						parser.getAbsorptions());
+							parser.getCombats(), parser.getCurrentCombat(),
+							parser.getEffects(), parser.getCurrentEffects(),
+							parser.getPhases(), parser.getCurrentPhase(),
+							parser.getAbsorptions(),
+							parser.getActorStates());
 				}
 			}
 			eventService.flushEvents(parser.getEvents(),
 					parser.getCombats(), parser.getCurrentCombat(),
 					parser.getEffects(), parser.getCurrentEffects(),
 					parser.getPhases(), parser.getCurrentPhase(),
-					parser.getAbsorptions());
+					parser.getAbsorptions(),
+					parser.getActorStates());
 
 		} finally {
-			try { br.close(); } catch (Exception ignored) {}
-			try { fr.close(); } catch (Exception ignored) {}
+			try {
+				br.close();
+			} catch (Exception ignored) {
+			}
+			try {
+				fr.close();
+			} catch (Exception ignored) {
+			}
 		}
 
 		// check result
@@ -105,7 +115,7 @@ public class EventServiceTest {
 		assertEquals("Dread Master Calphayus (SM 8m)", c.getBoss().toString());
 		assertEquals(442874, c.getTimeTo() - c.getTimeFrom());
 
-		stats = eventService.getCombatStats(c, null);
+		stats = eventService.getCombatStats(c, null, parser.getCombatLog().getCharacterName());
 		assertEquals(34.68, stats.getApm());
 		assertEquals(1018954, stats.getDamage());
 		assertEquals(2301, stats.getDps());
@@ -129,7 +139,7 @@ public class EventServiceTest {
 		assertEquals("Dread Master Raptus (HM 8m)", c.getBoss().toString());
 		assertEquals(394327, c.getTimeTo() - c.getTimeFrom());
 
-		stats = eventService.getCombatStats(c, null);
+		stats = eventService.getCombatStats(c, null, parser.getCombatLog().getCharacterName());
 		assertEquals(32.41, stats.getApm());
 		assertEquals(874441, stats.getDamage());
 		assertEquals(2218, stats.getDps());
@@ -159,9 +169,9 @@ public class EventServiceTest {
 		assertEquals("Dread Master Brontes (SM 8m)", c.getBoss().toString());
 		assertEquals(444166, c.getTimeTo() - c.getTimeFrom());
 
-		stats = eventService.getCombatStats(c, null);
+		stats = eventService.getCombatStats(c, null, parser.getCombatLog().getCharacterName());
 
-		damageDealtStats = eventService.getDamageDealtStats(c, false, false, false, null);
+		damageDealtStats = eventService.getDamageDealtStats(c, false, false, false, null, parser.getCombatLog().getCharacterName());
 
 		assertEquals(1, damageDealtStats.size());
 
@@ -178,7 +188,7 @@ public class EventServiceTest {
 		assertEquals(2625, dds.getDps());
 		assertEquals(100.0, dds.getPercentTotal());
 
-		damageDealtStats = eventService.getDamageDealtStats(c, false, false, true, null);
+		damageDealtStats = eventService.getDamageDealtStats(c, false, false, true, null, parser.getCombatLog().getCharacterName());
 
 		assertEquals(12, damageDealtStats.size());
 
@@ -197,8 +207,8 @@ public class EventServiceTest {
 		assertEquals(21.8, dds.getPercentTotal());
 		assertEquals("elemental", dds.getDamageType());
 
-		
-		damageDealtStats = eventService.getDamageDealtStats(c, true, true, false, null);
+
+		damageDealtStats = eventService.getDamageDealtStats(c, true, true, false, null, parser.getCombatLog().getCharacterName());
 
 		assertEquals(17, damageDealtStats.size());
 
@@ -208,7 +218,7 @@ public class EventServiceTest {
 		assertEquals(2065.0, dds.getAverageCrit());
 		assertEquals(33.33, dds.getPercentCrit());
 
-		damageDealtStats = eventService.getDamageDealtStatsSimple(c, null);
+		damageDealtStats = eventService.getDamageDealtStatsSimple(c, null, parser.getCombatLog().getCharacterName());
 
 		assertEquals(1, damageDealtStats.size());
 
@@ -289,7 +299,7 @@ public class EventServiceTest {
 		c = combats.get(14);
 		assertEquals("2014-01-27 02:05:31.950", sdf.format(c.getTimeFrom()));
 		assertEquals("2014-01-27 02:06:33.378", sdf.format(c.getTimeTo()));
-		final String combat14 = FileLoader.extractPortion(sourceLog, "["+sdfTime.format(c.getTimeFrom()), "["+sdfTime.format(c.getTimeTo()));
+		final String combat14 = FileLoader.extractPortion(sourceLog, "[" + sdfTime.format(c.getTimeFrom()), "[" + sdfTime.format(c.getTimeTo())).sb.toString();
 
 		assertNotNull(combat14);
 		assertEquals(58794, combat14.length());
@@ -319,21 +329,27 @@ public class EventServiceTest {
 				parser.parseLogLine(line);
 				if (++i % 3000 == 0) {
 					eventService.flushEvents(parser.getEvents(),
-						parser.getCombats(), parser.getCurrentCombat(),
-						parser.getEffects(), parser.getCurrentEffects(),
-						parser.getPhases(), parser.getCurrentPhase(),
-						parser.getAbsorptions());
+							parser.getCombats(), parser.getCurrentCombat(),
+							parser.getEffects(), parser.getCurrentEffects(),
+							parser.getPhases(), parser.getCurrentPhase(),
+							parser.getAbsorptions(), parser.getActorStates());
 				}
 			}
 			eventService.flushEvents(parser.getEvents(),
 					parser.getCombats(), parser.getCurrentCombat(),
 					parser.getEffects(), parser.getCurrentEffects(),
 					parser.getPhases(), parser.getCurrentPhase(),
-					parser.getAbsorptions());
+					parser.getAbsorptions(), parser.getActorStates());
 
 		} finally {
-			try { br.close(); } catch (Exception ignored) {}
-			try { fr.close(); } catch (Exception ignored) {}
+			try {
+				br.close();
+			} catch (Exception ignored) {
+			}
+			try {
+				fr.close();
+			} catch (Exception ignored) {
+			}
 		}
 
 		// check result
@@ -358,7 +374,7 @@ public class EventServiceTest {
 		assertEquals(420490, c.getTimeTo() - c.getTimeFrom());
 
 		// damage dealt
-		damageDealtStats = eventService.getDamageDealtStats(c, false, false, true, null);
+		damageDealtStats = eventService.getDamageDealtStats(c, false, false, true, null, parser.getCombatLog().getCharacterName());
 		assertEquals(15, damageDealtStats.size());
 
 		dds = damageDealtStats.get(0);
@@ -368,7 +384,7 @@ public class EventServiceTest {
 		assertEquals(1852.0, dds.getAverageNormal());
 
 		// damage taken
-		damageTakenStats = eventService.getDamageTakenStats(c, false, false, true, null);
+		damageTakenStats = eventService.getDamageTakenStats(c, false, false, true, null, parser.getCombatLog().getCharacterName());
 		assertEquals(14, damageTakenStats.size());
 
 		dts = damageTakenStats.get(1);
@@ -381,7 +397,7 @@ public class EventServiceTest {
 		assertEquals(84343, dts.getTotal());
 
 		// mitigation
-		cms = eventService.getCombatMitigationStats(c, null);
+		cms = eventService.getCombatMitigationStats(c, null, parser.getCombatLog().getCharacterName());
 		assertEquals(275, cms.getTicks());
 		assertEquals(491144, cms.getDamage());
 
@@ -402,9 +418,9 @@ public class EventServiceTest {
 		assertEquals(205, cms.getAps());
 
 		// absorptions & healing
-		healingTakenStats = eventService.getHealingTakenStats(c, true, true, null);
+		healingTakenStats = eventService.getHealingTakenStats(c, true, true, null, parser.getCombatLog().getCharacterName());
 		assertEquals(15, healingTakenStats.size());
-		
+
 		hts = healingTakenStats.get(0);
 		assertNotNull(hts);
 	}
@@ -433,21 +449,27 @@ public class EventServiceTest {
 				parser.parseLogLine(line);
 				if (++i % 3000 == 0) {
 					eventService.flushEvents(parser.getEvents(),
-						parser.getCombats(), parser.getCurrentCombat(),
-						parser.getEffects(), parser.getCurrentEffects(),
-						parser.getPhases(), parser.getCurrentPhase(),
-						parser.getAbsorptions());
+							parser.getCombats(), parser.getCurrentCombat(),
+							parser.getEffects(), parser.getCurrentEffects(),
+							parser.getPhases(), parser.getCurrentPhase(),
+							parser.getAbsorptions(), parser.getActorStates());
 				}
 			}
 			eventService.flushEvents(parser.getEvents(),
 					parser.getCombats(), parser.getCurrentCombat(),
 					parser.getEffects(), parser.getCurrentEffects(),
 					parser.getPhases(), parser.getCurrentPhase(),
-					parser.getAbsorptions());
+					parser.getAbsorptions(), parser.getActorStates());
 
 		} finally {
-			try { br.close(); } catch (Exception ignored) {}
-			try { fr.close(); } catch (Exception ignored) {}
+			try {
+				br.close();
+			} catch (Exception ignored) {
+			}
+			try {
+				fr.close();
+			} catch (Exception ignored) {
+			}
 		}
 
 		// check result
@@ -475,61 +497,61 @@ public class EventServiceTest {
 
 		// test immutable actor/entity cache
 		assertEquals(effect.getSource(), effect.getTarget());
-		assertEquals(effect.getSource(),  effects.get(1).getSource());
-		assertEquals(effect.getEffect(),  effects.get(20).getEffect()); // another CuP
+		assertEquals(effect.getSource(), effects.get(1).getSource());
+		assertEquals(effect.getEffect(), effects.get(20).getEffect()); // another CuP
 	}
 
 	@Test
 	public void testIncremental() throws Exception {
 
 		// test data
-		final Object[] samplePairs = new Object[] {
-			new String[] {
-				"[14:14:33.877] [@Ixayly] [@Ixayly] [Aimed Shot {1117507540746240}] [Event {836045448945472}: AbilityActivate {836045448945479}] ()",
-				"[14:14:35.306] [@Ixayly] [@Ixayly] [] [Event {836045448945472}: EnterCombat {836045448945489}] ()",
-				"[14:14:35.419] [@Ixayly] [Palace Interrogator {3295433916940288}:24640000008962] [XS Freighter Flyby {2524220999335936}] [ApplyEffect {836045448945477}: Damage {836045448945501}] (6027* elemental {836045448940875}) <6027>",
-				"[14:14:40.593] [Palace Watchman {3295455391776768}:24640000009029] [@Ixayly] [Shadow Strike {3298783991431168}] [ApplyEffect {836045448945477}: Immobilized (Physical) {3298783991431428}] ()"
-			}, new Integer[][] {
+		final Object[] samplePairs = new Object[]{
+				new String[]{
+						"[14:14:33.877] [@Ixayly] [@Ixayly] [Aimed Shot {1117507540746240}] [Event {836045448945472}: AbilityActivate {836045448945479}] ()",
+						"[14:14:35.306] [@Ixayly] [@Ixayly] [] [Event {836045448945472}: EnterCombat {836045448945489}] ()",
+						"[14:14:35.419] [@Ixayly] [Palace Interrogator {3295433916940288}:24640000008962] [XS Freighter Flyby {2524220999335936}] [ApplyEffect {836045448945477}: Damage {836045448945501}] (6027* elemental {836045448940875}) <6027>",
+						"[14:14:40.593] [Palace Watchman {3295455391776768}:24640000009029] [@Ixayly] [Shadow Strike {3298783991431168}] [ApplyEffect {836045448945477}: Immobilized (Physical) {3298783991431428}] ()"
+				}, new Integer[][]{
 				{2, null}
-			}, // one combat, open from 2
-	
-			new String[] {
-				"[14:14:44.554] [@Ixayly] [Palace Watchman {3295455391776768}:24640000009029] [] [Event {836045448945472}: Death {836045448945493}] ()",
-				"[14:15:01.171] [@Ixayly] [@Ixayly] [] [Event {836045448945472}: ExitCombat {836045448945490}] ()",
-			}, new Integer[][] {
-				{2, 6}
-			}, // still the one combat, 6 is the candidate
-	
-			new String[] {
-				"[14:15:04.419] [@Ixayly] [Palace Interrogator {3295433916940288}:24640000008962] [XS Freighter Flyby {2524220999335936}] [ApplyEffect {836045448945477}: Damage {836045448945501}] (6027* elemental {836045448940875}) <6027>",
-				"[14:15:28.192] [@Ixayly] [@Ixayly] [Sprint {810670782152704}] [ApplyEffect {836045448945477}: Sprint {810670782152704}] ()"
-			}, new Integer[][] {
-				{2, 7}
-			}, // one combat, closed at 7
+		}, // one combat, open from 2
 
-			new String[] {
-				"[14:15:32.446] [@Ixayly] [@Ixayly] [] [Event {836045448945472}: EnterCombat {836045448945489}] ()",
-				"[14:15:33.282] [@Ixayly] [Palace Guardian {3295459686744064}:24640000009093] [Vital Shot {2115340112756736}] [ApplyEffect {836045448945477}: Bleeding (Tech) {2115340112756992}] ()",
-				"[14:15:34.366] [Palace Guardian {3295459686744064}:24640000009093] [@Ixayly] [Saber Reflect {3305905047207936}] [ApplyEffect {836045448945477}: Damage {836045448945501}] (2830 energy {836045448940874}(reflected {836045448953649})) <2830>",
-				"[14:15:52.595] [@Ixayly] [@Ixayly] [] [Event {836045448945472}: ExitCombat {836045448945490}] ()",
-				"[14:15:56.783] [@Evelona] [@Ixayly] [Emergency Medpac {807518276157440}] [ApplyEffect {836045448945477}: Heal {836045448945500}] (3464) <1558>", 
-				"[14:15:56.996] [@Ixayly] [@Ixayly] [] [Event {836045448945472}: LeaveCover {836045448945486}] ()",
-			}, new Integer[][] {
+				new String[]{
+						"[14:14:44.554] [@Ixayly] [Palace Watchman {3295455391776768}:24640000009029] [] [Event {836045448945472}: Death {836045448945493}] ()",
+						"[14:15:01.171] [@Ixayly] [@Ixayly] [] [Event {836045448945472}: ExitCombat {836045448945490}] ()",
+				}, new Integer[][]{
+				{2, 6}
+		}, // still the one combat, 6 is the candidate
+
+				new String[]{
+						"[14:15:04.419] [@Ixayly] [Palace Interrogator {3295433916940288}:24640000008962] [XS Freighter Flyby {2524220999335936}] [ApplyEffect {836045448945477}: Damage {836045448945501}] (6027* elemental {836045448940875}) <6027>",
+						"[14:15:28.192] [@Ixayly] [@Ixayly] [Sprint {810670782152704}] [ApplyEffect {836045448945477}: Sprint {810670782152704}] ()"
+				}, new Integer[][]{
+				{2, 7}
+		}, // one combat, closed at 7
+
+				new String[]{
+						"[14:15:32.446] [@Ixayly] [@Ixayly] [] [Event {836045448945472}: EnterCombat {836045448945489}] ()",
+						"[14:15:33.282] [@Ixayly] [Palace Guardian {3295459686744064}:24640000009093] [Vital Shot {2115340112756736}] [ApplyEffect {836045448945477}: Bleeding (Tech) {2115340112756992}] ()",
+						"[14:15:34.366] [Palace Guardian {3295459686744064}:24640000009093] [@Ixayly] [Saber Reflect {3305905047207936}] [ApplyEffect {836045448945477}: Damage {836045448945501}] (2830 energy {836045448940874}(reflected {836045448953649})) <2830>",
+						"[14:15:52.595] [@Ixayly] [@Ixayly] [] [Event {836045448945472}: ExitCombat {836045448945490}] ()",
+						"[14:15:56.783] [@Evelona] [@Ixayly] [Emergency Medpac {807518276157440}] [ApplyEffect {836045448945477}: Heal {836045448945500}] (3464) <1558>",
+						"[14:15:56.996] [@Ixayly] [@Ixayly] [] [Event {836045448945472}: LeaveCover {836045448945486}] ()",
+				}, new Integer[][]{
 				{2, 7},
 				{9, 12}
-			}, // two combats, last from 9 to 12, already closed
-			
-			new String[] {
-				"[21:14:49.052] [@Ixard] [@Ixard] [] [Event {836045448945472}: EnterCombat {836045448945489}] ()",
-				"[21:14:49.077] [@Ixard] [@Ixard] [Riot Strike {2204391964672000}] [Event {836045448945472}: AbilityActivate {836045448945479}] ()",
-				"[21:14:49.078] [@Ixard] [@Ixard] [Sprint {810670782152704}] [RemoveEffect {836045448945478}: Sprint {810670782152704}] ()",
-				"[21:14:50.318] [@Ixard] [Operations Training Dummy {2857785339412480}:144003109767] [Riot Strike {2204391964672000}] [Event {836045448945472}: ModifyThreat {836045448945483}] () <1>",
-				"[21:14:58.358] [@Ixard] [@Ixard] [] [Event {836045448945472}: ExitCombat {836045448945490}] ()",
-			}, new Integer[][] {
+		}, // two combats, last from 9 to 12, already closed
+
+				new String[]{
+						"[21:14:49.052] [@Ixayly] [@Ixayly] [] [Event {836045448945472}: EnterCombat {836045448945489}] ()",
+						"[21:14:49.077] [@Ixayly] [@Ixayly] [Riot Strike {2204391964672000}] [Event {836045448945472}: AbilityActivate {836045448945479}] ()",
+						"[21:14:49.078] [@Ixayly] [@Ixayly] [Sprint {810670782152704}] [RemoveEffect {836045448945478}: Sprint {810670782152704}] ()",
+						"[21:14:50.318] [@Ixayly] [Operations Training Dummy {2857785339412480}:144003109767] [Riot Strike {2204391964672000}] [Event {836045448945472}: ModifyThreat {836045448945483}] () <1>",
+						"[21:14:58.358] [@Ixayly] [@Ixayly] [] [Event {836045448945472}: ExitCombat {836045448945490}] ()",
+				}, new Integer[][]{
 				{2, 7},
 				{9, 12},
 				{15, 19}
-			} // new combat, ended instantly
+		} // new combat, ended instantly
 		};
 
 		parser.setCombatLogFile(new File("combat_2014-01-26_22_01_13_435268.txt"));
@@ -537,7 +559,7 @@ public class EventServiceTest {
 		Combat c;
 		List<Combat> list;
 		for (int j = 0; j < samplePairs.length; j += 2) {
-			String msg = "Set "+(j/2 + 1)+" failed";
+			String msg = "Set " + (j / 2 + 1) + " failed";
 			for (int i = 0; i < ((String[]) samplePairs[j]).length; i++) {
 				parser.parseLogLine(((String[]) samplePairs[j])[i]);
 			}
@@ -547,7 +569,7 @@ public class EventServiceTest {
 					parser.getCombats(), parser.getCurrentCombat(),
 					parser.getEffects(), parser.getCurrentEffects(),
 					parser.getPhases(), parser.getCurrentPhase(),
-					parser.getAbsorptions());
+					parser.getAbsorptions(), parser.getActorStates());
 
 			// and fetch immediately
 			list = eventService.getCombats();
@@ -555,8 +577,8 @@ public class EventServiceTest {
 			assertEquals(msg, ((Integer[][]) samplePairs[j + 1]).length, list.size());
 			for (int k = 0; k < list.size(); k++) {
 				c = list.get(k);
-				assertEquals(msg + ", combat "+k, ((Integer[][]) samplePairs[j + 1])[k][0], Integer.valueOf(c.getEventIdFrom()));
-				assertEquals(msg + ", combat "+k, ((Integer[][]) samplePairs[j + 1])[k][1], c.getEventIdTo());
+				assertEquals(msg + ", combat " + k, ((Integer[][]) samplePairs[j + 1])[k][0], Integer.valueOf(c.getEventIdFrom()));
+				assertEquals(msg + ", combat " + k, ((Integer[][]) samplePairs[j + 1])[k][1], c.getEventIdTo());
 			}
 		}
 	}
@@ -564,32 +586,32 @@ public class EventServiceTest {
 	@Test
 	public void testEffectsIncremental() throws Exception {
 		// test data
-		final Object[] samplePairs = new Object[] {
-			new String[] {
-				"[03:14:35.306] [@Ixayla] [@Ixayla] [] [Event {836045448945472}: EnterCombat {836045448945489}] ()",
-	
-				"[03:50:49.304] [@Ixayla] [@Ixayla] [Trauma Probe {999516199190528}] [Event {836045448945472}: AbilityActivate {836045448945479}] ()",
-				"[03:50:49.304] [@Ixayla] [@Athéna] [Trauma Probe {999516199190528}] [ApplyEffect {836045448945477}: Trauma Probe {999516199190528}] ()",
+		final Object[] samplePairs = new Object[]{
+				new String[]{
+						"[03:14:35.306] [@Ixayla] [@Ixayla] [] [Event {836045448945472}: EnterCombat {836045448945489}] ()",
 
-				"[04:01:37.488] [@Ixayla] [@Ixayla] [Trauma Probe {999516199190528}] [Event {836045448945472}: AbilityActivate {836045448945479}] ()",
-				"[04:01:37.488] [@Ixayla] [@Athéna] [Trauma Probe {999516199190528}] [ApplyEffect {836045448945477}: Trauma Probe {999516199190528}] ()",
+						"[03:50:49.304] [@Ixayla] [@Ixayla] [Trauma Probe {999516199190528}] [Event {836045448945472}: AbilityActivate {836045448945479}] ()",
+						"[03:50:49.304] [@Ixayla] [@Athéna] [Trauma Probe {999516199190528}] [ApplyEffect {836045448945477}: Trauma Probe {999516199190528}] ()",
 
-				"[04:06:54.388] [@Ixayla] [@Athéna] [Trauma Probe {999516199190528}] [ApplyEffect {836045448945477}: Heal {836045448945500}] (2056*) <925>",
+						"[04:01:37.488] [@Ixayla] [@Ixayla] [Trauma Probe {999516199190528}] [Event {836045448945472}: AbilityActivate {836045448945479}] ()",
+						"[04:01:37.488] [@Ixayla] [@Athéna] [Trauma Probe {999516199190528}] [ApplyEffect {836045448945477}: Trauma Probe {999516199190528}] ()",
 
-				"[04:12:54.015] [@Ixayla] [@Athéna] [Trauma Probe {999516199190528}] [RemoveEffect {836045448945478}: Trauma Probe {999516199190528}] ()"
-			}, new Integer[][] {
+						"[04:06:54.388] [@Ixayla] [@Athéna] [Trauma Probe {999516199190528}] [ApplyEffect {836045448945477}: Heal {836045448945500}] (2056*) <925>",
+
+						"[04:12:54.015] [@Ixayla] [@Athéna] [Trauma Probe {999516199190528}] [RemoveEffect {836045448945478}: Trauma Probe {999516199190528}] ()"
+				}, new Integer[][]{
 				{3, null},
 				{5, 7}
-			} // two effects
+		} // two effects
 		};
 
 		parser.setCombatLogFile(new File("combat_2014-01-26_22_01_13_435268.txt"));
-		
+
 		List<Combat> combats;
 		List<Effect> effects;
 		Effect effect;
 		for (int j = 0; j < samplePairs.length; j += 2) {
-			String msg = "Set "+(j/2 + 1)+" failed";
+			String msg = "Set " + (j / 2 + 1) + " failed";
 
 			for (int i = 0; i < ((String[]) samplePairs[j]).length; i++) {
 				parser.parseLogLine(((String[]) samplePairs[j])[i]);
@@ -600,7 +622,7 @@ public class EventServiceTest {
 					parser.getCombats(), parser.getCurrentCombat(),
 					parser.getEffects(), parser.getCurrentEffects(),
 					parser.getPhases(), parser.getCurrentPhase(),
-					parser.getAbsorptions());
+					parser.getAbsorptions(), parser.getActorStates());
 
 			// and fetch immediately
 			combats = eventService.getCombats();
@@ -609,8 +631,73 @@ public class EventServiceTest {
 			assertEquals(msg, ((Integer[][]) samplePairs[j + 1]).length, effects.size());
 			for (int k = 0; k < effects.size(); k++) {
 				effect = effects.get(k);
-				assertEquals(msg + ", effect "+k, ((Integer[][]) samplePairs[j + 1])[k][0], Integer.valueOf(effect.getEventIdFrom()));
-				assertEquals(msg + ", effect "+k, ((Integer[][]) samplePairs[j + 1])[k][1], effect.getEventIdTo());
+				assertEquals(msg + ", effect " + k, ((Integer[][]) samplePairs[j + 1])[k][0], Integer.valueOf(effect.getEventIdFrom()));
+				assertEquals(msg + ", effect " + k, ((Integer[][]) samplePairs[j + 1])[k][1], effect.getEventIdTo());
+			}
+		}
+	}
+
+	@Test
+	public void testOverlappingAbsorbs() throws Exception {
+		// test data
+		final Object[] samplePairs = new Object[]{
+				new String[]{
+						"[21:17:14.248] [@Senarî#689198525926986|(63.84,1553.43,229.43,180.00)|(392212/406515)] [] [] [AreaEntered {836045448953664}: Valley of the Machine Gods {833571547775765} 8 Player Veteran {836045448953652}] (HE600) <v7.0.0b>",
+						"[21:17:36.495] [@Senarî#689198525926986|(810.56,2055.88,239.14,166.28)|(406515/406515)] [] [] [Event {836045448945472}: EnterCombat {836045448945489}]",
+						"[21:17:36.495] [@Senarî#689198525926986|(809.48,2082.54,242.24,-179.53)|(370571/370571)] [] [] [DisciplineChanged {836045448953665}: Sniper {16141046347418927959}/Engineering {2031339142381592}]",
+						// dampers up - 3
+						"[21:17:39.324] [@Senarî#689198525926986|(808.77,2093.91,244.88,-191.16)|(370571/370571)] [=] [Ballistic Dampers {3394012006318080}] [ApplyEffect {836045448945477}: Ballistic Dampers {3394012006318080}] (3 charges {836045448953667})",
+						// probe up
+						"[21:17:39.418] [@Senarî#689198525926986|(808.77,2093.91,244.88,-191.16)|(370571/370571)] [=] [Shield Probe {784716294782976}] [Event {836045448945472}: AbilityActivate {836045448945479}]",
+						"[21:17:39.418] [@Senarî#689198525926986|(808.77,2093.91,244.88,-191.16)|(370571/370571)] [=] [Shield Probe {784716294782976}] [ApplyEffect {836045448945477}: Shield Probe {784716294782976}]",
+						// -- probe 60% (!?), charges incorrect
+						"[21:17:41.002] [@Senarî#689198525926986|(808.76,2093.89,244.88,-191.16)|(370571/370571)] [] [Ballistic Dampers {3394012006318080}] [ModifyCharges {836045448953666}: Ballistic Dampers {3394012006318080}] (2 charges {836045448953667})",
+						"[21:17:41.115] [Scour Droid {4075842359525376}:2869000007497|(810.37,2102.05,244.91,-17.07)|(338070/375723)] [@Senarî#689198525926986|(808.76,2093.89,244.88,-191.16)|(370571/370571)] [Freezing Beam {4075859539394560}] [ApplyEffect {836045448945477}: Damage {836045448945501}] (14387 ~0 kinetic {836045448940873} (10071 absorbed {836045448945511})) <14387>",
+						// probe down
+						"[21:17:49.523] [@Senarî#689198525926986|(808.76,2093.89,244.88,173.53)|(370571/370571)] [=] [Shield Probe {784716294782976}] [RemoveEffect {836045448945478}: Shield Probe {784716294782976}]",
+						// -- dampers 30%, charges incorrect
+						"[21:17:50.799] [@Senarî#689198525926986|(808.76,2093.89,244.88,173.53)|(363046/370571)] [] [Ballistic Dampers {3394012006318080}] [ModifyCharges {836045448953666}: Ballistic Dampers {3394012006318080}] (1 charges {836045448953667})",
+						"[21:17:50.888] [Scour Droid {4075842359525376}:2869000007497|(810.54,2102.73,244.91,31.30)|(137081/375723)] [@Senarî#689198525926986|(808.76,2093.89,244.88,173.29)|(363046/370571)] [Explosive Round {4075863834361856}] [ApplyEffect {836045448945477}: Damage {836045448945501}] (10750 ~7525 kinetic {836045448940873} (3225 absorbed {836045448945511})) <10750>",
+						// dampers down
+						"[21:17:56.759] [@Senarî#689198525926986|(808.76,2093.89,244.88,168.44)|(363416/370571)] [=] [Ballistic Dampers {3394012006318080}] [RemoveEffect {836045448945478}: Ballistic Dampers {3394012006318080}]",
+						// -- dampers 30%, charges incorrect
+						"[21:17:56.977] [Magma Droid {4068373411397632}:2869000007309|(806.50,2104.71,244.92,-11.86)|(867987/1225625)] [@Senarî#689198525926986|(808.76,2093.89,244.88,168.44)|(363416/370571)] [Ranged Attack {4070503715176448}] [ApplyEffect {836045448945477}: Damage {836045448945501}] (5111 ~3577 kinetic {836045448940873} (1533 absorbed {836045448945511})) <5111>",
+						// -- dampers 30%, charges incorrect
+						"[21:17:58.318] [Magma Droid {4068373411397632}:2869000007309|(807.17,2101.64,244.91,-11.74)|(833754/1225625)] [@Senarî#689198525926986|(808.76,2093.89,244.88,168.44)|(365003/370571)] [Ranged Attack {4070503715176448}] [ApplyEffect {836045448945477}: Damage {836045448945501}] (5111 ~3577 kinetic {836045448940873} (1533 absorbed {836045448945511})) <5111>"
+				}, new Integer[][]{
+				{2, 10},
+				{4, 7}
+		} // two effects
+		};
+
+		parser.setCombatLogFile(new File("combat_2021-12-01_22_01_13_435268.txt"));
+
+		List<Combat> combats;
+		List<Effect> effects;
+		Effect effect;
+		for (int j = 0; j < samplePairs.length; j += 2) {
+			String msg = "Set " + (j / 2 + 1) + " failed";
+
+			for (int i = 0; i < ((String[]) samplePairs[j]).length; i++) {
+				parser.parseLogLine(((String[]) samplePairs[j])[i]);
+			}
+
+			// save
+			eventService.flushEvents(parser.getEvents(),
+					parser.getCombats(), parser.getCurrentCombat(),
+					parser.getEffects(), parser.getCurrentEffects(),
+					parser.getPhases(), parser.getCurrentPhase(),
+					parser.getAbsorptions(), parser.getActorStates());
+
+			// and fetch immediately
+			combats = eventService.getCombats();
+			effects = eventService.getCombatEffects(combats.get(0), null);
+
+			assertEquals(msg, ((Integer[][]) samplePairs[j + 1]).length, effects.size());
+			for (int k = 0; k < effects.size(); k++) {
+				effect = effects.get(k);
+				assertEquals(msg + ", effect " + k, ((Integer[][]) samplePairs[j + 1])[k][0], Integer.valueOf(effect.getEventIdFrom()));
+				assertEquals(msg + ", effect " + k, ((Integer[][]) samplePairs[j + 1])[k][1], effect.getEventIdTo());
 			}
 		}
 	}

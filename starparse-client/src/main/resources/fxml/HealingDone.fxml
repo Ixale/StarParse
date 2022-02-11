@@ -8,7 +8,6 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<?scenebuilder-stylesheet ../styles.css?>
 
 <VBox id="overviewRoot" fx:id="root" fillWidth="true" prefHeight="-1.0" prefWidth="-1.0" spacing="0.0" styleClass="content" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.ixale.starparse.gui.main.HealingDonePresenter">
   <children>
@@ -47,6 +46,14 @@
         <TableColumn editable="false" maxWidth="45.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="HPS" fx:id="hpsCol" />
         <TableColumn editable="false" maxWidth="45.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="EHPS" fx:id="ehpsCol" />
         <TableColumn editable="false" maxWidth="60.0" minWidth="60.0" prefWidth="60.0" resizable="false" text="Total" fx:id="totalCol" />
+
+        <TableColumn editable="false" resizable="false"  text="Absorbed">
+          <columns>
+            <TableColumn editable="false" maxWidth="60.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="APS" fx:id="apsCol" />
+            <TableColumn editable="false" maxWidth="60.0" minWidth="40.0" prefWidth="40.0" resizable="false" text="Total" fx:id="absorbedCol" />
+          </columns>
+        </TableColumn>
+
         <TableColumn editable="false" maxWidth="100.0" minWidth="60.0" prefWidth="60.0" resizable="false" text="Total %" fx:id="pctTotalCol" />
       </columns>
     </TableView>

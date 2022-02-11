@@ -12,24 +12,20 @@ import com.ixale.starparse.gui.Format;
 public class NumberCellFactory<T> implements Callback<TableColumn<T, Integer>, TableCell<T, Integer>> {
 
 	final protected boolean isEmptyOnZero, isThousands;
-	final protected Paint color;
+	final protected String className;
 
 	public NumberCellFactory() {
 		this(false, null, false);
 	}
 
-	public NumberCellFactory(boolean isEmptyOnZero, final String color) {
-		this(isEmptyOnZero, color, false);
+	public NumberCellFactory(boolean isEmptyOnZero, final String className) {
+		this(isEmptyOnZero, className, false);
 	}
 
-	public NumberCellFactory(boolean isEmptyOnZero, final String color, boolean isThousands) {
+	public NumberCellFactory(boolean isEmptyOnZero, final String className, boolean isThousands) {
 		this.isEmptyOnZero = isEmptyOnZero;
 		this.isThousands = isThousands;
-		if (color != null) {
-			this.color = Paint.valueOf(color);
-		} else {
-			this.color = null;
-		}
+		this.className = className;
 	}
 
 	@Override
@@ -40,11 +36,7 @@ public class NumberCellFactory<T> implements Callback<TableColumn<T, Integer>, T
 	class Cell extends TableCell<T, Integer> {
 		public Cell() {
 			setAlignment(Pos.CENTER_RIGHT);
-			if (color != null) {
-				setTextFill(color);
-			} else {
-				setTextFill(Color.BLACK);
-			}
+			getStyleClass().set(0, className);
 		}
 
 		@Override
@@ -62,5 +54,7 @@ public class NumberCellFactory<T> implements Callback<TableColumn<T, Integer>, T
 				}
 			}
 		}
-	};
+	}
+
+	;
 };

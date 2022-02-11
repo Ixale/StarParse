@@ -17,16 +17,16 @@ public class RaidTimeCellFactory implements Callback<TableColumn<RaidItem, Integ
 		return new Cell();
 	}
 
-	class Cell extends TableCell<RaidItem, Integer> {
+	static class Cell extends TableCell<RaidItem, Integer> {
 
 		public Cell() {
 			setAlignment(Pos.CENTER_RIGHT);
-			setTextFill(Color.BLACK);
 		}
 
 		@Override
 		public void updateItem(Integer item, boolean empty) {
 			super.updateItem(item, empty);
+			getStyleClass().remove("damage-dealt");
 
 			if (empty || item == null) {
 				setText(null);
@@ -35,9 +35,7 @@ public class RaidTimeCellFactory implements Callback<TableColumn<RaidItem, Integ
 			setText(Format.formatTime(item));
 			final RaidItem i = getTableView().getItems().get(getIndex());
 			if (i.getMessage() != null && Event.Type.DEATH.equals(i.getMessage().getExitEvent())) {
-				setTextFill(Color.MAROON);
-			} else {
-				setTextFill(Color.BLACK);
+				getStyleClass().add("damage-dealt");
 			}
 		}
 	};

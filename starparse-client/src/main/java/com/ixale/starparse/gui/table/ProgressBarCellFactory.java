@@ -23,6 +23,10 @@ public class ProgressBarCellFactory<T> implements Callback<TableColumn<T, Double
 		private Text txt = new Text();
 		private StackPane pane = new StackPane(pb, txt);
 
+		public Cell() {
+			txt.getStyleClass().add("progress-bar-text");
+		}
+
 		@Override
 		public void updateItem(Double item, boolean empty) {
 			super.updateItem(item, empty);

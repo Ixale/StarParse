@@ -1,27 +1,26 @@
 package com.ixale.starparse.service.impl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import com.esotericsoftware.kryo.io.ByteBufferInput;
 import com.esotericsoftware.kryo.io.Output;
 import com.ixale.starparse.domain.RaidRequest;
 import com.ixale.starparse.domain.stats.CombatLogStats;
 import com.ixale.starparse.domain.stats.RaidCombatStats;
+import com.ixale.starparse.gui.Format;
 import com.ixale.starparse.gui.Marshaller;
 import com.ixale.starparse.serialization.KryoSerialization;
 import com.ixale.starparse.service.RaidService;
 import com.ixale.starparse.ws.RaidCombatMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 
 @Service("raidService")
 public class RaidServiceImpl implements RaidService {
@@ -33,18 +32,19 @@ public class RaidServiceImpl implements RaidService {
 	private static final String REQUEST_FILE_PATTERN = STATS_DIR + "/%s.dat";
 	private static final int MAX_STORE_INTERVAL = 2 * 60 * 1000;
 
-	final HashMap<String, HashMap<Integer, HashMap<String, RaidCombatMessage>>> localCache = new HashMap<String, HashMap<Integer, HashMap<String, RaidCombatMessage>>>();
+	final HashMap<String, HashMap<Integer, HashMap<String, RaidCombatMessage>>> localCache = new HashMap<>();
 
-	final HashMap<String, String> fileNames = new HashMap<String, String>();
+	final HashMap<String, String> fileNames = new HashMap<>();
 
 	private Long lastStoreTime = null;
-	private final ArrayList<String> dirtyLogs = new ArrayList<String>();
+	private final ArrayList<String> dirtyLogs = new ArrayList<>();
 	private String lastCombatLogName = null;
 
 	public RaidServiceImpl() {
 		try {
 			File f = new File(STATS_DIR);
 			if (!f.exists()) {
+				//noinspection ResultOfMethodCallIgnored
 				f.mkdir();
 			}
 		} catch (Exception e) {
@@ -56,10 +56,10 @@ public class RaidServiceImpl implements RaidService {
 	public void storeCombatUpdate(final String combatLogName, int combatId, RaidCombatMessage message) {
 
 		if (!localCache.containsKey(combatLogName)) {
-			localCache.put(combatLogName, new HashMap<Integer, HashMap<String, RaidCombatMessage>>());
+			localCache.put(combatLogName, new HashMap<>());
 		}
 		if (!localCache.get(combatLogName).containsKey(combatId)) {
-			localCache.get(combatLogName).put(combatId, new HashMap<String, RaidCombatMessage>());
+			localCache.get(combatLogName).put(combatId, new HashMap<>());
 		}
 
 		localCache.get(combatLogName).get(combatId).put(message.getCharacterName(), message);
@@ -96,12 +96,30 @@ public class RaidServiceImpl implements RaidService {
 		final CombatLogStats combatLogStats = new CombatLogStats();
 		combatLogStats.setCombatLogName(combatLogName);
 
-		for (Integer combatId: localCache.get(combatLogName).keySet()) {
+		for (Integer combatId : localCache.get(combatLogName).keySet()) {
+			int players = 0;
+			for (final RaidCombatMessage m : localCache.get(combatLogName).get(combatId).values()) {
+				if (Format.isFakePlayerName(m.getCharacterName())) {
+					continue;
+				}
+				players++;
+				if (players > 1) {
+					break; // two real players, proceed with saving
+				}
+			}
+			if (players < 2) {
+				// fake players only
+				continue;
+			}
 			final RaidCombatStats stats = new RaidCombatStats();
 			stats.setCombatId(combatId);
 			stats.getCombatStats().addAll(localCache.get(combatLogName).get(combatId).values());
 
 			combatLogStats.getRaids().add(stats);
+		}
+		if (combatLogStats.getRaids().isEmpty()) {
+			// local parsing only
+			return;
 		}
 
 		if (Marshaller.storeToFile(combatLogStats, getLocalFileName(combatLogName))) {
@@ -120,11 +138,11 @@ public class RaidServiceImpl implements RaidService {
 			return;
 		}
 
-		localCache.put(combatLogName, new HashMap<Integer, HashMap<String, RaidCombatMessage>>());
+		localCache.put(combatLogName, new HashMap<>());
 
-		for (final RaidCombatStats stats: combatLogStats.getRaids()) {
-			final HashMap<String, RaidCombatMessage> messages = new HashMap<String, RaidCombatMessage>();
-			for (final RaidCombatMessage message: stats.getCombatStats()) {
+		for (final RaidCombatStats stats : combatLogStats.getRaids()) {
+			final HashMap<String, RaidCombatMessage> messages = new HashMap<>();
+			for (final RaidCombatMessage message : stats.getCombatStats()) {
 				messages.put(message.getCharacterName(), message);
 			}
 			localCache.get(combatLogName).put(stats.getCombatId(), messages);
@@ -193,18 +211,12 @@ public class RaidServiceImpl implements RaidService {
 			throw new IllegalArgumentException("Content is empty");
 		}
 
-		ByteBufferInput bis = null;
-		try {
-			bis = new ByteBufferInput(payload);
+		try (ByteBufferInput bis = new ByteBufferInput(payload)) {
 			return (T) KryoSerialization.getKryo().readClassAndObject(bis);
 
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Unable to decode: " + e.getMessage(), e);
 
-		} finally {
-			if (bis != null) {
-				bis.close();
-			}
 		}
 	}
 
@@ -213,10 +225,8 @@ public class RaidServiceImpl implements RaidService {
 			throw new IllegalArgumentException("Content is empty");
 		}
 
-		ByteArrayOutputStream bos = null;
-		Output output = null;
-		try {
-			bos = new ByteArrayOutputStream();
+		Output output;
+		try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
 			output = new Output(bos);
 
 			KryoSerialization.getKryo().writeClassAndObject(output, response);
@@ -227,13 +237,6 @@ public class RaidServiceImpl implements RaidService {
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Unable to encode: " + e.getMessage(), e);
 
-		} finally {
-			if (bos != null) {
-				try {
-					bos.close();
-				} catch (IOException e) {
-				}
-			}
 		}
 	}
 }

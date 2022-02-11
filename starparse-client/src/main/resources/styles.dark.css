@@ -1,0 +1,735 @@
+.root {
+    -fx-base: #191919;
+    -fx-background: derive(-fx-base, 5%);
+    -fx-accent: #1e74c6;
+    -fx-default-button: -fx-accent;
+    -fx-focus-color: #1e74c6;
+    -fx-faint-focus-color: transparent;
+    -fx-control-inner-background: derive(-fx-base, 5%);
+    -fx-control-inner-background-alt: derive(-fx-base, 10%);
+
+    -fx-dark-text-color: #888; /*#888;*/
+    -fx-mid-text-color: #ddd; /*#ddd;*/
+    -fx-light-text-color: #ccc; /*rgb(217, 217, 217);*/
+    -fx-table-color: #ddd; /*-fx-light-text-color;*/
+
+    -fx-black-line-color: #060606;
+    -fx-mid-line-color: derive(-fx-base, 26.4%);
+    -fx-light-line-color: derive(-fx-base, 15%);;
+    -fx-background-gradient: linear-gradient(from 0% 0% to 0% 100%, -fx-base 0%, -fx-black-line-color 100%);
+    -fx-soft-text: #c8c8c8;
+    -fx-light-text-alt: #e1e1e1;
+    -fx-loader-color: -fx-accent;
+    -fx-backdrop: rgba(0, 0, 0, 0.5);
+    /*-fx-backdrop: rgba(30, 116, 198, 0.5);*/
+
+    -fx-damage: derive(maroon, +75%);
+    -fx-heal: DarkSeaGreen;
+    -fx-heal-eff: LimeGreen;
+    -fx-threat: Goldenrod;
+    -fx-absorb: #30cccd;
+    -fx-damage-taken: #cd31cc;
+    -fx-mitigation: #cd31cc;
+}
+
+.label {
+    -fx-text-fill: -fx-mid-text-color;
+}
+
+.text-field {
+    -fx-prompt-text-fill: -fx-dark-text-color;
+}
+
+.button {
+    -fx-focus-traversable: false;
+}
+
+.button:hover {
+    -fx-text-fill: -fx-light-text-color;
+}
+
+.table-view .column-header .label {
+    -fx-font-weight: none;
+}
+
+/**
+ SP
+ */
+
+#root {
+}
+
+#header {
+    -fx-background-color: -fx-background-gradient;
+    -fx-border-width: 0 0 1px 0;
+    -fx-border-color: -fx-black-line-color;
+}
+
+#buttons .toggle-button,
+#toolbar .button {
+    -fx-border-width: 0;
+    -fx-background-insets: 0;
+}
+
+#toolbar #darkModeButton {
+    -fx-base: #333;
+}
+
+#buttons .toggle-button:hover,
+#toolbar .button:hover,
+#toolbar #darkModeButton:hover {
+}
+
+#buttons .toggle-button:selected {
+}
+
+#buttons .toggle-button-inter:selected {
+}
+
+#logo {
+    -fx-opacity: .6;
+}
+
+.menu-bar {
+}
+
+.context-menu {
+    -fx-background-color:
+            derive(-fx-color, 0%), /* border outer */
+            derive(-fx-color, +40%), /* border inner */
+            derive(-fx-color, +20%);
+}
+
+.menu-bar .menu-item > .label,
+.check-item {
+}
+
+.menu-bar .menu-item:focused > .label,
+.check-item:hover {
+}
+
+#characterName .separator > .line,
+.menu-bar .separator > .line {
+    -fx-border-color: derive(-fx-mid-line-color, +20%) transparent transparent transparent;
+}
+
+.label-separator .line {
+    -fx-border-color: derive(-fx-mid-line-color, +20%);
+}
+
+.label-separator .label {
+    -fx-text-fill: derive(-fx-mid-line-color, +60%);
+}
+
+Text {
+    -fx-fill: -fx-light-text-color;
+}
+
+/**
+ * Combat header
+ */
+
+.combat-head {
+    -fx-background-color: -fx-background;
+}
+
+.tab-pane {
+    -fx-background-color: -fx-control-inner-background-alt;
+    -fx-border-width: 0;
+}
+
+.tab-pane .tab-header-background {
+    -fx-background-color: -fx-background;
+    -fx-border-width: 0 0 1px 0;
+    -fx-border-color: -fx-black-line-color;
+    -fx-effect: null;
+}
+
+.tab-pane .tab .tab-label {
+    -fx-text-fill: -fx-dark-text-color;
+}
+
+.tab-pane .tab:selected .tab-label,
+.tab-pane .tab:hover .tab-label {
+    -fx-text-fill: -fx-light-text-color;
+    -fx-cursor: hand;
+}
+
+#combat-list-menu {
+    -fx-border-color: -fx-black-line-color -fx-black-line-color -fx-black-line-color -fx-black-line-color;
+}
+
+#characterPane, #headCombat {
+    -fx-border-color: -fx-black-line-color -fx-black-line-color -fx-black-line-color -fx-black-line-color;
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, -fx-base 0%, -fx-background 100%);
+}
+
+#combatName, #combatTime, #characterName {
+}
+
+#combatName {
+}
+
+.combat-time {
+    -fx-text-fill: -fx-soft-text;
+}
+
+#characterName {
+    -fx-text-fill: -fx-light-text-alt;
+}
+
+#trashButton {
+}
+
+.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+}
+
+/**
+ * Timeline
+ */
+
+.timeline-axis {
+    -fx-stroke: -fx-mid-line-color;
+}
+
+.timeline-handle {
+    -fx-stroke: -fx-mid-line-color;
+    -fx-stroke-type: outside;
+    -fx-fill: -fx-dark-text-color;
+}
+
+.timeline-handle-inner {
+    -fx-fill: derive(-fx-soft-text, -40%);
+}
+
+.timeline-phase {
+    -fx-background-color: derive(-fx-soft-text, -40%);
+    /*-fx-border-color: -fx-soft-text -fx-black-line-color -fx-soft-text #ddd;*/
+}
+
+.timeline-phase-damage {
+}
+
+.timeline-phase-label {
+    -fx-text-fill: -fx-light-text-alt;
+}
+
+.timeline-phase-hover {
+    -fx-background-color: #0093ff;
+    -fx-opacity: .5;
+}
+
+.timeline-phase-damage.timeline-phase-hover {
+}
+
+.timeline-phase-selected {
+    -fx-background-color: -fx-background-selected;
+}
+
+.timeline-phase-damage.timeline-phase-selected {
+    -fx-background-color: linear-gradient(-fx-damage 0%, maroon 100%);
+    -fx-opacity: .6;
+}
+
+.timeline-phase-label-selected {
+    -fx-text-fill: -fx-light-text-alt;
+}
+
+.timeline-tick-line {
+    -fx-stroke: -fx-mid-line-color;
+}
+
+.timeline-handle-label {
+    -fx-fill: -fx-mid-text-color;
+    -fx-font-weight: bold;
+}
+
+.timeline-handle-sign {
+    -fx-background-color: derive(-fx-background, +10%);
+    -fx-border-color: -fx-black-line-color;
+}
+
+.timeline-tick {
+    -fx-fill: -fx-soft-text;
+}
+
+/**
+ * Bottom status
+ */
+
+#status {
+    -fx-border-color: -fx-black-line-color;
+    -fx-background-color: -fx-background-gradient;
+}
+
+#statusMessage {
+    -fx-text-fill: -fx-dark-text-color;
+}
+
+#resizer {
+    -fx-fill: transparent;
+}
+
+#linkDonate, #linkTwitter {
+    -fx-text-fill: -fx-dark-text-color;
+}
+
+/**
+ * Tables
+ */
+
+.list-view,
+.list-view:focused {
+    -fx-border-color: -fx-black-line-color;
+}
+
+.list-cell {
+    -fx-border-color: transparent;
+}
+
+.combo-box .list-cell { /* java7 */
+}
+
+.list-cell .label {
+}
+
+.list-view .scroll-bar:horizontal .increment-arrow,
+.list-view .scroll-bar:horizontal .decrement-arrow,
+.list-view .scroll-bar:horizontal .increment-button,
+.list-view .scroll-bar:horizontal .decrement-button {
+}
+
+.list-cell:even { /* <=== changed to even */
+}
+
+.list-cell:filled:selected:focused,
+.list-cell:filled:selected,
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover,
+.menu-bar .menu-item:hover {
+}
+
+.list-cell:filled:hover,
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
+}
+
+.list-cell .combat-title.label {
+    -fx-text-fill: -fx-soft-text;
+}
+
+.list-cell .combat-time.label {
+    -fx-text-fill: derive(-fx-soft-text, -30%);
+}
+
+.list-cell.combat-pvp .combat-title.label {
+}
+
+.list-cell.combat-boss .combat-title.label {
+    -fx-text-fill: -fx-light-text-alt;
+}
+
+.list-cell:filled:hover .combat-title.label,
+.list-cell:filled:selected:focused .combat-title.label,
+.list-cell:filled:selected .combat-title.label,
+.list-cell:filled:hover .combat-time.label,
+.list-cell:filled:selected:focused .combat-time.label,
+.list-cell:filled:selected .combat-time.label {
+    -fx-text-fill: -fx-light-text-alt;
+}
+
+.content {
+    -fx-background-color: -fx-background;
+}
+
+.combat-stats {
+    -fx-background-color: -fx-base;
+    -fx-border-color: -fx-base -fx-black-line-color -fx-base -fx-black-line-color;
+    -fx-fill: -fx-soft-text;
+}
+
+.combat-stats .ps, .total-damage, .total-healing {
+    -fx-font-weight: bold;
+}
+
+.combat-stats .damage, .total-damage {
+}
+
+.combat-stats .damage2 {
+}
+
+.combat-stats .healing {
+}
+
+.combat-stats .healing-eff, .total-healing {
+}
+
+.combat-stats .threat {
+}
+
+.combat-stats .absorbed {
+}
+
+.combat-stats .apm,
+.combat-stats .apm .text,
+.combat-stats .damage,
+.combat-stats .healing,
+.combat-stats .healing-eff,
+.combat-stats .threat,
+.combat-stats .absorbed {
+    -fx-fill: -fx-soft-text;
+}
+
+.combat-stats .taken {
+}
+
+/***
+ * Panes
+ */
+
+.scroll-pane {
+    -fx-border-width: 0;
+    /*-fx-background-color: -fx-black-line-color;*/
+}
+
+.scroll-pane:focused {
+}
+
+/**
+ * Tables
+ */
+
+.table-row-cell:empty {
+}
+
+.table-row-cell:empty .table-cell {
+}
+
+.table-view {
+    -fx-background-color: -fx-base; /*effectively background for empty */
+    -fx-border-color: -fx-black-line-color;
+}
+
+.table-view .column-header .label {
+}
+
+.table-cell {
+    -fx-text-fill: -fx-table-color;
+}
+
+.table-view .table-cell:focused:selected .text {
+    /* this will prevent the default "white" color from being used */
+}
+
+.table-view .damage-dealt {
+}
+
+.table-view .damage-taken {
+}
+
+.table-view .healing-done {
+}
+
+.table-view .healing-eff-done {
+}
+
+.table-view .threat {
+}
+
+.table-view .absorbed {
+}
+
+.table-view .healing-taken {
+}
+
+.table-view .mitigated {
+}
+
+#root .table-view .table-row-cell:filled:hover {
+    -fx-background-color: derive(-fx-threat, -60%);
+}
+
+#root .table-view .table-row-cell:filled:selected {
+    -fx-background-color: derive(-fx-threat, -50%);
+}
+
+.progress-bar-text {
+    -fx-fill: -fx-light-text-color;
+}
+
+#combatLogTable {
+}
+
+.table-view .event-activated {
+    -fx-background-color: derive(-fx-accent, -50%);
+}
+
+.table-view .event-actor-enemy {
+    -fx-background-color: derive(-fx-damage, -60%);
+}
+
+.table-view .event-actor-ally {
+    -fx-background-color: derive(-fx-heal-eff, -60%);
+}
+
+.table-view .totals-row {
+    -fx-background-color: derive(-fx-control-inner-background-alt, +5%);
+}
+
+.check-box:hover {
+}
+
+.check-item-menu {
+    -fx-padding: 0;
+}
+
+.check-item {
+    -fx-padding: .2em;
+}
+
+.check-item .box {
+}
+
+.check-item .box > .mark {
+}
+
+.check-item:selected .box > .mark {
+}
+
+.check-item:hover:selected .box > .mark {
+}
+
+.check-item:hover:selected {
+}
+
+#root .table-view {
+    -fx-selection-bar-text: violet;
+}
+
+#root .table-view .table-row-cell:focused {
+}
+
+/**
+ * Damage dealt
+ */
+.table-view .bolden {
+}
+
+/**
+ * Effects
+ */
+#procsTable, #actTable, #givTable, #recTable {
+}
+
+.simple-table .table-view .column-header .label,
+.simple-table .table-view .filler {
+}
+
+.simple-table .table-view .filler {
+}
+
+.simple-table .table-view .column-header-background {
+}
+
+.simple-table .table-view .column-header,
+.simple-table .table-view .filler {
+}
+
+.simple-table {
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, -fx-black-line-color 0%, -fx-base 100%);
+}
+
+.simple-table .table-view .table-cell {
+    /*-fx-background-color: -fx-base;*//* XXX */
+    -fx-background-color: transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-border-color: transparent;
+    -fx-text-fill: -fx-black-line-color;
+}
+
+.simple-table .table-view .table-row-cell:hover .table-cell {
+}
+
+#root .selected-overlay-none,
+.simple-table .table-view .selected-overlay-none .table-cell {
+    -fx-background-color: -fx-control-inner-background;
+    -fx-text-fill: -fx-light-text-alt;
+}
+
+#root .selected-overlay-none:even,
+.simple-table .table-view .selected-overlay-none:even .table-cell {
+    -fx-background-color: -fx-control-inner-background-alt;
+}
+
+#root .selected-overlay-none:hover,
+.simple-table .table-view .selected-overlay-none:hover .table-cell {
+    -fx-background-color: derive(Goldenrod, -60%);
+}
+
+#root .selected-overlay-0 {
+}
+
+#root .selected-overlay-1 {
+}
+
+#root .selected-overlay-2 {
+}
+
+#root .selected-overlay-3 {
+}
+
+#root .selected-overlay-4 {
+}
+
+#root .selected-overlay-5 {
+}
+
+/**
+ * Charts
+ * ----------------------------------------------------------------------------
+ */
+
+.chart-legend {
+}
+
+.chart-legend .label {
+    -fx-text-fill: -fx-soft-text;
+}
+
+.chart-legend .legend-symbol {
+}
+
+.chart-overlay-button {
+    -fx-text-fill: -fx-soft-text;
+}
+
+.chart-overlay-button:hover {
+    -fx-text-fill: -fx-accent;
+}
+
+.chart-area-symbol {
+}
+
+.chart-content {
+}
+
+.chart-plot-background {
+}
+
+.chart-plot-background:even {
+}
+
+.chart .chart-series-line {
+
+}
+
+.chart-horizontal-grid-lines {
+}
+
+.chart-alternative-row-fill {
+}
+
+.axis {
+    -fx-tick-label-fill: -fx-light-text-alt;
+}
+
+.chart-dps .default-color0 {
+}
+
+.chart-damage .default-color0 {
+}
+
+.chart-hps .default-color0 {
+}
+
+.chart-hps .default-color1 {
+}
+
+.chart-healing .default-color0 {
+}
+
+.chart-dtps .default-color0 {
+}
+
+.chart-damage-taken .default-color0 {
+}
+
+.chart-damage-taken .default-color1 {
+}
+
+.chart-damage-taken .default-color2 {
+}
+
+.raid-title {
+    -fx-text-fill: -fx-soft-text;
+}
+
+.raid-players {
+    -fx-text-fill: -fx-soft-text;
+}
+
+.raid-death {
+    -fx-background-color: derive(-fx-background, 10%); /* 123c62 classic theme XXX */
+}
+
+.raid-death-inter {
+}
+
+.raid-death-active {
+    -fx-background-color: -fx-background-selected;
+    -fx-text-fill: -fx-light-text-color;
+}
+
+/**
+ * Tooltip
+ */
+.tooltip {
+    -fx-background-color: derive(-fx-base, 25%);
+}
+
+.page-corner {
+}
+
+.root {
+    -fx-glass-color: -fx-soft-text;
+}
+
+
+.modal-dialog {
+    -fx-background-color: -fx-background;
+    -fx-border-color: -fx-black-line-color;
+    -fx-effect: dropshadow(three-pass-box, rgba(100, 100, 100, .5), 15, 0.5, 0, 0);
+}
+
+.modal-title {
+    -fx-background-color: -fx-background-gradient;
+    -fx-border-color: -fx-black-line-color;
+}
+
+.modal-title .text {
+    -fx-fill: -fx-light-text-color;
+}
+
+.modal-text {
+    -fx-border-color: transparent;
+}
+
+#dialogRoot.tab-pane .tab-content-area {
+    -fx-border-color: -fx-black-line-color;
+    -fx-background-color: -fx-control-inner-background-alt;
+}
+
+.modal-dialog .input-error {
+    -fx-background-color: -fx-shadow-highlight-color, -fx-text-box-border, derive(-fx-damage, -60%);
+}
+
+.modal-dialog .input-nondefault {
+    -fx-background-color: -fx-shadow-highlight-color, -fx-text-box-border, derive(-fx-threat, -60%);
+}
+
+.modal-dialog .input-updated {
+    -fx-background-color: -fx-shadow-highlight-color, -fx-text-box-border, derive(-fx-accent, -60%);;
+}
+
+.timer-preview {
+    -fx-background-color: green;
+}

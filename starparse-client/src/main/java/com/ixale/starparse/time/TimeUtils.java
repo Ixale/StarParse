@@ -1,5 +1,6 @@
 package com.ixale.starparse.time;
 
+import java.net.SocketTimeoutException;
 import java.util.TimeZone;
 
 import org.slf4j.Logger;
@@ -13,7 +14,8 @@ public class TimeUtils {
 
 	private static Long localClockOffset = 0L;
 
-	private static TimeZone defaultTimezone, currentTimezone;
+	private static final TimeZone defaultTimezone;
+	private static TimeZone currentTimezone;
 
 	static {
 		defaultTimezone = currentTimezone = TimeZone.getDefault();
@@ -24,7 +26,7 @@ public class TimeUtils {
 			NtpRequest.requestTime(timeSyncHost, 15000);
 			localClockOffset = Math.round(NtpRequest.getLocalClockOffset() * 1000);
 
-			Long off = Math.abs(localClockOffset);
+			long off = Math.abs(localClockOffset);
 			if (off > 10000) {
 				if (off > 30 * 60 * 1000) {
 					// possibly incorrect time zone, cap it as it would not work anyway
@@ -36,12 +38,14 @@ public class TimeUtils {
 				}
 
 			} else {
-				logger.debug("Local clock difference resolved as: " + localClockOffset + " ms");
+				if (logger.isDebugEnabled()) {
+					logger.debug("Local clock difference resolved as: " + localClockOffset + " ms");
+				}
 			}
 			return off;
 
 		} catch (Exception e) {
-			logger.warn("Unable to resolve local clock difference using [" + timeSyncHost + "]: " + e.getMessage(), e);
+			logger.warn("Unable to resolve local clock difference using [" + timeSyncHost + "]: " + e.getMessage(), e instanceof SocketTimeoutException ? null : e);
 			return null;
 		}
 	}

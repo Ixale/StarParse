@@ -97,6 +97,8 @@ public abstract class BaseClient {
 				try {
 					messageLatch.await(TIMEOUT, TimeUnit.SECONDS);
 				} catch (InterruptedException e) {
+					logger.warn("Interrupted wait: " + e.getMessage(), e);
+					// ignored
 				}
 			}
 

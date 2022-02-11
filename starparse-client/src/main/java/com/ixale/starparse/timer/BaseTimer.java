@@ -2,7 +2,6 @@ package com.ixale.starparse.timer;
 
 import com.ixale.starparse.domain.ConfigTimer;
 import com.ixale.starparse.gui.Format;
-
 import javafx.scene.paint.Color;
 
 abstract public class BaseTimer {
@@ -30,6 +29,7 @@ abstract public class BaseTimer {
 
 	private Integer colorIndex;
 	private Color color;
+	private ConfigTimer.Slot slot;
 
 	public BaseTimer(String name, String fullName, Integer length) {
 		this(name, fullName, length, null, null, Scope.COMBAT);
@@ -85,6 +85,14 @@ abstract public class BaseTimer {
 		return colorIndex;
 	}
 
+	public ConfigTimer.Slot getSlot() {
+		return slot == null ? ConfigTimer.Slot.A : slot;
+	}
+
+	public void setSlot(final ConfigTimer.Slot slot) {
+		this.slot = slot;
+	}
+
 	public void start(final Long timeFrom) {
 		this.timeFrom = timeFrom;
 		timeTo = timeFrom;
@@ -96,6 +104,7 @@ abstract public class BaseTimer {
 		state = State.STOPPED;
 	}
 
+	@SuppressWarnings("IntegerMultiplicationImplicitCastToLong")
 	public void update(final Long timeNow) {
 
 		switch (state) {
@@ -113,7 +122,7 @@ abstract public class BaseTimer {
 			timeTo = timeFrom + firstInterval;
 			timeRemaining = timeTo - timeNow;
 			repeatCounter = 1;
-			progress = 1.0 * timeRemaining / firstInterval;
+			progress = Math.min(1, 1.0 * timeRemaining / firstInterval);
 			runningTick(timeTo, timeRemaining);
 			return;
 		}
@@ -128,7 +137,7 @@ abstract public class BaseTimer {
 						expiredRepeat(timeTo - repeatInterval);
 						lastRepeatCounter = repeatCounter;
 					}
-					progress = 1.0 * timeRemaining / repeatInterval;
+					progress = Math.min(1, 1.0 * timeRemaining / repeatInterval);
 					runningTick(timeTo, timeRemaining);
 					return;
 				}
@@ -188,6 +197,7 @@ abstract public class BaseTimer {
 		configTimer.setColor(TimerManager.getSystemColor(this));
 		configTimer.setAudio(null);
 		configTimer.setCountdownVoice(null);
+		configTimer.setSlot(null);
 	}
 
 	public boolean doOverrideExpiringThreshold() {
@@ -195,11 +205,12 @@ abstract public class BaseTimer {
 	}
 
 	public String toString() {
-		return name + " (" + (repeatInterval == null
-			? "one time in " + firstInterval
-			: "first in " + firstInterval + ", then each " + repeatInterval)
-			+ ") @ " + (timeFrom != null ? Format.formatTime(timeFrom, true, true) : "*")
-			+ (timeRemaining != null ? " (" + Format.formatTime(timeRemaining) + ")" : "")
-			+ " [" + state + " " + scope + "]";
+		return (name == null ? "?" : name.replace("\n", " "))
+				+ " (" + (repeatInterval == null
+				? "one time in " + firstInterval
+				: "first in " + firstInterval + ", then each " + repeatInterval)
+				+ ") @ " + (timeFrom != null ? Format.formatTime(timeFrom, true, true) : "*")
+				+ (timeRemaining != null ? " (" + Format.formatTime(timeRemaining) + ")" : "")
+				+ " [" + state + " " + scope + "]";
 	}
 }

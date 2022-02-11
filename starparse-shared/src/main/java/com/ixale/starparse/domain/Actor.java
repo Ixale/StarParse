@@ -27,12 +27,13 @@ public class Actor extends Entity implements Comparable<Actor> {
 		}
 	}
 
-	Type type;
-	Long instanceId;
+	private Type type;
+	private Long instanceId;
 
 	// contextual
-	Long timeFrom, timeTo;
-	Boolean isHostile;
+	private Long timeFrom, timeTo;
+	private Boolean isHostile;
+	private CharacterDiscipline discipline;
 
 	public enum Role {
 		SOURCE, TARGET
@@ -66,6 +67,10 @@ public class Actor extends Entity implements Comparable<Actor> {
 		return type;
 	}
 
+	public void setType(final Type type) {
+		this.type = type;
+	}
+
 	public Long getInstanceId() {
 		return instanceId;
 	}
@@ -92,6 +97,14 @@ public class Actor extends Entity implements Comparable<Actor> {
 
 	public void setIsHostile(Boolean isHostile) {
 		this.isHostile = isHostile;
+	}
+
+	public CharacterDiscipline getDiscipline() {
+		return discipline;
+	}
+
+	public void setDiscipline(final CharacterDiscipline discipline) {
+		this.discipline = discipline;
 	}
 
 	public String toString() {

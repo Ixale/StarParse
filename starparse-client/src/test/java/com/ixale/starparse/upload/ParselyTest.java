@@ -6,6 +6,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.junit.Test;
 
@@ -18,16 +19,16 @@ import com.ixale.starparse.service.impl.ParselyServiceImpl;
 
 public class ParselyTest {
 
-	private ParselyService service;
-	private byte[] content;
-	private String fileName = "combat14.txt";
-	private List<ParselyCombatInfo> combatsInfo = new ArrayList<>();
+	private final ParselyService service;
+	private final byte[] content;
+	private final String fileName = "combat14.txt";
+	private final List<ParselyCombatInfo> combatsInfo = new ArrayList<>();
 
 	public ParselyTest() {
 		service = new ParselyServiceImpl();
 
 		try {
-			content = Files.readAllBytes(new File(getClass().getClassLoader().getResource(fileName).toURI()).toPath());
+			content = Files.readAllBytes(new File(Objects.requireNonNull(getClass().getClassLoader().getResource(fileName)).toURI()).toPath());
 		} catch (Exception e) {
 			throw new RuntimeException("Missing " + fileName, e);
 		}
@@ -40,10 +41,11 @@ public class ParselyTest {
 		p.serverName = ServerName.TombOfFreedonNadd.getName();
 		p.timezone = "Europe/Prague";
 		p.guild = "Ixale and Friends (tm)";
-		p.isPublic = false;
+		p.visibility = 0;
 		p.notes = "test\nsecond\r\nthird +ìšèøžý";
 		p.username = "Ixale";
 		p.password = "mariparse";
+		p.version = "7.0.0b";
 
 		return p;
 	}
@@ -55,12 +57,12 @@ public class ParselyTest {
 			service.uploadLog(getParams(), fileName, null, combatsInfo);
 			fail();
 		} catch (Exception e) {
-			assertEquals("Parsely returned error: Empty File", e.getMessage());
+			assertEquals("Parsely returned error: Invalid File", e.getMessage());
 		}
 	}
 
 	@Test
-	public void testInvalidUser() throws Exception {
+	public void testInvalidUser() {
 
 		Params p = getParams();
 		p.username = "foobar";
@@ -74,6 +76,7 @@ public class ParselyTest {
 	}
 
 	//@Test
+	@SuppressWarnings("JUnit3StyleTestMethodInJUnit4Class")
 	public void testUploadAnonymous() throws Exception {
 
 		Params p = getParams();

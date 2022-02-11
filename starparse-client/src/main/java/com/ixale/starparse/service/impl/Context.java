@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ixale.starparse.domain.CombatInfo;
 import org.springframework.stereotype.Service;
 
 import com.ixale.starparse.domain.Actor;
@@ -22,15 +23,20 @@ import com.ixale.starparse.domain.stats.CombatEventStats;
 public class Context {
 
 	private String version;
+	private String serverId;
 
 	private final Map<Object, Actor> actors = new HashMap<>();
 	private final Map<Long, Entity> entities = new HashMap<>();
 	private final Map<Long, AttackType> attacks = new HashMap<>();
-	private final Map<Integer, List<CombatEventStats>> combatEvents = new HashMap<>();
+	private final Map<Integer, Map<String, List<CombatEventStats>>> combatEvents = new HashMap<>();
+	private final Map<Integer, CombatInfo> combatInfo = new HashMap<>();
 
 	private Long tickFrom, tickTo;
 
 	final private LinkedHashMap<EffectKey, ArrayList<Long[]>> effects = new LinkedHashMap<>();
+
+	private String characterName;
+	private String selectedPlayer;
 
 	public String getVersion() {
 		return version;
@@ -38,6 +44,14 @@ public class Context {
 
 	public void setVersion(final String version) {
 		this.version = version;
+	}
+
+	public String getServerId() {
+		return serverId;
+	}
+
+	public void setServerId(final String serverId) {
+		this.serverId = serverId;
 	}
 
 	public Actor getActor(final String name, final Type type, final Long guid, final Long instanceId) {
@@ -68,6 +82,10 @@ public class Context {
 			actors.put(name, new Actor(name, type));
 		}
 		return actors.get(name);
+	}
+
+	public boolean isActorHostile(final String playerName) {
+		return playerName != null && actors.containsKey(playerName) && Boolean.TRUE.equals(actors.get(playerName).isHostile());
 	}
 
 	public Entity getEntity(final String name, final Long guid) {
@@ -130,20 +148,27 @@ public class Context {
 		return attacks;
 	}
 
-	public void addCombatEvent(final int combatId, final Event.Type type, final long timestamp) {
+	public void addCombatEvent(final int combatId, final Actor player, final Event.Type type, final long timestamp) {
 		if (!combatEvents.containsKey(combatId)) {
-			combatEvents.put(combatId, new ArrayList<>());
+			combatEvents.put(combatId, new HashMap<>());
 		}
-		combatEvents.get(combatId).add(new CombatEventStats(type, timestamp));
+		final String playerName = player.getName();
+		if (!combatEvents.get(combatId).containsKey(playerName)) {
+			combatEvents.get(combatId).put(playerName, new ArrayList<>());
+		}
+		combatEvents.get(combatId).get(playerName).add(new CombatEventStats(type, timestamp));
 	}
 
-	public List<CombatEventStats> getCombatEvents(int combatId) {
-		return combatEvents.get(combatId);
+	public List<CombatEventStats> getCombatEvents(int combatId, final String playerName) {
+		return combatEvents.get(combatId) == null ? null : combatEvents.get(combatId).get(playerName);
 	}
 
-	public Integer findCombatIdByCombatEvent(final Event.Type type, final long timestamp) {
+	public Integer findCombatIdByCombatEvent(final Event.Type type, final long timestamp, final String playerName) {
 		for (final Integer combatId: combatEvents.keySet()) {
-			for (final CombatEventStats ce: combatEvents.get(combatId)) {
+			if (combatEvents.get(combatId).get(playerName) == null) {
+				continue;
+			}
+			for (final CombatEventStats ce: combatEvents.get(combatId).get(playerName)) {
 				if (ce.getTimestamp() == timestamp && ce.getType().equals(type)) {
 					return combatId;
 				}
@@ -152,12 +177,36 @@ public class Context {
 		return null;
 	}
 
+	public String getSelectedPlayer() {
+		return selectedPlayer;
+	}
+
+	public void setSelectedPlayer(final String selectedPlayer) {
+		this.selectedPlayer = selectedPlayer;
+	}
+
+	public String getCharacterName() {
+		return characterName;
+	}
+
+	public void setCharacterName(final String characterName) {
+		this.characterName = characterName;
+	}
+
+	public Map<Integer, CombatInfo> getCombatInfo() {
+		return combatInfo;
+	}
+
 	public void reset() {
 		actors.clear();
 		entities.clear();
 		tickFrom = tickTo = null;
 		effects.clear();
 		combatEvents.clear();
+		combatInfo.clear();
 		version = null;
+		serverId = null;
+		selectedPlayer = null;
+		characterName = null;
 	}
 }

@@ -1,5 +1,8 @@
 package com.ixale.starparse.domain.stats;
 
+import com.esotericsoftware.kryo.serializers.FieldSerializer;
+import com.ixale.starparse.domain.CharacterDiscipline;
+
 import java.io.Serializable;
 
 public class CombatStats implements Serializable {
@@ -28,16 +31,19 @@ public class CombatStats implements Serializable {
 	int threat;
 	int threatPositive;
 
+	@FieldSerializer.Optional("ignored")
+	CharacterDiscipline discipline;
+
 	CombatStats() {
 
 	}
 
 	public CombatStats(int tick, int actions, int damage,
-		int heal, int effectiveHeal,
-		int damageTaken, int damageTakenTotal,
-		int absorbed, int absorbedTotal,
-		int healTaken, int effectiveHealTaken, int effectiveHealTakenTotal,
-		int threat, int threatPositive) {
+			int heal, int effectiveHeal,
+			int damageTaken, int damageTakenTotal,
+			int absorbed, int absorbedTotal,
+			int healTaken, int effectiveHealTaken, int effectiveHealTakenTotal,
+			int threat, int threatPositive, CharacterDiscipline discipline) {
 		this.tick = tick;
 		this.actions = actions;
 		this.damage = damage;
@@ -55,6 +61,8 @@ public class CombatStats implements Serializable {
 		this.effectiveHealTakenTotal = effectiveHealTakenTotal;
 		this.threat = threat;
 		this.threatPositive = threatPositive;
+
+		this.discipline = discipline;
 	}
 
 	public int getTick() {
@@ -157,14 +165,18 @@ public class CombatStats implements Serializable {
 		return (int) Math.round(threat * 1000.0 / tick);
 	}
 
+	public CharacterDiscipline getDiscipline() {
+		return discipline;
+	}
+
 	public String toString() {
 		return "APM: " + getApm()
-			+ ", dmg: " + damage + " (" + getDps() + ")"
-			+ ", heal: " + heal + " (" + getHps() + "), effective " + effectiveHeal + " (" + getEhps() + ", " + getEhpsPercent() + "%)"
-			+ ", dmg taken: " + damageTaken + " (" + getDtps() + ", " + damageTakenTotal + ")"
-			+ ", absorbed: " + absorbed + " (" + getAps() + ", " + absorbedTotal + ")"
-			+ ", heal taken: " + healTaken + " (" + getHpsTaken() + ", " + effectiveHealTaken + ", " + getEhpsTaken() + ", " + effectiveHealTakenTotal
-			+ ")"
-			+ ", threat: " + threat + " (" + getTps() + ", " + threatPositive + ")";
+				+ ", dmg: " + damage + " (" + getDps() + ")"
+				+ ", heal: " + heal + " (" + getHps() + "), effective " + effectiveHeal + " (" + getEhps() + ", " + getEhpsPercent() + "%)"
+				+ ", dmg taken: " + damageTaken + " (" + getDtps() + ", " + damageTakenTotal + ")"
+				+ ", absorbed: " + absorbed + " (" + getAps() + ", " + absorbedTotal + ")"
+				+ ", heal taken: " + healTaken + " (" + getHpsTaken() + ", " + effectiveHealTaken + ", " + getEhpsTaken() + ", " + effectiveHealTakenTotal
+				+ ")"
+				+ ", threat: " + threat + " (" + getTps() + ", " + threatPositive + ")";
 	}
 }

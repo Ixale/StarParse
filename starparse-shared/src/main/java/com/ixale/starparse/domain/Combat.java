@@ -15,7 +15,6 @@ public class Combat {
 
 	private String name;
 	private RaidBoss boss;
-	private CharacterDiscipline discipline;
 
 	private Boolean isPvp;
 
@@ -74,14 +73,6 @@ public class Combat {
 		this.boss = boss;
 	}
 
-	public CharacterDiscipline getDiscipline() {
-		return discipline;
-	}
-
-	public void setDiscipline(CharacterDiscipline discipline) {
-		this.discipline = discipline;
-	}
-
 	public Boolean isPvp() {
 		return isPvp;
 	}
@@ -100,7 +91,7 @@ public class Combat {
 
 	public String toString() {
 		return combatId + "@" + logId + " [" + timeFrom + "-" + timeTo + "]"
-			+ " [" + eventIdFrom + "-" + eventIdTo + "]: [" + (boss != null ? boss : name) + "]"
-			+ (discipline != null ? " (@" + discipline + ")" : "");
+				+ " [" + eventIdFrom + "-" + eventIdTo + "]: [" + (boss != null ? boss : name) + "]"
+				;
 	}
 }

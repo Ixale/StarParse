@@ -1,7 +1,5 @@
 package com.ixale.starparse.gui;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -12,7 +10,6 @@ import javafx.scene.control.Label;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.effect.Effect;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -33,15 +30,7 @@ public class ModalDialog extends Stage {
 	private final StackPane rootPane;
 	private final AnchorPane contentWrapper;
 
-	private final EventHandler<ActionEvent> defaultCloseHandler = new EventHandler<ActionEvent>() {
-		@Override public void handle(ActionEvent actionEvent) {
-			close();
-		}
-	};
-
-	public ModalDialog(final Stage parent, final String title, final Parent content, final String buttonText) {
-		this(parent, title, content, buttonText, null);
-	}
+	private final EventHandler<ActionEvent> defaultCloseHandler = actionEvent -> close();
 
 	public ModalDialog(final Stage parent, final String title, final Parent content, final String buttonText, final EventHandler<ActionEvent> closeHandler) {
 
@@ -109,22 +98,14 @@ public class ModalDialog extends Stage {
 				contentPane
 		);
 
-		rootPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
-			@Override
-			public void handle(KeyEvent ke) {
-				if (ke.getCode() == KeyCode.ESCAPE) {
-					close();
-				}
+		rootPane.setOnKeyPressed(ke -> {
+			if (ke.getCode() == KeyCode.ESCAPE) {
+				close();
 			}
 		});
 
 		scene = new Scene(rootPane, Color.TRANSPARENT);
-		if (javafx.stage.Screen.getPrimary().getDpi() > 96) { // 125% = 96
-			// FIXME: workaround for JavaFX bug
-			scene.getStylesheets().add("styles120.bss");
-		} else {
-			scene.getStylesheets().add("styles.bss");
-		}
+		scene.getStylesheets().setAll(parent.getScene().getStylesheets());
 
 		setScene(scene);
 
@@ -136,25 +117,24 @@ public class ModalDialog extends Stage {
 	}
 
 	private void initParentEffects(final Stage parent) {
-		this.showingProperty().addListener(new ChangeListener<Boolean>() {
-			@Override public void changed(ObservableValue<? extends Boolean> observableValue, Boolean wasShowing, Boolean isShowing) {
-				if (!isShowing) {
-					modalCounter--;
-					if (modalCounter <= 0) {
-						parent.getScene().getRoot().setEffect(null);
-						modalCounter = 0;
-					}
-					return;
-				} else {
-					modalCounter++;
-					if (modalCounter == 1) {
-						parent.getScene().getRoot().setEffect(parentEffect);
-					}
+		this.showingProperty().addListener((observableValue, wasShowing, isShowing) -> {
+			if (!isShowing) {
+				modalCounter--;
+				if (modalCounter <= 0) {
+					parent.getScene().getRoot().setEffect(null);
+					modalCounter = 0;
 				}
-				scene.getWindow().setX(parent.getX() + parent.getWidth() / 2 - (rootPane.getBoundsInParent().getWidth() / 2));
-				scene.getWindow().setY(parent.getY() + parent.getHeight() / 2 - (rootPane.getBoundsInParent().getHeight() / 2));
-				toFront();
+				return;
+			} else {
+				modalCounter++;
+				if (modalCounter == 1) {
+					parent.getScene().getRoot().setEffect(parentEffect);
+				}
 			}
+			scene.getStylesheets().setAll(parent.getScene().getStylesheets());
+			scene.getWindow().setX(parent.getX() + parent.getWidth() / 2 - (rootPane.getBoundsInParent().getWidth() / 2));
+			scene.getWindow().setY(parent.getY() + parent.getHeight() / 2 - (rootPane.getBoundsInParent().getHeight() / 2));
+			toFront();
 		});
 	}
 }

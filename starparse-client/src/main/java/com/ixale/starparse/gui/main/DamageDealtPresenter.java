@@ -66,12 +66,12 @@ public class DamageDealtPresenter extends BaseStatsPresenter
 
 		actionsCol.setCellFactory(new NumberCellFactory<DamageAbilityItem>());
 		ticksCol.setCellFactory(new NumberCellFactory<DamageAbilityItem>());
-		totalCol.setCellFactory(new NumberCellFactory<DamageAbilityItem>(false, "maroon"));
+		totalCol.setCellFactory(new NumberCellFactory<DamageAbilityItem>(false, "damage-dealt"));
 
 		avgNormalCol.setCellFactory(new NumberCellFactory<DamageAbilityItem>());
 		avgCritCol.setCellFactory(new NumberCellFactory<DamageAbilityItem>());
 		avgTotalCol.setCellFactory(new NumberCellFactory<DamageAbilityItem>());
-		dpsCol.setCellFactory(new NumberCellFactory<DamageAbilityItem>(false, "maroon"));
+		dpsCol.setCellFactory(new NumberCellFactory<DamageAbilityItem>(false, "damage-dealt"));
 
 		pctCritCol.setCellFactory(new FloatCellFactory<DamageAbilityItem>());
 		pctMissCol.setCellFactory(new FloatCellFactory<DamageAbilityItem>());
@@ -158,7 +158,7 @@ public class DamageDealtPresenter extends BaseStatsPresenter
 		final List<DamageAbilityItem> items = new ArrayList<>();
 		for (final DamageDealtStats dds: eventService.getDamageDealtStats(combat,
 			targetTypeButton.isSelected(), targetInstanceButton.isSelected(), abilityButton.isSelected(),
-			context.getCombatSelection())) {
+			context.getCombatSelection(), context.getSelectedPlayer())) {
 			final DamageAbilityItem a = new DamageAbilityItem();
 
 			a.guid = dds.getGuid();

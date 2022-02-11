@@ -25,7 +25,7 @@ public class FileDownloader {
 		conn.setReadTimeout(TIMEOUT);
 
 		// checks server's status code first
-		ByteArrayOutputStream bos = null;
+		ByteArrayOutputStream bos;
 		ReadableByteChannel rbc = null;
 		WritableByteChannel wbc = null;
 		try {
@@ -47,7 +47,7 @@ public class FileDownloader {
 			while (buffer.hasRemaining()) {
 				wbc.write(buffer);
 			}
-			return new String(bos.toByteArray());
+			return bos.toString();
 
 		} finally {
 			if (wbc != null) {
