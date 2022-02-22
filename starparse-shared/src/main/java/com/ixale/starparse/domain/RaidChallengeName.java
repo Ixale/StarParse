@@ -19,9 +19,9 @@ public enum RaidChallengeName {
 
 	StyrakManifestation("Manifestation");
 
-	private String fullName;
+	private final String fullName;
 
-	private RaidChallengeName(String fullName) {
+	RaidChallengeName(String fullName) {
 		this.fullName = fullName;
 	}
 

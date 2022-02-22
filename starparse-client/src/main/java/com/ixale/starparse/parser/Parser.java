@@ -78,7 +78,7 @@ public class Parser {
 			.compile("^combat_(?<Year>\\d{4})-(?<Month>\\d{2})-(?<Day>\\d{2})_(?<HH>\\d{2})_\\d{2}_\\d{2}_\\d{6}\\.txt$");
 	private Matcher fileMatcher;
 
-	private Pattern basePattern, combatPattern, zonePattern, disciplinePattern, ignorePattern; // version dependent
+	private Pattern basePattern, combatPattern, zonePattern, disciplinePattern, ignorePattern, gsfPattern; // version dependent
 	private boolean isEffectiveLogged;
 
 	private final static String TIMESTAMP = "(?<TimeStamp>(?<HH>\\d{2}):(?<MM>\\d{2}):(?<SS>\\d{2})\\.(?<MS>\\d{3}))";
@@ -163,10 +163,15 @@ public class Parser {
 			+ "($| <(?<Threat>[^>]*?)>)");
 
 	// combat log line pattern for GSF only (fallback)
-	private final static Pattern gsfPattern = Pattern.compile("^"
+	private final static Pattern legacyGsfPattern = Pattern.compile("^"
 			+ "\\[" + TIMESTAMP + "]"
 			+ " \\[(?<SourceGsfName>|\\d{10,})]"
 			+ " \\[(?<TargetGsfName>|\\d{10,})] .*");
+
+	private final static Pattern v7GsfPattern = Pattern.compile("^"
+			+ "\\[" + TIMESTAMP + "]"
+			+ " \\[(?<SourceGsfName>|=|::\\d{10,}::\\|[^]]*)]"
+			+ " \\[(?<TargetGsfName>|=|::\\d{10,}::\\|[^]]*)] .*");
 
 	// healing threat ratios
 	private static final double THREAT_HEAL = .5,
@@ -447,6 +452,7 @@ public class Parser {
 				disciplinePattern = v7DisciplinePattern;
 				ignorePattern = null;
 				isEffectiveLogged = true;
+				gsfPattern = v7GsfPattern;
 
 			} else {
 				basePattern = legacyBasePattern;
@@ -455,6 +461,7 @@ public class Parser {
 				disciplinePattern = null;
 				ignorePattern = null;
 				isEffectiveLogged = false;
+				gsfPattern = legacyGsfPattern;
 			}
 
 			if (baseMatcher.matches()) {
@@ -562,7 +569,7 @@ public class Parser {
 					ac.role = e.getSource().getDiscipline().getRole();
 				}
 				if (combat != null && (isEffectiveLogged || Actor.Type.SELF.equals(e.getSource().getType()))) {
-					context.getCombatInfo().get(combat.getCombatId()).addCombatPlayer(e.getSource(), ac.discipline);
+					context.addCombatPlayer(combat, e.getSource(), ac.discipline);
 				}
 				actorStates.put(e.getSource(), ac);
 				if (Actor.Type.SELF.equals(e.getSource().getType())) {
@@ -574,7 +581,7 @@ public class Parser {
 				}
 			} else if (combat != null) {
 				if (isEffectiveLogged || Actor.Type.SELF.equals(e.getSource().getType())) {
-					context.getCombatInfo().get(combat.getCombatId()).addCombatPlayer(e.getSource(), ac.discipline);
+					context.addCombatPlayer(combat, e.getSource(), ac.discipline);
 				}
 			}
 		}
@@ -964,7 +971,7 @@ public class Parser {
 				for (Map.Entry<Actor, ActorState> entry : actorStates.entrySet()) {
 					entry.getValue().combatTotalThreat = 0;
 					if (Actor.Type.SELF.equals(entry.getKey().getType())) {
-						context.getCombatInfo().get(combat.getCombatId()).addCombatPlayer(entry.getKey(), entry.getKey().getDiscipline());
+						context.addCombatPlayer(combat, entry.getKey(), entry.getKey().getDiscipline());
 						break;
 					}
 				}
@@ -1079,7 +1086,7 @@ public class Parser {
 						logger.debug(e.getSource() + ": Discipline detected as [" + ac.discipline + "] at " + e.getTs());
 					}
 					if (isEffectiveLogged || Actor.Type.SELF.equals(e.getSource().getType())) {
-						context.getCombatInfo().get(combat.getCombatId()).addCombatPlayer(e.getSource(), ac.discipline);
+						context.addCombatPlayer(combat, e.getSource(), ac.discipline);
 					}
 					if (isSourceThisPlayer(e)) {
 						// self

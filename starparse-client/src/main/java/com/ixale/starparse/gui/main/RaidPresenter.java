@@ -52,6 +52,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +62,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -92,7 +94,9 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 			healingCol, hpsCol, ehpsCol, pctEffCol, shieldingCol, spsCol, raidTimeCol, rankCol;
 
 	@FXML
-	private HBox raidBar, raidDeaths, combatLogFilter;
+	private HBox raidBar, raidDeaths;//, combatLogFilter;
+	@FXML
+	private VBox combatLogWrapper;
 	@FXML
 	private Button pullButton, breakButton, raidNotesButton;
 
@@ -1114,16 +1118,23 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 				Platform.runLater(() -> showDeathRecap(label, events1, playerName));
 
 			} catch (Exception e) {
-				logger.error("Unable to decode " + message + " as " + request + ": " + e.getMessage(), e);
-				listener.setFlash("Error while decoding death recap for " + request.getTargetName() + ": " + e.getMessage(),
-						Type.ERROR);
+				if (e.getCause() instanceof IndexOutOfBoundsException) {
+					logger.error("Unable to decode " + message + " as " + request + ": " + e.getMessage() + "\nPayload: " + Arrays.toString(message.getPayload()), e);
+					listener.setFlash("Error while decoding death recap for " + request.getTargetName() + ": this is a known issue and it is being investigated, sorry for the inconvenience",
+							Type.ERROR);
+
+				} else {
+					logger.error("Unable to decode " + message + " as " + request + ": " + e.getMessage(), e);
+					listener.setFlash("Error while decoding death recap for " + request.getTargetName() + ": " + e.getMessage(),
+							Type.ERROR);
+				}
 			}
 		});
 	}
 
 	private void showDeathRecap(final Label label, final List<Event> events, final String playerName) {
 		raidTable.setVisible(false);
-		raidTable.setPrefHeight(0);
+//		raidTable.setPrefHeight(0);
 
 		for (final Label l : raidDeathLabels.values()) {
 			l.getStyleClass().remove("raid-death-active");
@@ -1146,10 +1157,11 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 		healingTaken.setAlignment(Pos.CENTER_RIGHT);
 		healingTaken.setText(Format.formatAdaptive(ht));
 
-		combatLogTable.setPrefHeight(-1);
-		combatLogTable.setVisible(true);
-		combatLogFilter.setPrefHeight(25);
-		combatLogFilter.setVisible(true);
+//		combatLogTable.setPrefHeight(-1);
+//		combatLogTable.setVisible(true);
+//		combatLogFilter.setPrefHeight(25);
+//		combatLogFilter.setVisible(true);
+		combatLogWrapper.setVisible(true);
 
 		currentEvents = events;
 		currentEventsPlayerName = playerName;
@@ -1164,11 +1176,12 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 	}
 
 	private void hideDeathRecap() {
-		combatLogTable.setVisible(false);
-		combatLogTable.setPrefHeight(0);
-		combatLogFilter.setVisible(false);
-		combatLogFilter.setPrefHeight(0);
-		raidTable.setPrefHeight(-1);
+//		combatLogTable.setVisible(false);
+//		combatLogTable.setPrefHeight(0);
+//		combatLogFilter.setVisible(false);
+//		combatLogFilter.setPrefHeight(0);
+//		raidTable.setPrefHeight(-1);
+		combatLogWrapper.setVisible(false);
 		raidTable.setVisible(true);
 
 		for (final Label l : raidDeathLabels.values()) {

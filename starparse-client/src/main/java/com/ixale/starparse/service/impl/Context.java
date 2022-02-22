@@ -6,6 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ixale.starparse.domain.CharacterDiscipline;
+import com.ixale.starparse.domain.Combat;
 import com.ixale.starparse.domain.CombatInfo;
 import org.springframework.stereotype.Service;
 
@@ -195,6 +197,13 @@ public class Context {
 
 	public Map<Integer, CombatInfo> getCombatInfo() {
 		return combatInfo;
+	}
+
+	public void addCombatPlayer(final Combat combat, final Actor player, final CharacterDiscipline discipline) {
+		final CombatInfo combatInfo = this.combatInfo.get(combat.getCombatId());
+		if (combatInfo != null) {
+			combatInfo.addCombatPlayer(player, discipline);
+		}
 	}
 
 	public void reset() {

@@ -1,11 +1,20 @@
 package com.ixale.starparse.utils;
 
+import com.ixale.starparse.domain.Combat;
+import com.ixale.starparse.domain.CombatInfo;
+import com.ixale.starparse.domain.Event;
+import com.ixale.starparse.domain.Raid;
+import com.ixale.starparse.domain.stats.CombatEventStats;
+import com.ixale.starparse.service.ParselyService.ParselyCombatInfo;
+import com.ixale.starparse.service.impl.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -15,17 +24,6 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import com.ixale.starparse.domain.CombatInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.ixale.starparse.domain.Combat;
-import com.ixale.starparse.domain.Event;
-import com.ixale.starparse.domain.Raid;
-import com.ixale.starparse.domain.stats.CombatEventStats;
-import com.ixale.starparse.service.ParselyService.ParselyCombatInfo;
-import com.ixale.starparse.service.impl.Context;
 
 public class FileLoader {
 
@@ -69,30 +67,32 @@ public class FileLoader {
 		return size;
 	}
 
-	public static final void extractZip(final File sourceZip, final File destinationDir) throws Exception {
+	public static void extractZip(final File sourceZip, final File destinationDir) throws Exception {
 
 		if (sourceZip == null || !sourceZip.isFile() || !sourceZip.canRead()) {
 			throw new Exception("Unable to read source file: " + sourceZip);
 		}
 		if (!destinationDir.exists()) {
-			destinationDir.mkdir();
+			if (!destinationDir.mkdir()) {
+				throw new Exception("Unable to create icons dir: " + destinationDir);
+			}
 		}
 
 		byte[] buffer = new byte[1024];
-		FileInputStream fis = null;
 		ZipInputStream zis = null;
 		FileOutputStream fos = null;
-		ZipEntry ze = null;
-		try {
-			fis = new FileInputStream(sourceZip);
+		ZipEntry ze;
+		try (FileInputStream fis = new FileInputStream(sourceZip)) {
 			zis = new ZipInputStream(fis);
 			ze = zis.getNextEntry();
 
 			while (ze != null) {
 				final File newFile = new File(destinationDir, ze.getName());
-				if (!newFile.exists()) {
+				if (!newFile.exists() || (newFile.isFile() && newFile.length() == 3162 /* placeholder */)) {
 					if (ze.isDirectory()) {
-						newFile.mkdirs();
+						if (!newFile.mkdir()) {
+							throw new Exception("Unable to create icons dir: " + newFile);
+						}
 					} else {
 						try {
 							fos = new FileOutputStream(newFile);
@@ -125,20 +125,13 @@ public class FileLoader {
 
 				}
 			}
-			if (fis != null) {
-				try {
-					fis.close();
-				} catch (Exception ignored) {
-
-				}
-			}
 		}
 	}
 
 	// TODO: decouple & move somewhere else?
 	public static byte[] extractCombats(final String fileName,
-		final List<Combat> allCombats, final List<Combat> selectedCombats,
-		final List<ParselyCombatInfo> combatsInfo, final Context context)
+			final List<Combat> allCombats, final List<Combat> selectedCombats,
+			final List<ParselyCombatInfo> combatsInfo, final Context context)
 			throws Exception {
 
 		final SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS", Locale.ENGLISH);
@@ -173,7 +166,7 @@ public class FileLoader {
 				// bound by the next start (or EOF)
 				to = ((i + 1) < allCombats.size()) ? allCombats.get(i + 1).getTimeFrom() : null;
 
-				for (final Combat c: selectedCombats) {
+				for (final Combat c : selectedCombats) {
 					if (c == null) {
 						// selection no longer valid, can happen 
 						// FIXME: investigate
@@ -214,7 +207,7 @@ public class FileLoader {
 			return;
 		}
 		try {
-			for (final Combat c: combats) {
+			for (final Combat c : combats) {
 				if (c == null) {
 					continue;
 				}
@@ -223,7 +216,7 @@ public class FileLoader {
 				info.to = c.getTimeTo();
 				info.raidBoss = c.getBoss();
 				if (info.raidBoss != null && Raid.Mode.NiM.equals(info.raidBoss.getMode())) {
-					for (final CombatEventStats e: context.getCombatEvents(c.getCombatId(), context.getSelectedPlayer())) {
+					for (final CombatEventStats e : context.getCombatEvents(c.getCombatId(), context.getSelectedPlayer())) {
 						if (Event.Type.NIM_CRYSTAL.equals(e.getType())) {
 							info.isNiMCrystal = true;
 							break;

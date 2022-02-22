@@ -497,7 +497,7 @@ public class StarparseApp extends Application {
 			if (s.getVisualBounds().getMinY() < minY) {
 				minY = s.getVisualBounds().getMinY();
 			}
-			if (s.getVisualBounds().getMaxY() < maxY && s.getVisualBounds().getMaxY() != 0) { // top-bottom multi-screen
+			if (s.getVisualBounds().getMaxY() > maxY && s.getVisualBounds().getMaxY() != 0) { // top-bottom multi-screen
 				maxY = s.getVisualBounds().getMaxY();
 			}
 		}

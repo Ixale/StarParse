@@ -1683,5 +1683,12 @@ public class AbilityIcon {
 		ico.put(4543495578583296L, "pt_pass_energy_burn.png");
 		ico.put(4022649189564416L, "abl_tr_va_pull_and_pummel.png");
 		ico.put(3408202578264346L, "thermaldetonation.png");
+		ico.put(4499609602752512L, "abl_bhtr_ptvg_accelerated_reel.png");
+		ico.put(4465370123468800L, "warknight_marked_focus_7_0_rep.png");
+		ico.put(4455251180519424L, "warknight_critical_condition_7_0_rep.png");
+		ico.put(4490104840126464L, "warknight_marked_focus_7_0_imp.png");
+		ico.put(4490435552608256L, "warknight_critical_condition_7_0_imp.png");
+		ico.put(3406686454808843L, "reanimation.png");
+		ico.put(4546931552419840L, "abl_bhtr_ptvg_accelerated_reel.png");
 	}
 }

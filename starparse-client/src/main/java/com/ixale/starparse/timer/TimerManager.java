@@ -469,6 +469,24 @@ public class TimerManager {
 				systemTimers.get(raidName).put(systemTimer, configTimer);
 			}
 		}
+		// run cleanup
+		final Iterator<ConfigTimer> it = timers.listIterator();
+		while (it.hasNext()) {
+			final ConfigTimer timer = it.next();
+			if (timer.isSystem() && TimerManager.getSystemTimer(timer) == null) {
+				// obsolete built-in timer, discard
+				if (logger.isDebugEnabled()) {
+					logger.debug("Removed obsolete built-in timer: " + timer);
+				}
+				it.remove();
+			}
+			if (timer.getTrigger() != null
+					&& Condition.Type.ABILITY_ACTIVATED.equals(timer.getTrigger().getType())
+					&& timer.getTrigger().getSource() == null) {
+				// migrate old to SELF as default
+				timer.getTrigger().setSource(Condition.SELF);
+			}
+		}
 	}
 
 	public static BaseTimer getSystemTimer(final ConfigTimer timer) {

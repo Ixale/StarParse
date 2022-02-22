@@ -129,6 +129,9 @@ public abstract class BaseTimersPopoutPresenter extends BasePopoutPresenter {
 		final Label title = new Label("");
 		title.setTextFill(this.textColor);
 		title.setFont(Font.font("System", 11));
+		title.setMaxWidth(TIMER_WIDTH - 30);
+		title.setMaxHeight(TITLE_HEIGHT);
+		title.setWrapText(true);
 
 		AnchorPane.setTopAnchor(title, 0d);
 		AnchorPane.setBottomAnchor(title, 0d);
