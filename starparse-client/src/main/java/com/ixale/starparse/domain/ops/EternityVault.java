@@ -1,5 +1,6 @@
 package com.ixale.starparse.domain.ops;
 
+import com.ixale.starparse.domain.NpcType;
 import com.ixale.starparse.domain.Raid;
 import com.ixale.starparse.domain.RaidBoss;
 import com.ixale.starparse.domain.RaidBossName;
@@ -50,5 +51,20 @@ public class EternityVault extends Raid {
 				new long[]{2289823159156736L},
 				new long[]{2290085152161792L},
 				null);
+
+		npcs.put(1779997656219648L, new Npc(NpcType.boss_raid, "XRR-3"));
+		npcs.put(2017165750304768L, new Npc(NpcType.boss_raid, "XRR-3"));
+		npcs.put(2034573252755456L, new Npc(NpcType.boss_raid, "XRR-3"));
+		npcs.put(2034611907461120L, new Npc(NpcType.boss_raid, "XRR-3"));
+
+		npcs.put(1783772932472832L, new Npc(NpcType.boss_raid));
+		npcs.put(2016946706972672L, new Npc(NpcType.boss_raid));
+		npcs.put(2034526008115200L, new Npc(NpcType.boss_raid));
+		npcs.put(2034534598049792L, new Npc(NpcType.boss_raid));
+
+		npcs.put(1783790112342016L, new Npc(NpcType.boss_raid, "Soa"));
+		npcs.put(2017170045272064L, new Npc(NpcType.boss_raid, "Soa"));
+		npcs.put(2289823159156736L, new Npc(NpcType.boss_raid, "Soa"));
+		npcs.put(2290085152161792L, new Npc(NpcType.boss_raid, "Soa"));
 	}
 }

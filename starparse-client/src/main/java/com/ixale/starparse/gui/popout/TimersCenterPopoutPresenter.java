@@ -1,9 +1,12 @@
 package com.ixale.starparse.gui.popout;
 
-import java.net.URL;
-import java.util.HashMap;
-import java.util.ResourceBundle;
-
+import com.ixale.starparse.domain.Combat;
+import com.ixale.starparse.domain.stats.CombatStats;
+import com.ixale.starparse.gui.Format;
+import com.ixale.starparse.timer.BaseTimer;
+import com.ixale.starparse.timer.BaseTimer.Scope;
+import com.ixale.starparse.timer.CustomTimer;
+import com.ixale.starparse.timer.TimerManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
@@ -14,12 +17,9 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 
-import com.ixale.starparse.domain.Combat;
-import com.ixale.starparse.domain.stats.CombatStats;
-import com.ixale.starparse.gui.Format;
-import com.ixale.starparse.timer.BaseTimer;
-import com.ixale.starparse.timer.TimerManager;
-import com.ixale.starparse.timer.BaseTimer.Scope;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.ResourceBundle;
 
 public class TimersCenterPopoutPresenter extends BasePopoutPresenter {
 
@@ -161,7 +161,16 @@ public class TimersCenterPopoutPresenter extends BasePopoutPresenter {
 	}
 
 	private String getFullTimerLabel(final BaseTimer timer) {
-		return timer.getName() + (timer.getRepeatCounter() > 1 ? " #" + timer.getRepeatCounter() : "");
+		return getShortName(timer.getName(), 15) + (timer.getRepeatCounter() > 1 ? " #" + timer.getRepeatCounter() : "");
+	}
+
+	private String getShortName(final String n, final int limit) {
+		if (n != null && n.contains("\n")) {
+			return CustomTimer.getShortName(n.split("\n")[0], limit)
+					+ "\n"
+					+ getShortName(n.split("\n")[1], limit);
+		}
+		return CustomTimer.getShortName(n, limit);
 	}
 
 	@Override

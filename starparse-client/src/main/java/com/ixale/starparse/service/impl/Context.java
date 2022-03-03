@@ -1,6 +1,7 @@
 package com.ixale.starparse.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -8,7 +9,10 @@ import java.util.Map;
 
 import com.ixale.starparse.domain.CharacterDiscipline;
 import com.ixale.starparse.domain.Combat;
+import com.ixale.starparse.domain.CombatActorState;
 import com.ixale.starparse.domain.CombatInfo;
+import com.ixale.starparse.domain.LocationInfo;
+import com.ixale.starparse.domain.Raid;
 import org.springframework.stereotype.Service;
 
 import com.ixale.starparse.domain.Actor;
@@ -26,6 +30,7 @@ public class Context {
 
 	private String version;
 	private String serverId;
+	private LocationInfo locationInfo;
 
 	private final Map<Object, Actor> actors = new HashMap<>();
 	private final Map<Long, Entity> entities = new HashMap<>();
@@ -54,6 +59,14 @@ public class Context {
 
 	public void setServerId(final String serverId) {
 		this.serverId = serverId;
+	}
+
+	public LocationInfo getLocationInfo() {
+		return locationInfo;
+	}
+
+	public void setLocationInfo(final LocationInfo locationInfo) {
+		this.locationInfo = locationInfo;
 	}
 
 	public Actor getActor(final String name, final Type type, final Long guid, final Long instanceId) {
@@ -171,7 +184,7 @@ public class Context {
 				continue;
 			}
 			for (final CombatEventStats ce: combatEvents.get(combatId).get(playerName)) {
-				if (ce.getTimestamp() == timestamp && ce.getType().equals(type)) {
+				if (Math.abs(ce.getTimestamp() - timestamp) < 1000 && ce.getType().equals(type)) {
 					return combatId;
 				}
 			}
@@ -206,6 +219,32 @@ public class Context {
 		}
 	}
 
+	public void setCombatActorState(final Combat combat, final Actor actor, final Raid.Npc npc, final String currentHp, final String maxHp, final long tick) {
+		if (maxHp == null || currentHp == null || maxHp.equals(currentHp)) {
+			return;
+		}
+		final CombatInfo combatInfo = this.combatInfo.get(combat.getCombatId());
+		if (combatInfo != null) {
+			CombatActorState cas = combatInfo.getCombatActorStates().get(actor);
+			if (cas == null) {
+				cas = new CombatActorState(actor, npc, tick);
+				combatInfo.getCombatActorStates().put(actor, cas);
+			} else {
+				cas.setTick(tick);
+			}
+			cas.setCurrentHp(Long.valueOf(currentHp));
+			cas.setMaxHp(Long.valueOf(maxHp));
+		}
+	}
+
+	public Collection<CombatActorState> getCombatActorStates(final Combat combat) {
+		final CombatInfo combatInfo = this.combatInfo.get(combat.getCombatId());
+		if (combatInfo != null) {
+			return combatInfo.getCombatActorStates().values();
+		}
+		return null;
+	}
+
 	public void reset() {
 		actors.clear();
 		entities.clear();
@@ -213,6 +252,7 @@ public class Context {
 		effects.clear();
 		combatEvents.clear();
 		combatInfo.clear();
+		locationInfo = null;
 		version = null;
 		serverId = null;
 		selectedPlayer = null;

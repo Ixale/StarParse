@@ -74,6 +74,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class RaidPresenter extends BaseCombatLogPresenter {
 
@@ -704,7 +705,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 			rankCol.setVisible(true);
 		}
 
-		if (currentCombat.isRunning()) {
+		if (currentCombat.isRunning() && currentCombat.getTimeTo() == null) {
 			int exits = 0;
 			for (final RaidItem item : raidTable.getItems()) {
 				if (item.getMessage().getExitEvent() != null) {
@@ -1062,7 +1063,7 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 
 		// is it me?
 		final String playerName = Format.getRealNameEvenForFakePlayer(request.getTargetName());
-		if (events == null && (request.getTargetName().equals(characterName) || Format.isFakePlayerName(request.getTargetName()))) {
+		if (events == null && (!raidManager.isRunning() || request.getTargetName().equals(characterName) || Format.isFakePlayerName(request.getTargetName()))) {
 			try {
 				events = getDeathRecap(request, playerName);
 				if (events == null) {
@@ -1211,8 +1212,9 @@ public class RaidPresenter extends BaseCombatLogPresenter {
 				deathTick);
 
 		return eventService.getCombatEvents(combat,
-				Collections.singleton(Event.Type.SIMPLIFIED), null, null, null,
-				combatSel, playerName);
+						Collections.singleton(Event.Type.SIMPLIFIED), null, null, null,
+						combatSel, playerName).stream().filter((e) -> playerName.equals(e.getSource().getName()) || playerName.equals(e.getTarget().getName()))
+				.collect(Collectors.toList());
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 import com.ixale.starparse.domain.Combat;
 import com.ixale.starparse.domain.CombatChallenge;
 import com.ixale.starparse.domain.Event;
+import com.ixale.starparse.domain.NpcType;
 import com.ixale.starparse.domain.Raid;
 import com.ixale.starparse.domain.RaidBoss;
 import com.ixale.starparse.domain.RaidBoss.BossUpgradeCallback;
@@ -87,6 +88,73 @@ public class ExplosiveConflict extends Raid {
 
 		addChallenge(RaidBossName.WarlordKephess, new KephessWalkerChallenge());
 		addChallenge(RaidBossName.FirebrandAndStormcaller, new TanksShieldChallenge());
+
+		npcs.put(2788331423268864L, new Npc(NpcType.boss_raid)); // Zorn, boss_troll_1, npc.qtr.1x2.raid.denova.enemy.difficulty_1.boss.trolls.boss_troll_1
+		npcs.put(2857544821243904L, new Npc(NpcType.boss_raid)); // Zorn, boss_troll_1, npc.qtr.1x2.raid.denova.enemy.difficulty_2.boss.trolls.boss_troll_1
+		npcs.put(2860770341683200L, new Npc(NpcType.boss_raid)); // Zorn, boss_troll_1, npc.qtr.1x2.raid.denova.enemy.difficulty_3.boss.trolls.boss_troll_1
+		npcs.put(2861388816973824L, new Npc(NpcType.boss_raid)); // Zorn, boss_troll_1, npc.qtr.1x2.raid.denova.enemy.difficulty_4.boss.trolls.boss_troll_1
+		npcs.put(2788335718236160L, new Npc(NpcType.boss_raid)); // Toth, boss_troll_2, npc.qtr.1x2.raid.denova.enemy.difficulty_1.boss.trolls.boss_troll_2
+		npcs.put(2857549116211200L, new Npc(NpcType.boss_raid)); // Toth, boss_troll_2, npc.qtr.1x2.raid.denova.enemy.difficulty_2.boss.trolls.boss_troll_2
+		npcs.put(2860766046715904L, new Npc(NpcType.boss_raid)); // Toth, boss_troll_2, npc.qtr.1x2.raid.denova.enemy.difficulty_3.boss.trolls.boss_troll_2
+		npcs.put(2861384522006528L, new Npc(NpcType.boss_raid)); // Toth, boss_troll_2, npc.qtr.1x2.raid.denova.enemy.difficulty_4.boss.trolls.boss_troll_2
+		npcs.put(2810922951245824L, new Npc(NpcType.boss_4)); // Handler Murdok, boss.trolls.drouk_handler, npc.qtr.1x2.raid.denova.enemy.difficulty_1.boss.trolls.drouk_handler
+		npcs.put(2855809654456320L, new Npc(NpcType.boss_4)); // Handler Murdok, boss.trolls.drouk_handler, npc.qtr.1x2.raid.denova.enemy.difficulty_2.boss.trolls.drouk_handler
+		npcs.put(2855813949423616L, new Npc(NpcType.boss_4)); // Handler Murdok, boss.trolls.drouk_handler, npc.qtr.1x2.raid.denova.enemy.difficulty_3.boss.trolls.drouk_handler
+		npcs.put(2855818244390912L, new Npc(NpcType.boss_4)); // Handler Murdok, boss.trolls.drouk_handler, npc.qtr.1x2.raid.denova.enemy.difficulty_4.boss.trolls.drouk_handler
+
+		npcs.put(2808827007205376L, new Npc(NpcType.boss_raid, "Firebrand")); // Firebrand Battle Tank, boss.tanks.tank_1, npc.qtr.1x2.raid.denova.enemy.difficulty_1.boss.tanks.tank_1
+		npcs.put(2876434087411712L, new Npc(NpcType.boss_raid, "Firebrand")); // Firebrand Battle Tank, boss.tanks.tank_1, npc.qtr.1x2.raid.denova.enemy.difficulty_2.boss.tanks.tank_1
+		npcs.put(2876459857215488L, new Npc(NpcType.boss_raid, "Firebrand")); // Firebrand Battle Tank, boss.tanks.tank_1, npc.qtr.1x2.raid.denova.enemy.difficulty_3.boss.tanks.tank_1
+		npcs.put(2876481332051968L, new Npc(NpcType.boss_raid, "Firebrand")); // Firebrand Battle Tank, boss.tanks.tank_1, npc.qtr.1x2.raid.denova.enemy.difficulty_4.boss.tanks.tank_1
+		npcs.put(2808831302172672L, new Npc(NpcType.boss_raid, "Stormcaller")); // Stormcaller Blast Tank, boss.tanks.tank_2, npc.qtr.1x2.raid.denova.enemy.difficulty_1.boss.tanks.tank_2
+		npcs.put(2876438382379008L, new Npc(NpcType.boss_raid, "Stormcaller")); // Stormcaller Blast Tank, boss.tanks.tank_2, npc.qtr.1x2.raid.denova.enemy.difficulty_2.boss.tanks.tank_2
+		npcs.put(2876464152182784L, new Npc(NpcType.boss_raid, "Stormcaller")); // Stormcaller Blast Tank, boss.tanks.tank_2, npc.qtr.1x2.raid.denova.enemy.difficulty_3.boss.tanks.tank_2
+		npcs.put(2876485627019264L, new Npc(NpcType.boss_raid, "Stormcaller")); // Stormcaller Blast Tank, boss.tanks.tank_2, npc.qtr.1x2.raid.denova.enemy.difficulty_4.boss.tanks.tank_2
+
+		npcs.put(2854134617210880L, new Npc(NpcType.boss_1)); // Imperial Assassin Droid, boss.puzzle.imperial_droid, npc.qtr.1x2.raid.denova.enemy.difficulty_3.boss.puzzle.imperial_droid
+		npcs.put(2854138912178176L, new Npc(NpcType.boss_1)); // Imperial Assassin Droid, boss.puzzle.imperial_droid, npc.qtr.1x2.raid.denova.enemy.difficulty_4.boss.puzzle.imperial_droid
+		npcs.put(2783478110224384L, new Npc(NpcType.boss_4)); // Imperial Demolitions Probe, boss.puzzle.probe, npc.qtr.1x2.raid.denova.enemy.difficulty_1.boss.puzzle.probe
+		npcs.put(2854151797080064L, new Npc(NpcType.boss_4)); // Imperial Demolitions Probe, boss.puzzle.probe, npc.qtr.1x2.raid.denova.enemy.difficulty_2.boss.puzzle.probe
+		npcs.put(2854156092047360L, new Npc(NpcType.boss_4)); // Imperial Demolitions Probe, boss.puzzle.probe, npc.qtr.1x2.raid.denova.enemy.difficulty_3.boss.puzzle.probe
+		npcs.put(2854160387014656L, new Npc(NpcType.boss_4)); // Imperial Demolitions Probe, boss.puzzle.probe, npc.qtr.1x2.raid.denova.enemy.difficulty_4.boss.puzzle.probe
+//		npcs.put(2854164681981952L, new Npc(NpcToughness.boss_1)); // Defected Imperial Commander, boss.puzzle.rocket_commander, npc.qtr.1x2.raid.denova.enemy.difficulty_2.boss.puzzle.rocket_commander
+//		npcs.put(2854173271916544L, new Npc(NpcToughness.boss_1)); // Defected Imperial Commander, boss.puzzle.rocket_commander, npc.qtr.1x2.raid.denova.enemy.difficulty_4.boss.puzzle.rocket_commander
+//		npcs.put(2854190451785728L, new Npc(NpcToughness.boss_1)); // Defected Imperial Trooper, boss.puzzle.rocket_trooper, npc.qtr.1x2.raid.denova.enemy.difficulty_4.boss.puzzle.rocket_trooper
+//		npcs.put(2854194746753024L, new Npc(NpcToughness.boss_1)); // Defected Imperial Commander, boss.puzzle.scout_trooper, npc.qtr.1x2.raid.denova.enemy.difficulty_2.boss.puzzle.scout_trooper
+//		npcs.put(2854207631654912L, new Npc(NpcToughness.boss_1)); // Defected Imperial Commander, boss.puzzle.scout_trooper, npc.qtr.1x2.raid.denova.enemy.difficulty_4.boss.puzzle.scout_trooper
+		npcs.put(2848692893646848L, new Npc(NpcType.boss_4)); // Colonel Vorgath, boss.puzzle.colonel_vorgath, npc.qtr.1x2.raid.denova.enemy.difficulty_1.boss.puzzle.colonel_vorgath
+		npcs.put(2854117437341696L, new Npc(NpcType.boss_4)); // Colonel Vorgath, boss.puzzle.colonel_vorgath, npc.qtr.1x2.raid.denova.enemy.difficulty_2.boss.puzzle.colonel_vorgath
+		npcs.put(2854224811524096L, new Npc(NpcType.boss_4)); // Colonel Vorgath, boss.puzzle.colonel_vorgath, npc.qtr.1x2.raid.denova.enemy.difficulty_3.boss.puzzle.colonel_vorgath
+		npcs.put(2854229106491392L, new Npc(NpcType.boss_4)); // Colonel Vorgath, boss.puzzle.colonel_vorgath, npc.qtr.1x2.raid.denova.enemy.difficulty_4.boss.puzzle.colonel_vorgath
+//		npcs.put(2854121732308992L, new Npc(NpcToughness.boss_1)); // Automated Defense Turret, boss.puzzle.colonel_vorgath_turret, npc.qtr.1x2.raid.denova.enemy.difficulty_2.boss.puzzle.colonel_vorgath_turret
+//		npcs.put(2854130322243584L, new Npc(NpcToughness.boss_1)); // Automated Defense Turret, boss.puzzle.colonel_vorgath_turret, npc.qtr.1x2.raid.denova.enemy.difficulty_4.boss.puzzle.colonel_vorgath_turret
+//		npcs.put(2810819872030720L, new Npc(NpcToughness.boss_1)); // Automated Defense Turret, boss.puzzle.turret, npc.qtr.1x2.raid.denova.enemy.difficulty_1.boss.puzzle.turret
+//		npcs.put(2854211926622208L, new Npc(NpcToughness.boss_1)); // Automated Defense Turret, boss.puzzle.turret, npc.qtr.1x2.raid.denova.enemy.difficulty_2.boss.puzzle.turret
+//		npcs.put(2854216221589504L, new Npc(NpcToughness.boss_1)); // Automated Defense Turret, boss.puzzle.turret, npc.qtr.1x2.raid.denova.enemy.difficulty_3.boss.puzzle.turret
+//		npcs.put(2854220516556800L, new Npc(NpcToughness.boss_2)); // Automated Defense Turret, boss.puzzle.turret, npc.qtr.1x2.raid.denova.enemy.difficulty_4.boss.puzzle.turret
+//		npcs.put(2813182104043520L, new Npc(NpcToughness.boss_4)); // Colonel Vorgath, boss.puzzle.controller, npc.qtr.1x2.raid.denova.enemy.difficulty_1.boss.puzzle.controller
+
+		npcs.put(2800357331697664L, new Npc(NpcType.boss_raid, "Kephess")); // Warlord Kephess, boss_kephess, npc.qtr.1x2.raid.denova.enemy.difficulty_1.boss.kephess.boss_kephess
+		npcs.put(2876528576692224L, new Npc(NpcType.boss_raid, "Kephess")); // Warlord Kephess, boss_kephess, npc.qtr.1x2.raid.denova.enemy.difficulty_2.boss.kephess.boss_kephess
+		npcs.put(2876550051528704L, new Npc(NpcType.boss_raid, "Kephess")); // Warlord Kephess, boss_kephess, npc.qtr.1x2.raid.denova.enemy.difficulty_3.boss.kephess.boss_kephess
+		npcs.put(2876588706234368L, new Npc(NpcType.boss_raid, "Kephess")); // Warlord Kephess, boss_kephess, npc.qtr.1x2.raid.denova.enemy.difficulty_4.boss.kephess.boss_kephess
+		npcs.put(2794185463693312L, new Npc(NpcType.boss_raid, "Walker")); // Warstrider Battlewalker, boss_walker, npc.qtr.1x2.raid.denova.enemy.difficulty_1.boss.kephess.boss_walker
+		npcs.put(2876532871659520L, new Npc(NpcType.boss_raid, "Walker")); // Warstrider Battlewalker, boss_walker, npc.qtr.1x2.raid.denova.enemy.difficulty_2.boss.kephess.boss_walker
+		npcs.put(2876562936430592L, new Npc(NpcType.boss_raid, "Walker")); // Warstrider Battlewalker, boss_walker, npc.qtr.1x2.raid.denova.enemy.difficulty_3.boss.kephess.boss_walker
+		npcs.put(2876593001201664L, new Npc(NpcType.boss_raid, "Walker")); // Warstrider Battlewalker, boss_walker, npc.qtr.1x2.raid.denova.enemy.difficulty_4.boss.kephess.boss_walker
+		npcs.put(2802491930443776L, new Npc(NpcType.boss_3)); // Imperial Siege Droid, boss.kephess.add_massive_damage, npc.qtr.1x2.raid.denova.enemy.difficulty_1.boss.kephess.add_massive_damage
+		npcs.put(2876515691790336L, new Npc(NpcType.boss_3)); // Imperial Siege Droid, boss.kephess.add_massive_damage, npc.qtr.1x2.raid.denova.enemy.difficulty_2.boss.kephess.add_massive_damage
+		npcs.put(2876545756561408L, new Npc(NpcType.boss_3)); // Imperial Siege Droid, boss.kephess.add_massive_damage, npc.qtr.1x2.raid.denova.enemy.difficulty_3.boss.kephess.add_massive_damage
+		npcs.put(2876575821332480L, new Npc(NpcType.boss_3)); // Imperial Siege Droid, boss.kephess.add_massive_damage, npc.qtr.1x2.raid.denova.enemy.difficulty_4.boss.kephess.add_massive_damage
+		npcs.put(2810295886020608L, new Npc(NpcType.boss_4)); // Pulsar Power Droid, boss.kephess.add_massive_pbae, npc.qtr.1x2.raid.denova.enemy.difficulty_1.boss.kephess.add_massive_pbae
+		npcs.put(2876519986757632L, new Npc(NpcType.boss_4)); // Pulsar Power Droid, boss.kephess.add_massive_pbae, npc.qtr.1x2.raid.denova.enemy.difficulty_2.boss.kephess.add_massive_pbae
+		npcs.put(2876554346496000L, new Npc(NpcType.boss_4)); // Pulsar Power Droid, boss.kephess.add_massive_pbae, npc.qtr.1x2.raid.denova.enemy.difficulty_3.boss.kephess.add_massive_pbae
+		npcs.put(2876580116299776L, new Npc(NpcType.boss_4)); // Pulsar Power Droid, boss.kephess.add_massive_pbae, npc.qtr.1x2.raid.denova.enemy.difficulty_4.boss.kephess.add_massive_pbae
+		npcs.put(2792969987948544L, new Npc(NpcType.boss_2)); // Baradium Bomber, boss.kephess.bomb_carrier, npc.qtr.1x2.raid.denova.enemy.difficulty_1.boss.kephess.bomb_carrier
+		npcs.put(2876524281724928L, new Npc(NpcType.boss_2)); // Baradium Bomber, boss.kephess.bomb_carrier, npc.qtr.1x2.raid.denova.enemy.difficulty_2.boss.kephess.bomb_carrier
+		npcs.put(2876558641463296L, new Npc(NpcType.boss_2)); // Baradium Bomber, boss.kephess.bomb_carrier, npc.qtr.1x2.raid.denova.enemy.difficulty_3.boss.kephess.bomb_carrier
+		npcs.put(2876584411267072L, new Npc(NpcType.boss_2)); // Baradium Bomber, boss.kephess.bomb_carrier, npc.qtr.1x2.raid.denova.enemy.difficulty_4.boss.kephess.bomb_carrier
+//		npcs.put(2919491134554112L, new Npc(NpcToughness.boss_raid)); // Breath of the Masters, boss.kephess.gtae_caster, npc.qtr.1x2.raid.denova.enemy.difficulty_1.boss.kephess.gtae_caster
 	}
 
 	@Override

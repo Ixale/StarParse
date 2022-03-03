@@ -5,6 +5,7 @@ import com.ixale.starparse.domain.Combat;
 import com.ixale.starparse.domain.CombatInfo;
 import com.ixale.starparse.domain.CombatLog;
 import com.ixale.starparse.domain.ConfigTimer;
+import com.ixale.starparse.domain.RaidBossName;
 import com.ixale.starparse.domain.RaidGroup;
 import com.ixale.starparse.domain.stats.CombatStats;
 import com.ixale.starparse.gui.Config;
@@ -24,6 +25,7 @@ import com.ixale.starparse.gui.popout.BaseTimersPopoutPresenter;
 import com.ixale.starparse.gui.popout.ChallengesPopoutPresenter;
 import com.ixale.starparse.gui.popout.HotsPopoutPresenter;
 import com.ixale.starparse.gui.popout.PersonalStatsPopoutPresenter;
+import com.ixale.starparse.gui.popout.RaidBossPopoutPresenter;
 import com.ixale.starparse.gui.popout.RaidDpsPopoutPresenter;
 import com.ixale.starparse.gui.popout.RaidHpsPopoutPresenter;
 import com.ixale.starparse.gui.popout.RaidNotesPopoutPresenter;
@@ -52,7 +54,6 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -77,7 +78,6 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -152,7 +152,8 @@ public class MainPresenter implements Initializable {
 	@FXML
 	private CheckMenuItem timersAPopoutMenu, timersBPopoutMenu, timersCPopoutMenu,
 			timersCenterPopoutMenu, personalStatsPopoutMenu, challengesPopoutMenu,
-			raidDpsPopoutMenu, raidHpsPopoutMenu, raidTpsPopoutMenu, hotsPopoutMenu, raidNotesPopoutMenu, lockOverlaysMenu;
+			raidDpsPopoutMenu, raidHpsPopoutMenu, raidTpsPopoutMenu, raidBossPopoutMenu,
+			hotsPopoutMenu, raidNotesPopoutMenu, lockOverlaysMenu;
 	@FXML
 	private Button darkModeButton;
 
@@ -196,6 +197,8 @@ public class MainPresenter implements Initializable {
 	private RaidHpsPopoutPresenter raidHpsPopoutPresenter;
 	@Inject
 	private RaidTpsPopoutPresenter raidTpsPopoutPresenter;
+	@Inject
+	private RaidBossPopoutPresenter raidBossPopoutPresenter;
 	@Inject
 	private HotsPopoutPresenter hotsPopoutPresenter;
 	@Inject
@@ -358,6 +361,7 @@ public class MainPresenter implements Initializable {
 				final double raidDamageOpacity, final boolean raidDamageBars,
 				final double raidHealingOpacity, final boolean raidHealingBars, final String raidHealingMode,
 				final double raidThreatOpacity, final boolean raidThreatBars,
+				final double raidBossOpacity, final boolean raidBossBars,
 				final double raidChallengesOpacity, final boolean raidChallengesBars,
 				final double timersOpacity, final boolean timersBars,
 				final double personalOpacity, final boolean personalBars, final String personalMode,
@@ -407,6 +411,10 @@ public class MainPresenter implements Initializable {
 						sp.presenter.setOpacity(personalOpacity);
 						sp.presenter.setBars(personalBars);
 						sp.presenter.setMode(personalMode);
+
+					} else if (sp.presenter instanceof RaidBossPopoutPresenter) {
+						sp.presenter.setOpacity(raidBossOpacity);
+						sp.presenter.setBars(raidBossBars);
 
 					} else if (sp.presenter instanceof RaidNotesPopoutPresenter) {
 						sp.presenter.setOpacity(personalOpacity); // TODO
@@ -1239,6 +1247,7 @@ public class MainPresenter implements Initializable {
 		StatsPopout.add(raidDpsPopoutPresenter, raidDpsPopoutMenu, config);
 		StatsPopout.add(raidHpsPopoutPresenter, raidHpsPopoutMenu, config);
 		StatsPopout.add(raidTpsPopoutPresenter, raidTpsPopoutMenu, config);
+		StatsPopout.add(raidBossPopoutPresenter, raidBossPopoutMenu, config);
 		StatsPopout.add(hotsPopoutPresenter, hotsPopoutMenu, config);
 		StatsPopout.add(raidNotesPopoutPresenter, raidNotesPopoutMenu, config);
 
@@ -1281,6 +1290,7 @@ public class MainPresenter implements Initializable {
 					final double raidDamageOpacity, final boolean raidDamageBars,
 					final double raidHealingOpacity, final boolean raidHealingBars, final String raidHealingMode,
 					final double raidThreatOpacity, final boolean raidThreatBars,
+					final double raidBossOpacity, final boolean raidBossBars,
 					final double raidChallengesOpacity, final boolean raidChallengesBars,
 					final double timersOpacity, final boolean timersBars,
 					final double personalOpacity, final boolean personalBars, final String personalMode,
@@ -1291,6 +1301,7 @@ public class MainPresenter implements Initializable {
 						raidDamageOpacity, raidDamageBars,
 						raidHealingOpacity, raidHealingBars, raidHealingMode,
 						raidThreatOpacity, raidThreatBars,
+						raidBossOpacity, raidBossBars,
 						raidChallengesOpacity, raidChallengesBars,
 						timersOpacity, timersBars,
 						personalOpacity, personalBars, personalMode,
@@ -1478,8 +1489,8 @@ public class MainPresenter implements Initializable {
 
 	private void updateCombatOverview(final Combat combat, final CombatStats stats, final int combatCount) {
 		final CombatInfo combatInfo = context.getCombatInfo().get(combat.getCombatId());
-		combatName.setText((combatInfo != null && combatInfo.getInstanceName() != null
-				? combatInfo.getInstanceName() + ": "
+		combatName.setText((combatInfo != null && combatInfo.getLocationInfo() != null && combatInfo.getLocationInfo().getInstanceName() != null
+				? combatInfo.getLocationInfo().getInstanceName() + ": "
 				: "")
 				+ Format.formatCombatName(combat));
 

@@ -3,6 +3,7 @@ package com.ixale.starparse.gui;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.ixale.starparse.gui.popout.RaidBossPopoutPresenter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
@@ -130,6 +131,12 @@ public class StarparseAppFactory
 	public RaidTpsPopoutPresenter raidTpsPopoutPresenter()
 	{
 		return loadPresenter("/fxml/RaidTpsPopout.fxml");
+	}
+
+	@Bean
+	public RaidBossPopoutPresenter raidBossPopoutPresenter()
+	{
+		return loadPresenter("/fxml/RaidBossPopout.fxml");
 	}
 
 	@Bean

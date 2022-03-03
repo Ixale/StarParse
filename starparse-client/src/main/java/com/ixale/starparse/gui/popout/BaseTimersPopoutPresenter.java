@@ -129,7 +129,7 @@ public abstract class BaseTimersPopoutPresenter extends BasePopoutPresenter {
 		final Label title = new Label("");
 		title.setTextFill(this.textColor);
 		title.setFont(Font.font("System", 11));
-		title.setMaxWidth(TIMER_WIDTH - 30);
+		title.setMaxWidth(TIMER_WIDTH - 40);
 		title.setMaxHeight(TITLE_HEIGHT);
 		title.setWrapText(true);
 
@@ -193,7 +193,11 @@ public abstract class BaseTimersPopoutPresenter extends BasePopoutPresenter {
 
 		final boolean timersVisible = !TimerManager.isMuted() || Scope.ANY.equals(timer.getScope());
 		if (timersVisible != pane.isVisible()) {
-			pane.setVisible(timersVisible);
+			if (!timersVisible) {
+				removeTimer(timer);
+			} else {
+				pane.setVisible(true);
+			}
 		}
 	}
 

@@ -17,6 +17,7 @@ import com.ixale.starparse.domain.Combat;
 import com.ixale.starparse.domain.CombatChallenge;
 import com.ixale.starparse.domain.EntityGuid;
 import com.ixale.starparse.domain.Event;
+import com.ixale.starparse.domain.NpcType;
 import com.ixale.starparse.domain.Raid;
 import com.ixale.starparse.domain.RaidBoss;
 import com.ixale.starparse.domain.RaidBossName;
@@ -168,6 +169,35 @@ public class TempleOfSacrifice extends Raid {
 		bosses.add(revan16h);
 
 		addChallenge(RaidBossName.Revan, new RevanBurnChallenge());
+
+		npcs.put(3469281308180480L, new Npc(NpcType.boss_raid, "Malaphar")); // Malaphar the Savage
+		npcs.put(3469277013213184L, new Npc(NpcType.boss_raid, "Malaphar")); // Malaphar the Savage
+		npcs.put(3431245077807104L, new Npc(NpcType.boss_raid, "Malaphar")); // Malaphar the Savage
+		npcs.put(3469285603147776L, new Npc(NpcType.boss_raid, "Malaphar")); // Malaphar the Savage
+//		npcs.put(3436630966796288L, new Npc(NpcToughness.boss_4)); // Feral Massassi
+//		npcs.put(3448450716794880L, new Npc(NpcToughness.boss_4)); // Feral Massassi Leaper
+
+		npcs.put(3468765912104960L, new Npc(NpcType.boss_raid, "Unit 1")); // Sword Squadron Unit 1
+		npcs.put(3468770207072256L, new Npc(NpcType.boss_raid, "Unit 1")); // Sword Squadron Unit 1
+		npcs.put(3468774502039552L, new Npc(NpcType.boss_raid, "Unit 1")); // Sword Squadron Unit 1
+		npcs.put(3447784996864000L, new Npc(NpcType.boss_raid, "Unit 1")); // Sword Squadron Unit 1
+		npcs.put(3447789291831296L, new Npc(NpcType.boss_raid, "Unit 2")); // Sword Squadron Unit 2
+
+		npcs.put(3411402328899584L, new Npc(NpcType.boss_raid)); // The Underlurker
+		npcs.put(3462267626586112L, new Npc(NpcType.boss_raid)); // The Underlurker
+		npcs.put(3462263331618816L, new Npc(NpcType.boss_raid)); // The Underlurker
+		npcs.put(3462271921553408L, new Npc(NpcType.boss_raid)); // The Underlurker
+
+		npcs.put(3456890327531520L, new Npc(NpcType.boss_raid)); // Deron Cadoruso
+		npcs.put(3456894622498816L, new Npc(NpcType.boss_raid)); // Sano Thrica
+		npcs.put(3456898917466112L, new Npc(NpcType.boss_raid)); // Lord Kurse
+//		npcs.put(3457818040467456L, new Npc(NpcToughness.boss_1)); // Outlaw Revanite
+//		npcs.put(3457813745500160L, new Npc(NpcToughness.boss_1)); // Sith Revanite
+//		npcs.put(3457809450532864L, new Npc(NpcToughness.boss_1)); // Mandalorian Revanite
+
+		npcs.put(3444310368321536L, new Npc(NpcType.boss_raid)); // HK-47
+		npcs.put(3431605855059968L, new Npc(NpcType.boss_raid, "Revan", 0.101)); // Revan
+		npcs.put(3447583133401088L, new Npc(NpcType.boss_raid)); // Machine Core
 	}
 
 	private RaidBoss upgradeCommandersHM(long guid, final Integer value, final RaidBoss hmBoss) {

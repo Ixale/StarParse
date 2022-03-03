@@ -6,22 +6,19 @@ import java.util.Objects;
 
 public class CombatInfo {
 
-	private Raid.Mode instanceMode;
-	private Raid.Size instanceSize;
-	private String instanceName;
-	private Long instanceGuid;
+	private LocationInfo locationInfo;
 
 	// transient
 	private final LinkedHashMap<Actor, CharacterDiscipline> combatPlayers = new LinkedHashMap<>();
 
+	// transient
+	private final LinkedHashMap<Actor, CombatActorState> combatActorStates = new LinkedHashMap<>();
+
 	public CombatInfo() {
 	}
 
-	public CombatInfo(final Raid.Mode instanceMode, final Raid.Size instanceSize, final String instanceName, final Long instanceGuid) {
-		this.instanceMode = instanceMode;
-		this.instanceSize = instanceSize;
-		this.instanceName = instanceName;
-		this.instanceGuid = instanceGuid;
+	public CombatInfo(final LocationInfo locationInfo) {
+		this.locationInfo = locationInfo;
 	}
 
 	public void addCombatPlayer(Actor player, CharacterDiscipline discipline) {
@@ -44,39 +41,16 @@ public class CombatInfo {
 		throw new IllegalStateException("Missing SELF, got " + combatPlayers);
 	}
 
-	public String getInstanceName() {
-		return instanceName;
+	public LocationInfo getLocationInfo() {
+		return locationInfo;
 	}
 
-	public void setInstanceName(final String instanceName) {
-		this.instanceName = instanceName;
+	public void setLocationInfo(final LocationInfo locationInfo) {
+		this.locationInfo = locationInfo;
 	}
 
-	public Long getInstanceGuid() {
-		return instanceGuid;
+	public LinkedHashMap<Actor, CombatActorState> getCombatActorStates() {
+		return combatActorStates;
 	}
 
-	public void setInstanceGuid(final Long instanceGuid) {
-		this.instanceGuid = instanceGuid;
-	}
-
-	public Raid.Mode getInstanceMode() {
-		return instanceMode;
-	}
-
-	public void setInstanceMode(final Raid.Mode instanceMode) {
-		this.instanceMode = instanceMode;
-	}
-
-	public Raid.Size getInstanceSize() {
-		return instanceSize;
-	}
-
-	public void setInstanceSize(final Raid.Size instanceSize) {
-		this.instanceSize = instanceSize;
-	}
-
-	public String getInstanceDifficulty() {
-		return (instanceMode == null ? null : instanceMode + " " + instanceSize);
-	}
 }

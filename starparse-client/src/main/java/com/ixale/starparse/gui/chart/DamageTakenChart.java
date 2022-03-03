@@ -7,7 +7,7 @@ public class DamageTakenChart extends BaseLineChart {
 	public DamageTakenChart(Context context) {
 		super(context);
 
-		setBoundaries(10000, 300000);
+		setBoundaries(10000, 500000);
 
 		setAsTransparent("chart-damage-taken");
 

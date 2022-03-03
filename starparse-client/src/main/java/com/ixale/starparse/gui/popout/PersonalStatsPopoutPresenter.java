@@ -63,9 +63,9 @@ public class PersonalStatsPopoutPresenter extends BasePopoutPresenter {
 		super.initialize(url, resourceBundle);
 
 		this.offsetY = 790;
-		this.height = 211;
+		this.height = 230;
 
-		addMode(new Mode(Mode.DEFAULT, "Personal", 211, modeAll));
+		addMode(new Mode(Mode.DEFAULT, "Personal", 230, modeAll));
 		addMode(new Mode(MODE_DAMAGE, "Damage", 116, modeDamage));
 		addMode(new Mode(MODE_HEALING, "Healing", 139, modeHealing));
 	}

@@ -3,6 +3,7 @@ package com.ixale.starparse.domain.ops;
 import com.ixale.starparse.domain.Combat;
 import com.ixale.starparse.domain.CombatChallenge;
 import com.ixale.starparse.domain.Event;
+import com.ixale.starparse.domain.NpcType;
 import com.ixale.starparse.domain.Raid;
 import com.ixale.starparse.domain.RaidBoss;
 import com.ixale.starparse.domain.RaidBossName;
@@ -90,6 +91,38 @@ public class Ravagers extends Raid {
 
 		addChallenge(RaidBossName.Torque, new TorqueDroidChallenge());
 		addChallenge(RaidBossName.Coratanni, new CoratanniRuugarChallenge());
+
+		npcs.put(3367555007774720L, new Npc(NpcType.boss_raid)); // Sparky, boss_junkyard_dog, npc.operation.rishi.enemy.difficulty_1.boss.junkyard_dog.boss_junkyard_dog
+		npcs.put(3458110098243584L, new Npc(NpcType.boss_raid)); // Sparky, boss_junkyard_dog, npc.operation.rishi.enemy.difficulty_2.boss.junkyard_dog.boss_junkyard_dog
+		npcs.put(3458114393210880L, new Npc(NpcType.boss_raid)); // Sparky, boss_junkyard_dog, npc.operation.rishi.enemy.difficulty_3.boss.junkyard_dog.boss_junkyard_dog
+		npcs.put(3458122983145472L, new Npc(NpcType.boss_raid)); // Sparky, boss_junkyard_dog, npc.operation.rishi.enemy.difficulty_4.boss.junkyard_dog.boss_junkyard_dog
+
+		npcs.put(3371446248144896L, new Npc(NpcType.boss_raid, "Bulo")); // Quartermaster Bulo, boss_quartermaster, npc.operation.rishi.enemy.difficulty_1.boss.quartermaster.boss_quartermaster
+		npcs.put(3468705782562816L, new Npc(NpcType.boss_raid, "Bulo")); // Quartermaster Bulo, boss_quartermaster, npc.operation.rishi.enemy.difficulty_2.boss.quartermaster.boss_quartermaster
+		npcs.put(3468701487595520L, new Npc(NpcType.boss_raid, "Bulo")); // Quartermaster Bulo, boss_quartermaster, npc.operation.rishi.enemy.difficulty_3.boss.quartermaster.boss_quartermaster
+		npcs.put(3468697192628224L, new Npc(NpcType.boss_raid, "Bulo")); // Quartermaster Bulo, boss_quartermaster, npc.operation.rishi.enemy.difficulty_4.boss.quartermaster.boss_quartermaster
+//		npcs.put(3420211306823680L, new Npc(NpcType.boss_1)); // Load Lifter, boss.quartermaster.explosive_lifter, npc.operation.rishi.enemy.difficulty_1.boss.quartermaster.explosive_lifter
+//		npcs.put(3465286988595200L, new Npc(NpcType.boss_1)); // Exonium Cart, boss.quartermaster.explosive_lifter_2, npc.operation.rishi.enemy.difficulty_1.boss.quartermaster.explosive_lifter_2
+//		npcs.put(3392392803647488L, new Npc(NpcType.boss_1)); // Pirate, boss.quartermaster.pirate_add, npc.operation.rishi.enemy.difficulty_1.boss.quartermaster.pirate_add
+
+		npcs.put(3397005598523392L, new Npc(NpcType.boss_raid)); // Torque, boss_engineer, npc.operation.rishi.enemy.difficulty_1.boss.engineer.boss_engineer
+		npcs.put(3468710077530112L, new Npc(NpcType.boss_raid)); // Torque, boss_engineer, npc.operation.rishi.enemy.difficulty_2.boss.engineer.boss_engineer
+		npcs.put(3468714372497408L, new Npc(NpcType.boss_raid)); // Torque, boss_engineer, npc.operation.rishi.enemy.difficulty_3.boss.engineer.boss_engineer
+		npcs.put(3468718667464704L, new Npc(NpcType.boss_raid)); // Torque, boss_engineer, npc.operation.rishi.enemy.difficulty_4.boss.engineer.boss_engineer
+//		npcs.put(3397735742963712L, new Npc(NpcType.boss_1)); // Astromech Repair Unit, boss.engineer.astromech, npc.operation.rishi.enemy.difficulty_1.boss.engineer.astromech
+//		npcs.put(3513403507212288L, new Npc(NpcType.boss_1)); // FIX-4U, boss.engineer.astromech_2, npc.operation.rishi.enemy.difficulty_1.boss.engineer.astromech_2
+//		npcs.put(3406514656116736L, new Npc(NpcType.boss_1)); // Shoots Lasers, boss.engineer.line_turret, npc.operation.rishi.enemy.difficulty_1.boss.engineer.line_turret
+//		npcs.put(3406510361149440L, new Npc(NpcType.boss_1)); // Dangerous Fire Device, boss.engineer.pbaoe_turret, npc.operation.rishi.enemy.difficulty_1.boss.engineer.pbaoe_turret
+
+		npcs.put(3391100018491392L, new Npc(NpcType.boss_raid, "Master")); // BO-55 Master Droid, boss.buddy_battledroid.astromech, npc.operation.rishi.enemy.difficulty_1.boss.buddy_battledroid.astromech
+		npcs.put(3391095723524096L, new Npc(NpcType.boss_raid)); // Blaster, boss.buddy_battledroid.battledroid, npc.operation.rishi.enemy.difficulty_1.boss.buddy_battledroid.battledroid
+		npcs.put(3458148752949248L, new Npc(NpcType.boss_raid)); // Blaster, boss.buddy_battledroid.battledroid, npc.operation.rishi.enemy.difficulty_2.boss.buddy_battledroid.battledroid
+		npcs.put(3462181727240192L, new Npc(NpcType.boss_raid)); // Blaster, boss.buddy_battledroid.battledroid, npc.operation.rishi.enemy.difficulty_3.boss.buddy_battledroid.battledroid
+		npcs.put(3462186022207488L, new Npc(NpcType.boss_raid)); // Blaster, boss.buddy_battledroid.battledroid, npc.operation.rishi.enemy.difficulty_4.boss.buddy_battledroid.battledroid
+
+		npcs.put(3371437658210304L, new Npc(NpcType.boss_raid)); // Coratanni, boss_pirate_queen, npc.operation.rishi.enemy.difficulty_1.boss.pirate_queen.boss_pirate_queen
+		npcs.put(3374109127868416L, new Npc(NpcType.boss_raid)); // Pearl, boss.pirate_queen.flutterplume, npc.operation.rishi.enemy.difficulty_1.boss.pirate_queen.flutterplume
+		npcs.put(3371441953177600L, new Npc(NpcType.boss_raid)); // Ruugar, boss_pirate_captain, npc.operation.rishi.enemy.difficulty_1.boss.pirate_queen.boss_pirate_captain
 	}
 
 	private RaidBoss upgradeCoratanniHM(long guid, final Integer value, final RaidBoss hmBoss) {

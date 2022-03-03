@@ -78,7 +78,7 @@ public class RankServiceImpl implements RankService {
 						logger.debug("Ranking fetched from remote (" + boss + ", " + type + ", " + discipline + "): " + ranking);
 					}
 				} catch (Exception e) {
-					if (e.getMessage().equals("Read timed out")) {
+					if (e.getMessage().equals("Read timed out") || e.getMessage().startsWith("Server returned non-OK status: 404")) {
 						// local issue, silently ignore
 						return;
 					}

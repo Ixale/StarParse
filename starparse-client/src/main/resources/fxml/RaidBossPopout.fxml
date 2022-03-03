@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+
+<VBox fx:id="popoutRoot" disable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="98.0" prefWidth="150.0" spacing="0.0" styleClass="popout" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ixale.starparse.gui.popout.RaidBossPopoutPresenter">
+  <children>
+    <AnchorPane fx:id="popoutHeader" maxWidth="-Infinity" minHeight="-1.0" minWidth="-Infinity" prefHeight="-1.0" prefWidth="150.0" scaleX="1.0" scaleY="1.0" styleClass="popout-header" VBox.vgrow="NEVER">
+      <children>
+        <Rectangle fx:id="popoutTitleBackground" fill="BLACK" height="19.0" opacity="0.9" width="150.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+        <Label fx:id="popoutTitle" alignment="CENTER" contentDisplay="TOP" minHeight="-Infinity" prefHeight="19.0" styleClass="popout-title" text="Raid Boss" textAlignment="CENTER" textFill="WHITE" underline="false" wrapText="false" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+        <Button focusTraversable="false" onAction="#handleIncreaseOpacity" text="+" AnchorPane.leftAnchor="2.0" AnchorPane.topAnchor="2.0" />
+        <Button focusTraversable="false" onAction="#handleDecreaseOpacity" text="-" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="2.0" />
+        <Button focusTraversable="false" onAction="#handleToggleBars" text="B" AnchorPane.leftAnchor="125.0" AnchorPane.topAnchor="2.0" />
+        <Button focusTraversable="false" onAction="#handleClose" text="X" AnchorPane.leftAnchor="137.0" AnchorPane.topAnchor="2.0" />
+      </children>
+    </AnchorPane>
+	<AnchorPane VBox.vgrow="NEVER">
+      <children>
+		<Rectangle fx:id="popoutBackground" fill="BLACK" height="94.0" opacity="0.7" width="150.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+        <VBox fx:id="itemsGrid" alignment="TOP_LEFT" layoutX="0.0" layoutY="0.0" minHeight="-1.0" opacity="1.0" spacing="0.5">
+          <children>
+          </children>
+		</VBox>
+        <AnchorPane fx:id="popoutFooter" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="19.0" prefWidth="-1.0" styleClass="popout-footer" visible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+          <children>
+            <Rectangle height="19.0" opacity="0.5" width="150.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+            <Rectangle fx:id="resizeSW" fill="TRANSPARENT" height="18.0" opacity="0.5" width="18.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+            <Rectangle fx:id="resizeN" fill="TRANSPARENT" height="18.0" opacity="0.5" width="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="60.0" />
+            <Rectangle fx:id="resizeSE" fill="TRANSPARENT" height="18.0" opacity="0.5" width="18.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="132.0" />
+			<Line disable="true" endX="10.0" endY="-10.0" fill="TRANSPARENT" rotate="0.0" startX="0.0" startY="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="138.0">
+              <stroke>
+                <Color red="0.376" green="0.376" blue="0.376" fx:id="x1" />
+              </stroke>
+            </Line>
+            <Line disable="true" endX="5.0" endY="-5.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x1" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="143.0" />
+            <Line disable="true" endX="-10.0" endY="-10.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x1" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+            <Line disable="true" endX="-5.0" endY="-5.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x1" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+            <Line disable="true" endX="20.0" endY="0.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x1" AnchorPane.bottomAnchor="9.0" AnchorPane.leftAnchor="65.0" />
+            <Line disable="true" endX="20.0" endY="0.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x1" AnchorPane.bottomAnchor="7.0" AnchorPane.leftAnchor="65.0" />
+            <Line disable="true" endX="20.0" endY="0.0" rotate="0.0" startX="0.0" startY="0.0" stroke="$x1" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="65.0" />
+          </children>
+        </AnchorPane>
+      </children>
+      <VBox.margin>
+        <Insets top="1.0" />
+      </VBox.margin>
+    </AnchorPane>
+  </children>
+</VBox>

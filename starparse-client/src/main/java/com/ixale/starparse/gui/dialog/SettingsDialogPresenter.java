@@ -102,14 +102,14 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 	private TextField logDirectoryField, recentParsedLogsLimitField, recentOpenedLogsLimitField, timeSyncHostField,
 			raidGroupNameField, raidGroupClientPasswordField, raidGroupAdminPasswordField,
 			raidPullSec, raidPullHotkey, raidBreakMin,
-			raidDamageOpacityText, raidHealingOpacityText, raidThreatOpacityText,
+			raidDamageOpacityText, raidHealingOpacityText, raidThreatOpacityText, raidBossOpacityText,
 			raidChallengesOpacityText, timersOpacityText, timersFractions, personalOpacityText, lockOverlaysHotkey,
 			guildField, parselyLoginField, parselyPasswordField,
 			timerName, timerSourceName, timerTargetName, timerAbilityName, timerEffectName,
 			timerDuration, timerRepeat, timerSoundOffset, timerCountdownCount;
 
 	@FXML
-	private Slider raidDamageOpacitySlider, raidHealingOpacitySlider, raidThreatOpacitySlider,
+	private Slider raidDamageOpacitySlider, raidHealingOpacitySlider, raidThreatOpacitySlider, raidBossOpacitySlider,
 			raidChallengesOpacitySlider, timersOpacitySlider, personalOpacitySlider, timerSoundVolume, timerCountdownVolume;
 
 	@FXML
@@ -118,7 +118,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 	@FXML
 	private CheckBox timeSyncEnabledButton, serverStoreEnabledButton,
-			raidDamageBars, raidHealingBars, raidThreatBars, raidChallengesBars, timersBars, personalBars, timersCenter, popoutSolid,
+			raidDamageBars, raidHealingBars, raidThreatBars, raidBossBars, raidChallengesBars, timersBars, personalBars, timersCenter, popoutSolid,
 			timerDisplay, timerPlaySound, timersIgnoreRepeated, timersShowSource, timerPlayCountdown;
 
 	@FXML
@@ -187,6 +187,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 				double raidDamageOpacity, boolean raidDamageBars,
 				double raidHealingOpacity, boolean raidHealingBars, String raidHealingMode,
 				double raidThreatOpacity, boolean raidThreatBars,
+				double raidBossOpacity, boolean raidBossBars,
 				double raidChallengesOpacity, boolean raidChallengesBars,
 				double timersOpacity, boolean timersBars,
 				double personalOpacity, boolean personalBars, String personalMode,
@@ -1038,6 +1039,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			bindSlider(raidDamageOpacitySlider, raidDamageOpacityText);
 			bindSlider(raidHealingOpacitySlider, raidHealingOpacityText);
 			bindSlider(raidThreatOpacitySlider, raidThreatOpacityText);
+			bindSlider(raidBossOpacitySlider, raidBossOpacityText);
 			bindSlider(raidChallengesOpacitySlider, raidChallengesOpacityText);
 			bindSlider(timersOpacitySlider, timersOpacityText);
 			bindSlider(personalOpacitySlider, personalOpacityText);
@@ -1045,6 +1047,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			bindPreview(raidDamageBars);
 			bindPreview(raidHealingBars);
 			bindPreview(raidThreatBars);
+			bindPreview(raidBossBars);
 			bindPreview(raidChallengesBars);
 			bindPreview(timersBars);
 			bindPreview(personalBars);
@@ -1273,6 +1276,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			loadPopoutCurrent("Raid Damage", raidDamageOpacitySlider, raidDamageOpacityText, raidDamageBars, null, null);
 			loadPopoutCurrent("Raid Healing", raidHealingOpacitySlider, raidHealingOpacityText, raidHealingBars, raidHealingModes, raidHealingMode);
 			loadPopoutCurrent("Raid Threat", raidThreatOpacitySlider, raidThreatOpacityText, raidThreatBars, null, null);
+			loadPopoutCurrent("Raid Boss", raidBossOpacitySlider, raidBossOpacityText, raidBossBars, null, null);
 			loadPopoutCurrent("Raid Challenges", raidChallengesOpacitySlider, raidChallengesOpacityText, raidChallengesBars, null, null);
 			loadPopoutCurrent("Timers", timersOpacitySlider, timersOpacityText, timersBars, null, null);
 			loadPopoutCurrent("Personal", personalOpacitySlider, personalOpacityText, personalBars, personalModes, personalMode);
@@ -1376,6 +1380,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 			savePopoutCurrent("Raid Damage", raidDamageOpacitySlider.getValue() / 100, raidDamageBars.isSelected());
 			savePopoutCurrent("Raid Healing", raidHealingOpacitySlider.getValue() / 100, raidHealingBars.isSelected());
 			savePopoutCurrent("Raid Threat", raidThreatOpacitySlider.getValue() / 100, raidThreatBars.isSelected());
+			savePopoutCurrent("Raid Boss", raidBossOpacitySlider.getValue() / 100, raidBossBars.isSelected());
 			savePopoutCurrent("Raid Challenges", raidChallengesOpacitySlider.getValue() / 100, raidChallengesBars.isSelected());
 			savePopoutCurrent("Timers", timersOpacitySlider.getValue() / 100, timersBars.isSelected());
 			savePopoutCurrent("Personal", personalOpacitySlider.getValue() / 100, personalBars.isSelected());
@@ -1447,6 +1452,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 						raidDamageOpacitySlider.getValue() / 100, raidDamageBars.isSelected(),
 						raidHealingOpacitySlider.getValue() / 100, raidHealingBars.isSelected(), getMode(raidHealingMode, raidHealingModes),
 						raidThreatOpacitySlider.getValue() / 100, raidThreatBars.isSelected(),
+						raidBossOpacitySlider.getValue() / 100, raidBossBars.isSelected(),
 						raidChallengesOpacitySlider.getValue() / 100, raidChallengesBars.isSelected(),
 						timersOpacitySlider.getValue() / 100, timersBars.isSelected(),
 						personalOpacitySlider.getValue() / 100, personalBars.isSelected(), getMode(personalMode, personalModes),
@@ -2129,6 +2135,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 				}
 				currentTimer = new ConfigTimer();
 				currentTimer.setFolder(folder);
+				currentTimer.setEnabled(true);
 				config.getConfigTimers().getTimers().add(currentTimer);
 			}
 			currentTimer.setName(timerName.getText());

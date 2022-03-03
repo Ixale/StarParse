@@ -5,6 +5,7 @@ import java.util.Arrays;
 import com.ixale.starparse.domain.Combat;
 import com.ixale.starparse.domain.CombatChallenge;
 import com.ixale.starparse.domain.Event;
+import com.ixale.starparse.domain.NpcType;
 import com.ixale.starparse.domain.Raid;
 import com.ixale.starparse.domain.RaidBoss;
 import com.ixale.starparse.domain.RaidBoss.BossUpgradeCallback;
@@ -189,6 +190,74 @@ public class ScumAndVillainy extends Raid {
 				new long[]{3264737785675776L}));
 
 		addChallenge(RaidBossName.Styrak, new StyrakManifestationChallenge());
+
+		// NPCs
+		npcs.put(3058837053505536L, new Npc(NpcType.boss_raid)); // Dash'Roode, darvannis, raidEncounter
+		npcs.put(3153575442120704L, new Npc(NpcType.boss_raid)); // Dash'Roode, darvannis, raidEncounter
+		npcs.put(3153571147153408L, new Npc(NpcType.boss_raid)); // Dash'Roode, darvannis, raidEncounter
+		npcs.put(3153558262251520L, new Npc(NpcType.boss_raid)); // Dash'Roode, darvannis, raidEncounter
+
+		npcs.put(3016450021261312L, new Npc(NpcType.boss_raid)); // Titan 6, darvannis, raidEncounter
+		npcs.put(3152458750623744L, new Npc(NpcType.boss_raid)); // Titan 6, darvannis, raidEncounter
+		npcs.put(3152463045591040L, new Npc(NpcType.boss_raid)); // Titan 6, darvannis, raidEncounter
+		npcs.put(3152467340558336L, new Npc(NpcType.boss_raid)); // Titan 6, darvannis, raidEncounter
+
+		npcs.put(3045819007631360L, new Npc(NpcType.boss_raid)); // Thrasher, darvannis, raidEncounter
+		npcs.put(3154567579566080L, new Npc(NpcType.boss_raid)); // Thrasher, darvannis, raidEncounter
+		npcs.put(3154563284598784L, new Npc(NpcType.boss_raid)); // Thrasher, darvannis, raidEncounter
+		npcs.put(3154571874533376L, new Npc(NpcType.boss_raid)); // Thrasher, darvannis, raidEncounter
+		npcs.put(3062092638715904L, new Npc(NpcType.boss_1)); // Mercenary Demolitionist, darvannis, raidEncounter
+//		npcs.put(3048576376635392L, new Npc(NpcType.boss_1)); // Mercenary Sniper, darvannis, raidEncounter
+
+		npcs.put(3016445726294016L, new Npc(NpcType.boss_raid)); // Olok the Shadow, darvannis, raidEncounter
+		npcs.put(3050663730741248L, new Npc(NpcType.boss_raid)); // Olok the Shadow, darvannis, raidEncounter
+		npcs.put(3071365473107968L, new Npc(NpcType.boss_raid)); // Olok the Shadow, darvannis, raidEncounter
+		npcs.put(3154662068846592L, new Npc(NpcType.boss_raid)); // Olok the Shadow, darvannis, raidEncounter
+		npcs.put(3154674953748480L, new Npc(NpcType.boss_raid)); // Olok the Shadow, darvannis, raidEncounter
+		npcs.put(3154679248715776L, new Npc(NpcType.boss_raid)); // Olok the Shadow, darvannis, raidEncounter
+		npcs.put(3235506238259200L, new Npc(NpcType.boss_1)); // Shady Customer, darvannis, raidEncounter
+		npcs.put(3067130635354112L, new Npc(NpcType.boss_2)); // Wealthy Buyer, darvannis, raidEncounter
+		npcs.put(3235501943291904L, new Npc(NpcType.boss_1)); // Underworld Arms Trader, darvannis, raidEncounter
+		npcs.put(3252041862348800L, new Npc(NpcType.boss_2)); // Underworld Arms Trader, darvannis, raidEncounter
+		npcs.put(3243219999522816L, new Npc(NpcType.boss_4)); // Accomplished Arms Trader, darvannis, raidEncounter
+		npcs.put(3247089765056512L, new Npc(NpcType.boss_4)); // Accomplished Arms Trader, darvannis, raidEncounter
+		npcs.put(3247094060023808L, new Npc(NpcType.boss_4)); // Accomplished Arms Trader, darvannis, raidEncounter
+		npcs.put(3247098354991104L, new Npc(NpcType.boss_4)); // Accomplished Arms Trader, darvannis, raidEncounter
+
+
+//		npcs.put(3131211547410432L, new Npc(NpcToughness.boss_1)); // Blue Team Pack Hunter, darvannis, raidTrash
+//		npcs.put(3131383346102272L, new Npc(NpcToughness.boss_1)); // Blue Team Pack Hunter, darvannis, raidTrash
+//		npcs.put(3131404820938752L, new Npc(NpcToughness.boss_1)); // Gold Team Medtech, darvannis, raidTrash
+//		npcs.put(3131409115906048L, new Npc(NpcToughness.boss_1)); // Gold Team Pyroguard, darvannis, raidTrash
+//		npcs.put(3131396231004160L, new Npc(NpcToughness.boss_1)); // Green Team Duelist, darvannis, raidTrash
+//		npcs.put(3131400525971456L, new Npc(NpcToughness.boss_1)); // Green Team Pyroguard, darvannis, raidTrash
+//		npcs.put(3141399209836544L, new Npc(NpcToughness.boss_2)); // Oasis Enforcer Battledroid, darvannis, raidTrash
+//		npcs.put(3210586838007808L, new Npc(NpcToughness.boss_4)); // Oasis Reinforcer Battledroid, darvannis, raidTrash
+//		npcs.put(3131387641069568L, new Npc(NpcToughness.boss_1)); // Red Team Assault Gunner, darvannis, raidTrash
+//		npcs.put(3131391936036864L, new Npc(NpcToughness.boss_1)); // Red Team Flametech, darvannis, raidTrash
+		npcs.put(3157556876804096L, new Npc(NpcType.boss_raid)); // Operations Chief, id, raidTrash
+		npcs.put(3141940375715840L, new Npc(NpcType.boss_raid)); // Operations Chief, id, raidTrash
+		npcs.put(3157548286869504L, new Npc(NpcType.boss_raid)); // Operations Chief, id, raidTrash
+		npcs.put(3157552581836800L, new Npc(NpcType.boss_raid)); // Operations Chief, id, raidTrash
+
+		npcs.put(3054408942223360L, new Npc(NpcType.boss_raid)); // Vilus Garr, darvannis, raidEncounter
+		npcs.put(3054404647256064L, new Npc(NpcType.boss_raid)); // Sunder, darvannis, raidEncounter
+		npcs.put(3054400352288768L, new Npc(NpcType.boss_raid)); // Captain Horic, darvannis, raidEncounter
+		npcs.put(3054413237190656L, new Npc(NpcType.boss_raid)); // Tu'chuk, darvannis, raidEncounter
+		npcs.put(3156904041775104L, new Npc(NpcType.boss_raid)); // Tu'chuk, darvannis, raidEncounter
+		npcs.put(3156899746807808L, new Npc(NpcType.boss_raid)); // Tu'chuk, darvannis, raidEncounter
+		npcs.put(3156895451840512L, new Npc(NpcType.boss_raid)); // Tu'chuk, darvannis, raidEncounter
+
+		npcs.put(3147154466013184L, new Npc(NpcType.boss_4, "Manifestation")); // Dread Master Styrak, darvannis, raidEncounter
+		npcs.put(3152445865721856L, new Npc(NpcType.boss_raid, "Styrak")); // Dread Master Styrak, darvannis, raidEncounter
+		npcs.put(3152441570754560L, new Npc(NpcType.boss_raid, "Styrak")); // Dread Master Styrak, darvannis, raidEncounter
+		npcs.put(3152407211016192L, new Npc(NpcType.boss_raid, "Styrak")); // Dread Master Styrak, darvannis, raidEncounter
+		npcs.put(3066945951760384L, new Npc(NpcType.boss_raid, "Styrak")); // Dread Master Styrak, darvannis, raidEncounter
+		npcs.put(3067057620910080L, new Npc(NpcType.boss_raid)); // Kell Dragon, darvannis, raidEncounter
+		npcs.put(3225679353085952L, new Npc(NpcType.boss_raid)); // Kell Dragon, darvannis, raidEncounter
+
+		npcs.put(3241669516328960L, new Npc(NpcType.boss_2)); // Hateful Presence, darvannis, raidTrash
+		npcs.put(3264737785675776L, new Npc(NpcType.boss_raid)); // Hateful Entity, darvannis, raidTrash
 	}
 
 	@Override

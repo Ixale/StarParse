@@ -43,7 +43,7 @@ public class TimersPopoutPresenter extends BaseTimersPopoutPresenter {
 	public void updateTimer(final BaseTimer timer) {
 		super.updateTimer(timer);
 		if (timersCenterControl != null && timersCenterControl.isEnabled()) {
-			if (timer.doOverrideExpiringThreshold() || timer.getTimeRemaining() < timersCenterControl.getThreshold()) {
+			if (timer.doOverrideExpiringThreshold() || (timer.getTimeRemaining() != null && timer.getTimeRemaining() < timersCenterControl.getThreshold())) {
 				timersCenterControl.updateTimer(timer);
 			} else {
 				// repeating timer expired and started again, remove for now
@@ -54,11 +54,10 @@ public class TimersPopoutPresenter extends BaseTimersPopoutPresenter {
 
 	@Override
 	public void removeTimer(BaseTimer timer) {
-		if (!timers.containsKey(timer)) {
-			return;
-		}
 		super.removeTimer(timer);
-		timersCenterControl.removeTimer(timer);
+		if (timersCenterControl != null) {
+			timersCenterControl.removeTimer(timer);
+		}
 	}
 
 	@Override

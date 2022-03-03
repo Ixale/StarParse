@@ -3,6 +3,7 @@ package com.ixale.starparse.domain.ops;
 import com.ixale.starparse.domain.Combat;
 import com.ixale.starparse.domain.CombatChallenge;
 import com.ixale.starparse.domain.Event;
+import com.ixale.starparse.domain.NpcType;
 import com.ixale.starparse.domain.Raid;
 import com.ixale.starparse.domain.RaidBoss;
 import com.ixale.starparse.domain.RaidBoss.BossUpgradeCallback;
@@ -263,6 +264,48 @@ public class DreadPalace extends Raid {
 		addChallenge(RaidBossName.Raptus, new RaptusDpsChallenge());
 		addChallenge(RaidBossName.Raptus, new RaptusHealingChallenge());
 		addChallenge(RaidBossName.Council, new CouncilPhase2Challenge());
+
+//		npcs.put(3292079547482112L, new Npc(NpcToughness.boss_1)); // boss.dread_master_bestia.dread_larva
+//		npcs.put(3291675820556288L, new Npc(NpcToughness.boss_raid)); // boss.dread_master_bestia.dread_monster
+		npcs.put(3292083842449408L, new Npc(NpcType.boss_4)); // boss.dread_master_bestia.dread_tentacle
+		npcs.put(3303581469900800L, new Npc(NpcType.boss_raid, "Bestia")); // boss.dread_master_bestia.dread_master_bestia
+		npcs.put(3303585764868096L, new Npc(NpcType.boss_raid, "Bestia")); // boss.dread_master_bestia.dread_master_bestia
+		npcs.put(3303590059835392L, new Npc(NpcType.boss_raid, "Bestia")); // boss.dread_master_bestia.dread_master_bestia
+		npcs.put(3273941900591104L, new Npc(NpcType.boss_raid, "Bestia")); // boss.dread_master_bestia.dread_master_bestia
+
+		npcs.put(3303418261143552L, new Npc(NpcType.boss_raid, "Tyrans")); // boss.dread_master_tyrans.dread_master_tyrans
+		npcs.put(3273954785492992L, new Npc(NpcType.boss_raid, "Tyrans")); // boss.dread_master_tyrans.dread_master_tyrans
+		npcs.put(3303409671208960L, new Npc(NpcType.boss_raid, "Tyrans")); // boss.dread_master_tyrans.dread_master_tyrans
+		npcs.put(3303413966176256L, new Npc(NpcType.boss_raid, "Tyrans")); // boss.dread_master_tyrans.dread_master_tyrans
+
+//		npcs.put(3350598476890112L, new Npc(NpcToughness.boss_4)); // boss.dread_master_calphayus.altar_guardian
+//		npcs.put(3284954196738048L, new Npc(NpcToughness.boss_raid)); // boss.dread_master_calphayus.calphayus_future
+//		npcs.put(3284949901770752L, new Npc(NpcToughness.boss_raid)); // boss.dread_master_calphayus.calphayus_past
+//		npcs.put(3285426643140608L, new Npc(NpcToughness.boss_1)); // boss.dread_master_calphayus.future_crystal
+//		npcs.put(3290812532129792L, new Npc(NpcToughness.boss_raid)); // boss.dread_master_calphayus.future_tree
+//		npcs.put(3295408147136512L, new Npc(NpcToughness.boss_1)); // boss.dread_master_calphayus.future_tree_pure
+//		npcs.put(3349812497874944L, new Npc(NpcToughness.boss_raid)); // boss.dread_master_calphayus.invis_void_zone_caster
+		npcs.put(3349915577090048L, new Npc(NpcType.boss_4, "Sphere")); // boss.dread_master_calphayus.nightmare_energy_sphere
+//		npcs.put(3350323598983168L, new Npc(NpcToughness.boss_4)); // boss.dread_master_calphayus.past_chainer
+//		npcs.put(3285422348173312L, new Npc(NpcToughness.boss_1)); // boss.dread_master_calphayus.past_crystal
+		npcs.put(3273946195558400L, new Npc(NpcType.boss_raid, "Calphayus")); // boss.dread_master_calphayus.dread_master_calphayus
+
+//		npcs.put(3289511157039104L, new Npc(NpcToughness.boss_2)); // boss.dread_master_raptus.dps_npc
+//		npcs.put(3355490444640256L, new Npc(NpcToughness.boss_2)); // boss.dread_master_raptus.dps_npc_nightmare
+//		npcs.put(3289335063379968L, new Npc(NpcToughness.boss_2)); // boss.dread_master_raptus.heal_npc
+//		npcs.put(3289498272137216L, new Npc(NpcToughness.boss_2)); // boss.dread_master_raptus.tank_npc
+		npcs.put(3302902865068032L, new Npc(NpcType.boss_raid, "Raptus")); // boss.dread_master_raptus.dread_master_raptus
+		npcs.put(3303555700097024L, new Npc(NpcType.boss_raid, "Raptus")); // boss.dread_master_raptus.dread_master_raptus
+		npcs.put(3303559995064320L, new Npc(NpcType.boss_raid, "Raptus")); // boss.dread_master_raptus.dread_master_raptus
+		npcs.put(3273950490525696L, new Npc(NpcType.boss_raid, "Raptus")); // boss.dread_master_raptus.dread_master_raptus
+
+		npcs.put(3273984850264064L, new Npc(NpcType.boss_raid, "Bestia")); // boss.dread_master_council.dread_master_bestia
+		npcs.put(3274019210002432L, new Npc(NpcType.boss_raid, "Brontes")); // boss.dread_master_council.dread_master_brontes
+		npcs.put(3273989145231360L, new Npc(NpcType.boss_raid, "Calphayus")); // boss.dread_master_council.dread_master_calphayus
+		npcs.put(3273993440198656L, new Npc(NpcType.boss_raid, "Raptus")); // boss.dread_master_council.dread_master_raptus
+//		npcs.put(3274014915035136L, new Npc(NpcToughness.boss_raid)); // boss.dread_master_council.dread_master_styrak
+		npcs.put(3273997735165952L, new Npc(NpcType.boss_raid, "Tyrans")); // boss.dread_master_council.dread_master_tyrans
+		npcs.put(3303830578003968L, new Npc(NpcType.boss_raid, "Styrak")); // boss.dread_master_council.kell_dragon_with_styrak
 	}
 
 	@Override
@@ -384,16 +427,6 @@ public class DreadPalace extends Raid {
 			TimerManager.startTimer(CouncilBestiaKickTimer.class, e.getTimestamp());
 		}
 
-		if (Helpers.isAbilityEqual(e, 3321757771497472L) && Helpers.isActionApply(e)) { // Fury of the Masters
-			if (Helpers.isTargetEqual(e, COUNCIL_TYRANS)) {
-				TimerManager.stopTimer(CouncilTyransTpP3Timer.class);
-				TimerManager.stopTimer(CouncilTyransDmP3Timer.class);
-
-				TimerManager.startTimer(CouncilTyransDmP3Timer.class, e.getTimestamp());
-				TimerManager.startTimer(CouncilTyransTpP3Timer.class, e.getTimestamp());
-			}
-		}
-
 		// ------------------ Phases ------------------
 
 		if (COUNCIL_PHASE_FOURTH.equals(currentPhaseName)) {
@@ -413,13 +446,19 @@ public class DreadPalace extends Raid {
 			return COUNCIL_PHASE_FOURTH;
 		}
 
-		if (COUNCIL_PHASE_SECOND.equals(currentPhaseName)
-				&& phaseTimers.get(COUNCIL_PHASE_THIRD) < e.getTimestamp()) {
-
+		if (COUNCIL_PHASE_SECOND.equals(currentPhaseName) && (
+				(Helpers.isAbilityEqual(e, 3321757771497472L)
+						&& Helpers.isActionApply(e)
+						&& Helpers.isTargetEqual(e, COUNCIL_TYRANS) // Fury of the Masters
+				) || (phaseTimers.get(COUNCIL_PHASE_THIRD) < e.getTimestamp()) // or timeout (legacy)
+		)) {
 			// setup timers
+			TimerManager.stopTimer(CouncilTyransTpP3Timer.class);
+			TimerManager.stopTimer(CouncilTyransDmP3Timer.class);
 			TimerManager.stopTimer(CouncilBrontesTpTimer.class);
 
-			TimerManager.startTimer(CouncilTyransTpP3Timer.class, phaseTimers.get(COUNCIL_PHASE_THIRD));
+			TimerManager.startTimer(CouncilTyransDmP3Timer.class, e.getTimestamp());
+			TimerManager.startTimer(CouncilTyransTpP3Timer.class, e.getTimestamp());
 
 			phaseTimers.remove(COUNCIL_PHASE_THIRD);
 

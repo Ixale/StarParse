@@ -1634,7 +1634,7 @@ public class CombatDaoImpl extends H2Dao implements CombatDao {
 			logger.warn("Emergency character name resolve: " + name + " at " + combat);
 			return name;
 		} catch (EmptyResultDataAccessException e) {
-			logger.error("No character found for " + combat + ", using " + context.getSelectedPlayer());
+//			logger.error("No character found for " + combat + ", using " + context.getCharacterName());
 			return context.getSelectedPlayer(); // will not show anything, but would not fail either
 		}
 	}

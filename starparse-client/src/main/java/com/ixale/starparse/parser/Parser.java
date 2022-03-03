@@ -13,6 +13,7 @@ import com.ixale.starparse.domain.EffectKey;
 import com.ixale.starparse.domain.Entity;
 import com.ixale.starparse.domain.EntityGuid;
 import com.ixale.starparse.domain.Event;
+import com.ixale.starparse.domain.LocationInfo;
 import com.ixale.starparse.domain.Phase;
 import com.ixale.starparse.domain.Raid;
 import com.ixale.starparse.domain.Raid.Mode;
@@ -35,6 +36,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -483,13 +485,19 @@ public class Parser {
 					if (baseMatcher.matches()) {
 						final long timestamp = getTimestamp(baseMatcher);
 						final Actor a = getSourceActor(baseMatcher, timestamp, null);
-						a.setDiscipline(CharacterDiscipline.valueOf(baseMatcher.group("Discipline").replace(" ", "")));
+						final CharacterDiscipline newDiscipline = CharacterDiscipline.valueOf(baseMatcher.group("Discipline").replace(" ", ""));
+						if (!Objects.equals(newDiscipline, a.getDiscipline())) {
+							if (logger.isDebugEnabled()) {
+								logger.debug(a + ": Discipline set as [" + newDiscipline + "] (was " + a.getDiscipline() + ") at " + Event.formatTs(getTimestamp(baseMatcher)));
+							}
+							a.setDiscipline(newDiscipline);
+							if (Actor.Type.SELF.equals(a.getType())) {
+								clearHotsTracking();
+							}
+						}
 						if (actorStates.containsKey(a)) {
 							actorStates.get(a).discipline = a.getDiscipline();
 							actorStates.get(a).role = a.getDiscipline().getRole();
-						}
-						if (logger.isTraceEnabled()) {
-							logger.trace(a + ": Discipline set as [" + a.getDiscipline() + "] at " + Event.formatTs(getTimestamp(baseMatcher)));
 						}
 						return false;
 					}
@@ -761,48 +769,38 @@ public class Parser {
 
 	private Actor getSourceActor(final Matcher baseMatcher, final long timestamp, final String effectGuid) {
 		return getActor(
-				baseMatcher.group("SourcePlayerName"),
-				baseMatcher.group("SourceCompanionName"),
-				baseMatcher.group("SourceCompanionGuid"),
-				baseMatcher.group("SourceNpcName"),
-				baseMatcher.group("SourceNpcGuid"),
-				baseMatcher.group("SourceNpcInstance"),
+				"Source",
 				timestamp,
-				effectGuid);
+				effectGuid,
+				baseMatcher);
 	}
 
 	private Actor getTargetActor(final Matcher baseMatcher, final long timestamp, final String effectGuid) {
 		return getActor(
-				baseMatcher.group("TargetPlayerName"),
-				baseMatcher.group("TargetCompanionName"),
-				baseMatcher.group("TargetCompanionGuid"),
-				baseMatcher.group("TargetNpcName"),
-				baseMatcher.group("TargetNpcGuid"),
-				baseMatcher.group("TargetNpcInstance"),
+				"Target",
 				timestamp,
-				effectGuid);
+				effectGuid,
+				baseMatcher);
 	}
 
-	private Actor getActor(String playerName,
-			String companionName, String companionGuid,
-			String npcName, String npcGuid, String npcInstanceId,
-			final long timestamp, final String effectGuid) {
+	private Actor getActor(final String type, final long timestamp, final String effectGuid, final Matcher baseMatcher) {
 
-		if (companionName != null) {
-			return context.getActor(companionName,
+		if (baseMatcher.group(type + "CompanionName") != null) {
+			return context.getActor(baseMatcher.group(type + "CompanionName"),
 					Actor.Type.COMPANION,
-					Long.parseLong(companionGuid));
+					Long.parseLong(baseMatcher.group(type + "CompanionGuid")));
 		}
 
-		if (playerName != null) {
+		if (baseMatcher.group(type + "PlayerName") != null) {
+			final String playerName = baseMatcher.group(type + "PlayerName");
 			return context.getActor(
 					playerName,
 					playerName.equals(combatLog.getCharacterName()) ? Actor.Type.SELF : Actor.Type.PLAYER);
 		}
 
-		if (npcGuid != null) {
+		if (baseMatcher.group(type + "NpcGuid") != null) {
 			// detect raid encounter
-			final long guid = Long.parseLong(npcGuid);
+			final long guid = Long.parseLong(baseMatcher.group(type + "NpcGuid"));
 			if (combat != null && combat.getBoss() == null) {
 				combat.setBoss(getRaidBoss(guid, instanceSize, instanceMode));
 				if (combat.getBoss() != null) {
@@ -836,17 +834,27 @@ public class Parser {
 			if (combat != null && combatBossUpgrade != null) {
 				resolveCombatUpgrade(combatBossUpgrade.upgradeByNpc(guid), true);
 			}
-			return context.getActor(
-					npcName,
+			final Actor actor = context.getActor(
+					baseMatcher.group(type + "NpcName"),
 					Actor.Type.NPC,
 					guid,
-					npcInstanceId != null ? Long.parseLong(npcInstanceId) : 0L);
+					baseMatcher.group(type + "NpcInstance") != null ? Long.parseLong(baseMatcher.group(type + "NpcInstance")) : 0L);
+
+			if (combat != null && combat.getBoss() != null && combat.getBoss().getRaid().getNpcs().containsKey(guid)) {
+				context.setCombatActorState(combat,
+						actor,
+						combat.getBoss().getRaid().getNpcs().get(guid),
+						baseMatcher.group(type + "CurrentHp"),
+						baseMatcher.group(type + "MaxHp"),
+						timestamp - combat.getTimeFrom());
+			}
+
+			return actor;
 		}
 
 		throw new IllegalArgumentException("Invalid actor:"
-				+ " companionGuid[" + companionGuid + "]"
-				+ " npcName[" + npcName + "]"
-				+ " npcInstanceId[" + npcInstanceId + "] at " + Event.formatTs(timestamp));
+				+ " npcName[" + baseMatcher.group(type + "NpcName") + "]"
+				+ " npcGuid[" + baseMatcher.group(type + "NpcGuid") + "] at " + Event.formatTs(timestamp));
 	}
 
 	private Entity getEntity(String name, String guid) {
@@ -896,6 +904,7 @@ public class Parser {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Instance set as " + s + " " + m + " (" + instanceName + " " + instanceGuid + ") at " + Event.formatTs(timestamp));
 			}
+			context.setLocationInfo(new LocationInfo(instanceMode, instanceSize, instanceName, this.instanceGuid));
 		}
 	}
 
@@ -958,7 +967,7 @@ public class Parser {
 			} else {
 				// setup new combat
 				combat = new Combat(++combatId, combatLogId, e.getTimestamp(), e.getEventId());
-				context.getCombatInfo().put(combat.getCombatId(), new CombatInfo(instanceMode, instanceSize, instanceName, instanceGuid));
+				context.getCombatInfo().put(combat.getCombatId(), new CombatInfo(new LocationInfo(instanceMode, instanceSize, instanceName, instanceGuid)));
 				for (final Actor a : actorStates.keySet()) {
 					actorStates.get(a).role = null; // might have re-specced
 					actorStates.get(a).discipline = null;

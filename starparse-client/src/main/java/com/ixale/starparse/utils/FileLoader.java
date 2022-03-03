@@ -224,9 +224,9 @@ public class FileLoader {
 					}
 				}
 				final CombatInfo combatInfo = context.getCombatInfo().get(c.getCombatId());
-				if (combatInfo != null) {
-					info.instanceName = combatInfo.getInstanceName();
-					info.instanceGuid = combatInfo.getInstanceGuid();
+				if (combatInfo != null && combatInfo.getLocationInfo() != null) {
+					info.instanceName = combatInfo.getLocationInfo().getInstanceName();
+					info.instanceGuid = combatInfo.getLocationInfo().getInstanceGuid();
 				}
 				combatsInfo.add(info);
 			}

@@ -2,6 +2,7 @@ package com.ixale.starparse.domain.ops;
 
 import com.ixale.starparse.domain.Combat;
 import com.ixale.starparse.domain.Event;
+import com.ixale.starparse.domain.NpcType;
 import com.ixale.starparse.domain.Raid;
 import com.ixale.starparse.domain.RaidBoss;
 import com.ixale.starparse.domain.RaidBoss.BossUpgradeCallback;
@@ -123,6 +124,61 @@ public class Dxun extends Raid {
 				});
 //
 //		addChallenge(RaidBossName.ApexVanguard, new ApexVoltinatorChallenge());
+
+		npcs.put(4246356856143872L, new Npc(NpcType.boss_1 /*boss_raid*/)); // Stampeding Bull, boss.the_pack_leader.charging_bull, npc.operation.dxun.difficulty_1.boss.the_pack_leader.charging_bull
+		npcs.put(4246176467517440L, new Npc(NpcType.boss_raid)); // Red, boss.the_pack_leader.red, npc.operation.dxun.difficulty_1.boss.the_pack_leader.red
+		npcs.put(4330233272467456L, new Npc(NpcType.boss_raid)); // Red, boss.the_pack_leader.red, npc.operation.dxun.difficulty_2.boss.the_pack_leader.red
+		npcs.put(4382185196879872L, new Npc(NpcType.boss_raid)); // Red, boss.the_pack_leader.red, npc.operation.dxun.difficulty_3.boss.the_pack_leader.red
+//		npcs.put(4247202964701184L, new Npc(NpcToughness.boss_raid)); // Venomous Harvorisk, boss.the_pack_leader.venomous_shriek, npc.operation.dxun.difficulty_1.boss.the_pack_leader.venomous_shriek
+//		npcs.put(4246253776928768L, new Npc(NpcToughness.boss_2)); // Venomous Stalker, boss.the_pack_leader.venomous_stalker, npc.operation.dxun.difficulty_1.boss.the_pack_leader.venomous_stalker
+//		npcs.put(4247112770387968L, new Npc(NpcToughness.boss_2)); // Venomous Stalker, boss.the_pack_leader.venomous_stalker_nightmare, npc.operation.dxun.difficulty_1.boss.the_pack_leader.venomous_stalker_nightmare
+//		npcs.put(4247108475420672L, new Npc(NpcToughness.boss_2)); // Venomous Stalker, boss.the_pack_leader.venomous_stalker_veteran, npc.operation.dxun.difficulty_1.boss.the_pack_leader.venomous_stalker_veteran
+
+//		npcs.put(4250475729780736L, new Npc(NpcToughness.boss_2)); // Felshade Reaper, boss.holding_pens.cz_felshade, npc.operation.dxun.difficulty_1.boss.holding_pens.cz_felshade
+//		npcs.put(4256042007396352L, new Npc(NpcToughness.boss_1)); // Felshade Hunter, boss.holding_pens.cz_felshade_lesser, npc.operation.dxun.difficulty_1.boss.holding_pens.cz_felshade_lesser
+//		npcs.put(4333506037547008L, new Npc(NpcToughness.boss_1)); // Felshade Hunter, boss.holding_pens.cz_felshade_lesser_veteran, npc.operation.dxun.difficulty_1.boss.holding_pens.cz_felshade_lesser_veteran
+//		npcs.put(4408835468951552L, new Npc(NpcToughness.boss_2)); // Cz Felshade Reaper Mount, boss.holding_pens.cz_felshade_reaper_mount, npc.operation.dxun.difficulty_1.boss.holding_pens.cz_felshade_reaper_mount
+//		npcs.put(4333471677808640L, new Npc(NpcToughness.boss_2)); // Felshade Reaper, boss.holding_pens.cz_felshade_veteran, npc.operation.dxun.difficulty_1.boss.holding_pens.cz_felshade_veteran
+//		npcs.put(4250514384486400L, new Npc(NpcToughness.boss_raid)); // Rampaging Charger, boss.holding_pens.cz_fiesty_feast, npc.operation.dxun.difficulty_1.boss.holding_pens.cz_fiesty_feast
+//		npcs.put(4397956316790784L, new Npc(NpcToughness.boss_raid)); // Delicious Rampaging Charger, boss.holding_pens.cz_fiesty_feast_reaper_bait, npc.operation.dxun.difficulty_1.boss.holding_pens.cz_fiesty_feast_reaper_bait
+//		npcs.put(4334515354861568L, new Npc(NpcToughness.boss_raid)); // Rampaging Charger, boss.holding_pens.cz_fiesty_feast_veteran, npc.operation.dxun.difficulty_1.boss.holding_pens.cz_fiesty_feast_veteran
+//		npcs.put(4334133102772224L, new Npc(NpcToughness.boss_1)); // Shadow Reaper, boss.holding_pens.cz_shadow_reaper_veteran, npc.operation.dxun.difficulty_1.boss.holding_pens.cz_shadow_reaper_veteran
+//		npcs.put(4251424917553152L, new Npc(NpcToughness.boss_1)); // Living Smoke, boss.holding_pens.cz_smoke, npc.operation.dxun.difficulty_1.boss.holding_pens.cz_smoke
+//		npcs.put(4333463087874048L, new Npc(NpcToughness.boss_1)); // Living Smoke, boss.holding_pens.cz_smoke_veteran, npc.operation.dxun.difficulty_1.boss.holding_pens.cz_smoke_veteran
+//		npcs.put(4333218274738176L, new Npc(NpcToughness.boss_1)); // Crimson Stalker, boss.holding_pens.cz_stalker, npc.operation.dxun.difficulty_1.boss.holding_pens.cz_stalker
+//		npcs.put(4333458792906752L, new Npc(NpcToughness.boss_1)); // Crimson Stalker, boss.holding_pens.cz_stalker_veteran, npc.operation.dxun.difficulty_1.boss.holding_pens.cz_stalker_veteran
+//		npcs.put(4389417921806336L, new Npc(NpcToughness.boss_raid)); // Czerka Pursuit Droid, boss.holding_pens.czerka_predator_droid, npc.operation.dxun.difficulty_1.boss.holding_pens.czerka_predator_droid
+//		npcs.put(4377769970499584L, new Npc(NpcToughness.boss_raid)); // Czerka Warden Predator Droid, boss.holding_pens.czerka_predator_droid, npc.operation.dxun.difficulty_3.boss.holding_pens.czerka_predator_droid
+//		npcs.put(4390229670625280L, new Npc(NpcToughness.boss_raid)); // Czerka Pursuit Droid, boss.holding_pens.czerka_predator_droid_checkpoint, npc.operation.dxun.difficulty_1.boss.holding_pens.czerka_predator_droid_checkpoint
+//		npcs.put(4390328454873088L, new Npc(NpcToughness.boss_raid)); // Czerka Pursuit Droid, boss.holding_pens.czerka_predator_droid_control_room, npc.operation.dxun.difficulty_1.boss.holding_pens.czerka_predator_droid_control_room
+//		npcs.put(4383168744390656L, new Npc(NpcToughness.boss_raid)); // Czerka Predator Droid Control Room, boss.holding_pens.czerka_predator_droid_control_room, npc.operation.dxun.difficulty_3.boss.holding_pens.czerka_predator_droid_control_room
+//		npcs.put(4390556088139776L, new Npc(NpcToughness.boss_raid)); // Czerka Pursuit Droid, boss.holding_pens.czerka_predator_droid_control_room_idle, npc.operation.dxun.difficulty_1.boss.holding_pens.czerka_predator_droid_control_room_idle
+//		npcs.put(4390577562976256L, new Npc(NpcToughness.boss_raid)); // Czerka Sanitizer Droid, boss.holding_pens.czerka_pyro_droid, npc.operation.dxun.difficulty_1.boss.holding_pens.czerka_pyro_droid
+		npcs.put(4377860164812800L, new Npc(NpcType.boss_raid, "Incineration Droid")); // Czerka Warden Incineration Droid, boss.holding_pens.czerka_pyro_droid, npc.operation.dxun.difficulty_3.boss.holding_pens.czerka_pyro_droid
+//		npcs.put(4245686841245696L, new Npc(NpcToughness.boss_raid)); // Czerka Warden Droid, boss.holding_pens.czerka_warden_droid, npc.operation.dxun.difficulty_1.boss.holding_pens.czerka_warden_droid
+//		npcs.put(4338552624119808L, new Npc(NpcToughness.boss_raid)); // Czerka Warden Enforcer Droid, boss.holding_pens.czerka_warden_droid_friendly, npc.operation.dxun.difficulty_1.boss.holding_pens.czerka_warden_droid_friendly
+//		npcs.put(4257339087519744L, new Npc(NpcToughness.boss_raid)); // Lake Crab, boss.holding_pens.lake_crab, npc.operation.dxun.difficulty_1.boss.holding_pens.lake_crab
+//		npcs.put(4250819327164416L, new Npc(NpcToughness.boss_raid)); // Security Coil, boss.holding_pens.pens_turret, npc.operation.dxun.difficulty_1.boss.holding_pens.pens_turret
+//		npcs.put(4258451484049408L, new Npc(NpcToughness.boss_raid)); // Secondary Generator, boss.holding_pens.secondary_generator, npc.operation.dxun.difficulty_1.boss.holding_pens.secondary_generator
+
+		npcs.put(4245970309087232L, new Npc(NpcType.boss_raid)); // Hissyphus, boss.morphing_trandoshans.acid_trandoshan, npc.operation.dxun.difficulty_1.boss.morphing_trandoshans.acid_trandoshan
+		npcs.put(4245978899021824L, new Npc(NpcType.boss_raid)); // Greus, boss.morphing_trandoshans.fire_trandoshan, npc.operation.dxun.difficulty_1.boss.morphing_trandoshans.fire_trandoshan
+		npcs.put(4245983193989120L, new Npc(NpcType.boss_raid)); // Kronissus, boss.morphing_trandoshans.ice_trandoshan, npc.operation.dxun.difficulty_1.boss.morphing_trandoshans.ice_trandoshan
+		npcs.put(4245987488956416L, new Npc(NpcType.boss_raid)); // Titax, boss.morphing_trandoshans.strength_trandoshan, npc.operation.dxun.difficulty_1.boss.morphing_trandoshans.strength_trandoshan
+		npcs.put(4381150109761536L, new Npc(NpcType.boss_raid)); // The Ultimate Hunter, boss.morphing_trandoshans.the_ultimate_hunter, npc.operation.dxun.difficulty_1.boss.morphing_trandoshans.the_ultimate_hunter
+
+		npcs.put(4265104388390912L, new Npc(NpcType.boss_raid)); // Huntmaster, boss.huntmaster.huntmaster, npc.operation.dxun.difficulty_1.boss.huntmaster.huntmaster
+		npcs.put(4281661487316992L, new Npc(NpcType.boss_raid)); // Shelleigh, boss.huntmaster.beast_crab, npc.operation.dxun.difficulty_1.boss.huntmaster.beast_crab
+		npcs.put(4330237567434752L, new Npc(NpcType.boss_raid)); // Shelleigh, boss.huntmaster.beast_crab, npc.operation.dxun.difficulty_2.boss.huntmaster.beast_crab
+//		npcs.put(4277723002306560L, new Npc(NpcToughness.boss_1)); // Lurking Beast, boss.huntmaster.beast_holdout, npc.operation.dxun.difficulty_1.boss.huntmaster.beast_holdout
+//		npcs.put(4270898299273216L, new Npc(NpcToughness.boss_1)); // Lurking Beast, boss.huntmaster.beast_standard, npc.operation.dxun.difficulty_1.boss.huntmaster.beast_standard
+//		npcs.put(4271624148746240L, new Npc(NpcToughness.boss_raid)); // Deliberate Charger, boss.huntmaster.beast_charger, npc.operation.dxun.difficulty_1.boss.huntmaster.beast_charger
+
+		npcs.put(4282872668094464L, new Npc(NpcType.boss_raid)); // Apex Vanguard, boss.hybrid_horror.hybrid_horror, npc.operation.dxun.difficulty_1.boss.hybrid_horror.hybrid_horror
+		npcs.put(4350020186800128L, new Npc(NpcType.boss_raid)); // Apex Vanguard, boss.hybrid_horror.hybrid_horror, npc.operation.dxun.difficulty_2.boss.hybrid_horror.hybrid_horror
+		npcs.put(4297557161279488L, new Npc(NpcType.boss_1 /*boss_raid*/)); // Power Transformer, boss.hybrid_horror.power_transformer, npc.operation.dxun.difficulty_1.boss.hybrid_horror.power_transformer
+//		npcs.put(4383022715502592L, new Npc(NpcToughness.boss_1)); // CI Anti-Theft Droid, boss.hybrid_horror.tether_droid, npc.operation.dxun.difficulty_1.boss.hybrid_horror.tether_droid
+
 	}
 
 	@Override

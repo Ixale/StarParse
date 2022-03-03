@@ -2,6 +2,7 @@ package com.ixale.starparse.domain.ops;
 
 import com.ixale.starparse.domain.Combat;
 import com.ixale.starparse.domain.Event;
+import com.ixale.starparse.domain.NpcType;
 import com.ixale.starparse.domain.Raid;
 import com.ixale.starparse.domain.RaidBoss;
 import com.ixale.starparse.domain.RaidBossName;
@@ -63,6 +64,43 @@ public class WorldBoss extends Raid {
 				new long[]{4204768687816704L}, // SM 16m
 				new long[]{4204764392849408L}, // HM 8m
 				new long[]{4204772982784000L}); // HM 16m
+
+		npcs.put(4199438633402368L, new Npc(NpcType.boss_1)); // Caustic Drone, ossus_lair, raidEncounter
+		npcs.put(4198317646938112L, new Npc(NpcType.boss_1)); // Geonosian Berserker, ossus_lair, raidEncounter
+		npcs.put(4197677696811008L, new Npc(NpcType.boss_2)); // Geonosian Royal Guard, ossus_lair, raidEncounter
+		npcs.put(4197299739688960L, new Npc(NpcType.boss_raid)); // Mutated Geonosian Queen, ossus_lair, raidEncounter
+		npcs.put(4232741809815552L, new Npc(NpcType.boss_1)); // Genosian Viscount, ossus_lair, raidTrash
+		npcs.put(4232862068899840L, new Npc(NpcType.boss_1)); // Genosian Viscount, ossus_lair, raidTrash
+		npcs.put(4232514176548864L, new Npc(NpcType.boss_1)); // Geonosian Berserker, ossus_lair, raidTrash
+		npcs.put(4216124581347328L, new Npc(NpcType.boss_1)); // Geonosian Grenadier, ossus_lair, raidTrash
+		npcs.put(4214853271027712L, new Npc(NpcType.boss_2)); // Geonosian Elite Guard, ossus_lair, raidTrash
+		npcs.put(4204764392849408L, new Npc(NpcType.boss_raid)); // Mutated Geonosian Queen, ossus_lair, raidEncounter
+		npcs.put(4204768687816704L, new Npc(NpcType.boss_raid)); // Mutated Geonosian Queen, ossus_lair, raidEncounter
+		npcs.put(4204772982784000L, new Npc(NpcType.boss_raid)); // Mutated Geonosian Queen, ossus_lair, raidEncounter
+
+		npcs.put(3570947479044096L, new Npc(NpcType.boss_raid)); // Colossal Monolith, undefined, Unknown
+		npcs.put(3570951774011392L, new Npc(NpcType.boss_raid)); // Colossal Monolith, undefined, Unknown
+		npcs.put(3570956068978688L, new Npc(NpcType.boss_raid)); // Colossal Monolith, undefined, Unknown
+
+		npcs.put(3174723861086208L, new Npc(NpcType.boss_1)); // Simulated Akkbeast, undefined, Unknown
+		npcs.put(3174749630889984L, new Npc(NpcType.boss_1)); // Simulated Wampa, undefined, Unknown
+		npcs.put(3176776855453696L, new Npc(NpcType.boss_1)); // Simulated Manka Cat, undefined, Unknown
+		npcs.put(3176858459832320L, new Npc(NpcType.boss_2)); // Simulated Rancor, undefined, Unknown
+		npcs.put(3174831235268608L, new Npc(NpcType.boss_1)); // Simulated Sleen, undefined, Unknown
+		npcs.put(3176785445388288L, new Npc(NpcType.boss_1)); // Simulated Terentatek, undefined, Unknown
+		npcs.put(3174698091282432L, new Npc(NpcType.boss_1)); // Simulated Vrblther, undefined, Unknown
+		npcs.put(3153545377349632L, new Npc(NpcType.boss_raid)); // Xenoanalyst II, undefined, Unknown
+		npcs.put(3230738824560640L, new Npc(NpcType.boss_raid)); // Xenoanalyst II, undefined, Unknown
+		npcs.put(3213919732629504L, new Npc(NpcType.boss_raid)); // Xenoanalyst II, undefined, Unknown
+		npcs.put(3213924027596800L, new Npc(NpcType.boss_raid)); // Xenoanalyst II, undefined, Unknown
+		npcs.put(3213928322564096L, new Npc(NpcType.boss_raid)); // Xenoanalyst II, undefined, Unknown
+
+		npcs.put(3259029774139392L, new Npc(NpcType.boss_1)); // Palace Security Droid, makeb_lair, raidEncounter
+		npcs.put(3210174521147392L, new Npc(NpcType.boss_raid)); // Golden Fury, makeb_lair, raidEncounter
+		npcs.put(3232735984353280L, new Npc(NpcType.boss_raid)); // Golden Fury, makeb_lair, raidEncounter
+		npcs.put(3232800408862720L, new Npc(NpcType.boss_raid)); // Golden Fury, makeb_lair, raidEncounter
+		npcs.put(3232817588731904L, new Npc(NpcType.boss_raid)); // Golden Fury, makeb_lair, raidEncounter
+//		npcs.put(3211136593821696L, new Npc(NpcType.boss_2)); // Shield Pylon, makeb_lair, raidEncounter
 	}
 
 	@Override

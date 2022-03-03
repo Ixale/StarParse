@@ -26,6 +26,7 @@ public class ConfigTimers implements Serializable, SerializeCallback {
 		if (timers.isEmpty()) {
 			ConfigTimer.Condition condHo = new ConfigTimer.Condition();
 			condHo.setType(Type.ABILITY_ACTIVATED);
+			condHo.setSource(ConfigTimer.Condition.SELF);
 			condHo.setAbilityGuid(801303458480128L);
 
 			final ConfigTimer ho = new ConfigTimer();

@@ -3,6 +3,7 @@ package com.ixale.starparse.domain;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 abstract public class Raid {
 
@@ -25,11 +26,44 @@ abstract public class Raid {
 		}
 	}
 
-	protected final String name;
-	protected final ArrayList<RaidBoss> bosses = new ArrayList<RaidBoss>();
-	protected final HashMap<RaidBossName, ArrayList<CombatChallenge>> challenges = new HashMap<RaidBossName, ArrayList<CombatChallenge>>();
+	public static class Npc {
+		final NpcType type;
+		final String name;
+		final Double hidePct;
 
-	protected final HashMap<String, Long> phaseTimers = new HashMap<String, Long>();
+		public Npc(final NpcType type) {
+			this(type, null, null);
+		}
+
+		public Npc(final NpcType type, final String name) {
+			this(type, name, null);
+		}
+
+		public Npc(final NpcType type, final String name, final Double hidePct) {
+			this.type = type;
+			this.name = name;
+			this.hidePct = hidePct;
+		}
+
+		public NpcType getType() {
+			return type;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public Double getHidePct() {
+			return hidePct;
+		}
+	}
+
+	protected final String name;
+	protected final ArrayList<RaidBoss> bosses = new ArrayList<>();
+	protected final HashMap<RaidBossName, ArrayList<CombatChallenge>> challenges = new HashMap<>();
+	protected final Map<Long, Npc> npcs = new HashMap<>();
+
+	protected final HashMap<String, Long> phaseTimers = new HashMap<>();
 
 	public Raid(String n) {
 		name = n;
@@ -57,4 +91,9 @@ abstract public class Raid {
 	public List<CombatChallenge> getChallenges(final RaidBoss boss) {
 		return challenges.getOrDefault(boss.getRaidBossName(), null);
 	}
+
+	public Map<Long, Npc> getNpcs() {
+		return npcs;
+	}
+
 }

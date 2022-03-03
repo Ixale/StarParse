@@ -3,6 +3,7 @@ package com.ixale.starparse.domain.ops;
 import com.ixale.starparse.domain.Combat;
 import com.ixale.starparse.domain.CombatChallenge;
 import com.ixale.starparse.domain.Event;
+import com.ixale.starparse.domain.NpcType;
 import com.ixale.starparse.domain.Raid;
 import com.ixale.starparse.domain.RaidBoss;
 import com.ixale.starparse.domain.RaidBoss.BossUpgradeCallback;
@@ -142,6 +143,59 @@ public class DreadFortress extends Raid {
 		bosses.add(br16n);
 
 		addChallenge(RaidBossName.Brontes, new BrontesBurnChallenge());
+
+		npcs.put(3266533082005504L, new Npc(NpcType.boss_raid, "Nefra")); // boss_gatekeeper	npc.operation.oricon.fortress.enemy.difficulty_1.boss.gatekeeper.boss_gatekeeper
+		npcs.put(3303031714086912L, new Npc(NpcType.boss_raid, "Nefra")); // boss_gatekeeper	npc.operation.oricon.fortress.enemy.difficulty_2.boss.gatekeeper.boss_gatekeeper
+		npcs.put(3303036009054208L, new Npc(NpcType.boss_raid, "Nefra")); // boss_gatekeeper	npc.operation.oricon.fortress.enemy.difficulty_3.boss.gatekeeper.boss_gatekeeper
+		npcs.put(3303040304021504L, new Npc(NpcType.boss_raid, "Nefra")); // boss_gatekeeper	npc.operation.oricon.fortress.enemy.difficulty_4.boss.gatekeeper.boss_gatekeeper
+
+		npcs.put(3273924720721920L, new Npc(NpcType.boss_raid, "Draxus")); // boss_gatemaster	npc.operation.oricon.fortress.enemy.difficulty_1.boss.gate_puzzle.boss_gatemaster
+		npcs.put(3303392491339776L, new Npc(NpcType.boss_raid, "Draxus")); // boss_gatemaster	npc.operation.oricon.fortress.enemy.difficulty_2.boss.gate_puzzle.boss_gatemaster
+		npcs.put(3303401081274368L, new Npc(NpcType.boss_raid, "Draxus")); // boss_gatemaster	npc.operation.oricon.fortress.enemy.difficulty_3.boss.gate_puzzle.boss_gatemaster
+		npcs.put(3303405376241664L, new Npc(NpcType.boss_raid, "Draxus")); // boss_gatemaster	npc.operation.oricon.fortress.enemy.difficulty_4.boss.gate_puzzle.boss_gatemaster
+		npcs.put(3317793516683264L, new Npc(NpcType.boss_1)); // boss	npc.operation.oricon.fortress.enemy.difficulty_1.boss.gate_puzzle.wave_mini_boss
+		npcs.put(3272597575827456L, new Npc(NpcType.boss_1)); // boss	npc.operation.oricon.fortress.enemy.difficulty_1.boss.gate_puzzle.dreadguard_mini_boss
+		npcs.put(3281333539307520L, new Npc(NpcType.boss_2)); // boss	npc.operation.oricon.fortress.enemy.difficulty_1.boss.gate_puzzle.wave_boss
+
+//		npcs.put(3272601870794752L, new Npc(NpcToughness.boss_1)); // boss.gate_puzzle.dreadguard_add	npc.operation.oricon.fortress.enemy.difficulty_1.boss.gate_puzzle.dreadguard_add
+//		npcs.put(3270364192833536L, new Npc(NpcToughness.boss_1)); // boss.gate_puzzle.dreadguard_healer	npc.operation.oricon.fortress.enemy.difficulty_1.boss.gate_puzzle.dreadguard_healer
+//		npcs.put(3272541741252608L, new Npc(NpcToughness.boss_1)); // boss.gate_puzzle.dreadguard_tank	npc.operation.oricon.fortress.enemy.difficulty_1.boss.gate_puzzle.dreadguard_tank
+//		npcs.put(3288136767504384L, new Npc(NpcToughness.boss_1)); // boss.gate_puzzle.wave_aoe	npc.operation.oricon.fortress.enemy.difficulty_1.boss.gate_puzzle.wave_aoe
+//		npcs.put(3281329244340224L, new Npc(NpcToughness.boss_1)); // boss.gate_puzzle.wave_elite	npc.operation.oricon.fortress.enemy.difficulty_1.boss.gate_puzzle.wave_elite
+//		npcs.put(3288029393321984L, new Npc(NpcToughness.boss_1)); // boss.gate_puzzle.wave_elite_2	npc.operation.oricon.fortress.enemy.difficulty_1.boss.gate_puzzle.wave_elite_2
+//		npcs.put(3288141062471680L, new Npc(NpcToughness.boss_1)); // boss.gate_puzzle.wave_nuke	npc.operation.oricon.fortress.enemy.difficulty_1.boss.gate_puzzle.wave_nuke
+//		npcs.put(3288145357438976L, new Npc(NpcToughness.boss_1)); // boss.gate_puzzle.wave_shield	npc.operation.oricon.fortress.enemy.difficulty_1.boss.gate_puzzle.wave_shield
+//		npcs.put(3281320654405632L, new Npc(NpcToughness.boss_1)); // boss.gate_puzzle.wave_standard	npc.operation.oricon.fortress.enemy.difficulty_1.boss.gate_puzzle.wave_standard
+//		npcs.put(3281324949372928L, new Npc(NpcToughness.boss_1)); // boss.gate_puzzle.wave_strong	npc.operation.oricon.fortress.enemy.difficulty_1.boss.gate_puzzle.wave_strong
+
+
+		npcs.put(3302567857618944L, new Npc(NpcType.boss_raid)); // boss_mecha_rancor	npc.operation.oricon.fortress.enemy.difficulty_4.boss.mecha_rancor.boss_mecha_rancor
+		npcs.put(3273929015689216L, new Npc(NpcType.boss_raid)); // boss_mecha_rancor	npc.operation.oricon.fortress.enemy.difficulty_1.boss.mecha_rancor.boss_mecha_rancor
+		npcs.put(3302563562651648L, new Npc(NpcType.boss_raid)); // boss_mecha_rancor	npc.operation.oricon.fortress.enemy.difficulty_3.boss.mecha_rancor.boss_mecha_rancor
+		npcs.put(3302559267684352L, new Npc(NpcType.boss_raid)); // boss_mecha_rancor	npc.operation.oricon.fortress.enemy.difficulty_2.boss.mecha_rancor.boss_mecha_rancor
+
+		npcs.put(3273933310656512L, new Npc(NpcType.boss_raid)); // boss_droid_general	npc.operation.oricon.fortress.enemy.difficulty_1.boss.droid_general.boss_droid_general
+		npcs.put(3303551405129728L, new Npc(NpcType.boss_raid)); // boss_droid_general	npc.operation.oricon.fortress.enemy.difficulty_4.boss.droid_general.boss_droid_general
+		npcs.put(3303534225260544L, new Npc(NpcType.boss_raid)); // boss_droid_general	npc.operation.oricon.fortress.enemy.difficulty_2.boss.droid_general.boss_droid_general
+		npcs.put(3303542815195136L, new Npc(NpcType.boss_raid)); // boss_droid_general	npc.operation.oricon.fortress.enemy.difficulty_3.boss.droid_general.boss_droid_general
+
+		npcs.put(3309040373334016L, new Npc(NpcType.boss_4)); // boss.dread_master_brontes.corrupted_clone	npc.operation.oricon.fortress.enemy.difficulty_1.boss.dread_master_brontes.corrupted_clone
+		npcs.put(3275625527771136L, new Npc(NpcType.boss_raid)); // boss.dread_master_brontes.tentacles.large_tentacle	npc.operation.oricon.fortress.enemy.difficulty_1.boss.dread_master_brontes.tentacles.large_tentacle
+		npcs.put(3277721471811584L, new Npc(NpcType.boss_raid)); // boss.dread_master_brontes.tentacles.large_tentacle_b	npc.operation.oricon.fortress.enemy.difficulty_1.boss.dread_master_brontes.tentacles.large_tentacle_b
+		npcs.put(3303276527222784L, new Npc(NpcType.boss_raid)); // boss.dread_master_brontes.tentacles.phase5_large_tentacle	npc.operation.oricon.fortress.enemy.difficulty_1.boss.dread_master_brontes.tentacles.phase5_large_tentacle
+//		npcs.put(3303289412124672L, new Npc(NpcType.boss_1)); // boss.dread_master_brontes.tentacles.phase5_small_tentacle	npc.operation.oricon.fortress.enemy.difficulty_1.boss.dread_master_brontes.tentacles.phase5_small_tentacle
+		npcs.put(3314013945462784L, new Npc(NpcType.boss_raid)); // boss.dread_master_brontes.tentacles.phase6_large_tentacle	npc.operation.oricon.fortress.enemy.difficulty_1.boss.dread_master_brontes.tentacles.phase6_large_tentacle
+		npcs.put(3314958838267904L, new Npc(NpcType.boss_raid)); // boss.dread_master_brontes.tentacles.phase6_large_tentacle_b	npc.operation.oricon.fortress.enemy.difficulty_1.boss.dread_master_brontes.tentacles.phase6_large_tentacle_b
+		npcs.put(3295399557201920L, new Npc(NpcType.boss_2)); // boss.dread_master_brontes.tentacles.shield_tentacle	npc.operation.oricon.fortress.enemy.difficulty_1.boss.dread_master_brontes.tentacles.shield_tentacle
+//		npcs.put(3275642707640320L, new Npc(NpcType.boss_1)); // boss.dread_master_brontes.tentacles.small_tentacle	npc.operation.oricon.fortress.enemy.difficulty_1.boss.dread_master_brontes.tentacles.small_tentacle
+//		npcs.put(3315362565193728L, new Npc(NpcType.boss_1)); // boss.dread_master_brontes.tentacles.small_tentacle_16m	npc.operation.oricon.fortress.enemy.difficulty_1.boss.dread_master_brontes.tentacles.small_tentacle_16m
+		npcs.put(3297946472808448L, new Npc(NpcType.boss_raid)); // boss.dread_master_brontes.tentacles.targeted_cone_tentacle	npc.operation.oricon.fortress.enemy.difficulty_1.boss.dread_master_brontes.tentacles.targeted_cone_tentacle
+
+		npcs.put(3273937605623808L, new Npc(NpcType.boss_raid, "Brontes")); // boss.dread_master_brontes.dread_master_brontes	npc.operation.oricon.fortress.enemy.difficulty_1.boss.dread_master_brontes.dread_master_brontes
+		npcs.put(3303529930293248L, new Npc(NpcType.boss_raid, "Brontes")); // boss.dread_master_brontes.dread_master_brontes	npc.operation.oricon.fortress.enemy.difficulty_2.boss.dread_master_brontes.dread_master_brontes
+		npcs.put(3303538520227840L, new Npc(NpcType.boss_raid, "Brontes")); // boss.dread_master_brontes.dread_master_brontes	npc.operation.oricon.fortress.enemy.difficulty_3.boss.dread_master_brontes.dread_master_brontes
+		npcs.put(3303547110162432L, new Npc(NpcType.boss_raid, "Brontes")); // boss.dread_master_brontes.dread_master_brontes	npc.operation.oricon.fortress.enemy.difficulty_4.boss.dread_master_brontes.dread_master_brontes
+
 	}
 
 	@Override

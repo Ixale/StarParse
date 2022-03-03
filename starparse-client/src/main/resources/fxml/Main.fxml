@@ -194,6 +194,7 @@
                 <CheckMenuItem fx:id="raidDpsPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Raid Damage" />
                 <CheckMenuItem fx:id="raidHpsPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Raid Healing" />
                 <CheckMenuItem fx:id="raidTpsPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Raid Threat" />
+                <CheckMenuItem fx:id="raidBossPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Raid Boss" />
                 <CheckMenuItem fx:id="hotsPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Raid Hots" />
                 <CheckMenuItem fx:id="raidNotesPopoutMenu" mnemonicParsing="false" onAction="#handlePopoutToggle" text="Raid Notes" />
                 <SeparatorMenuItem mnemonicParsing="false" text="" />

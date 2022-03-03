@@ -133,7 +133,29 @@ public class CustomTimer extends BaseTimer {
 	}
 
 	public static String getDisplayName(final ConfigTimer timer, final Event e) {
-		return (timer.isShowSource() && e != null && e.getSource() != null ? e.getSource().getName() + "\n" : "") + timer.getName();
+		return (timer.isShowSource() && e != null && e.getSource() != null
+				? getShortName(e.getSource().getName(), 15) + "\n"
+				: "") + timer.getName();
+	}
+
+	public static String getShortName(final String n, int limit) {
+		if (n != null && n.length() > limit) {
+			if (n.contains(",")) {
+				return getShortName(n.substring(0, n.indexOf(",")), limit);
+			}
+			if (n.startsWith("The ")) {
+				return getShortName(n.substring(4), limit);
+			}
+//			int i = n.indexOf(" ", n.length() - limit - 1);
+			int i = n.indexOf(" ");
+			if (i > 0) {
+				return n.charAt(0) + ". " + getShortName(n.substring(i + 1), limit - 3);
+			}
+			return n.substring(n.length() - limit);
+
+		} else {
+			return n;
+		}
 	}
 
 }
