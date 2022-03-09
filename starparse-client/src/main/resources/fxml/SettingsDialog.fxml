@@ -334,15 +334,15 @@
                         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Name" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="2.0" />
                         <TextField fx:id="timerName" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="0.0" />
                         <Text fx:id="timerBossLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="Boss" AnchorPane.leftAnchor="190.0" AnchorPane.topAnchor="2.0" />
-                        <ChoiceBox fx:id="timerBoss" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="140.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <ComboBox fx:id="timerBoss" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="140.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                       </children>
                     </AnchorPane>
                     <AnchorPane fx:id="timerTriggerContainer" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="-1.0">
                       <children>
                         <Text scaleX="1.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Trigger on" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="2.0" />
-                        <ChoiceBox fx:id="timerTrigger" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="0.0" />
+                        <ComboBox fx:id="timerTrigger" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="0.0" />
                         <Text id="timerTriggerLabel" fx:id="timerTriggerTimerLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="Timer" AnchorPane.leftAnchor="190.0" AnchorPane.topAnchor="2.0" />
-                        <ChoiceBox fx:id="timerTriggerTimer" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="140.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <ComboBox fx:id="timerTriggerTimer" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="140.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                       </children>
                     </AnchorPane>
                     <AnchorPane fx:id="timerSourceContainer" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="-1.0">
@@ -390,7 +390,7 @@
                     <AnchorPane fx:id="timerCancelContainer" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="-1.0">
                       <children>
                         <Text scaleX="1.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Cancel on" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="2.0" />
-                        <ChoiceBox fx:id="timerCancel" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="0.0" />
+                        <ComboBox fx:id="timerCancel" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="0.0" />
                         <CheckBox fx:id="timersIgnoreRepeated" mnemonicParsing="false" text="Ignore repeated triggers" AnchorPane.leftAnchor="250.0" AnchorPane.topAnchor="2.0" />
                       </children>
                     </AnchorPane>

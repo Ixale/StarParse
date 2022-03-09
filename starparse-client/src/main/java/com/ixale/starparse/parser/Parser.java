@@ -485,19 +485,21 @@ public class Parser {
 					if (baseMatcher.matches()) {
 						final long timestamp = getTimestamp(baseMatcher);
 						final Actor a = getSourceActor(baseMatcher, timestamp, null);
-						final CharacterDiscipline newDiscipline = CharacterDiscipline.valueOf(baseMatcher.group("Discipline").replace(" ", ""));
-						if (!Objects.equals(newDiscipline, a.getDiscipline())) {
-							if (logger.isDebugEnabled()) {
-								logger.debug(a + ": Discipline set as [" + newDiscipline + "] (was " + a.getDiscipline() + ") at " + Event.formatTs(getTimestamp(baseMatcher)));
+						final CharacterDiscipline newDiscipline = CharacterDiscipline.fromGuid(baseMatcher.group("DisciplineGuid"));
+						if (newDiscipline != null) {
+							if (!Objects.equals(newDiscipline, a.getDiscipline())) {
+								if (logger.isDebugEnabled()) {
+									logger.debug(a + ": Discipline set as [" + newDiscipline + "] (was " + a.getDiscipline() + ") at " + Event.formatTs(getTimestamp(baseMatcher)));
+								}
+								a.setDiscipline(newDiscipline);
+								if (Actor.Type.SELF.equals(a.getType())) {
+									clearHotsTracking();
+								}
 							}
-							a.setDiscipline(newDiscipline);
-							if (Actor.Type.SELF.equals(a.getType())) {
-								clearHotsTracking();
+							if (actorStates.containsKey(a)) {
+								actorStates.get(a).discipline = a.getDiscipline();
+								actorStates.get(a).role = a.getDiscipline().getRole();
 							}
-						}
-						if (actorStates.containsKey(a)) {
-							actorStates.get(a).discipline = a.getDiscipline();
-							actorStates.get(a).role = a.getDiscipline().getRole();
 						}
 						return false;
 					}
@@ -618,14 +620,14 @@ public class Parser {
 
 		// value (healing / damage)
 		if (baseMatcher.group("Value") != null
-				&& !"836045448945489".equals(baseMatcher.group("EffectGuid"))
-				&& !"836045448945490".equals(baseMatcher.group("EffectGuid"))) {
+				&& !EntityGuid.EnterCombat.toString().equals(baseMatcher.group("EffectGuid"))
+				&& !EntityGuid.ExitCombat.toString().equals(baseMatcher.group("EffectGuid"))) {
 			e.setValue(Integer.parseInt(baseMatcher.group("Value")));
 			// critical hit?
 			e.setCrit(baseMatcher.group("IsCrit") != null);
 
 			// damage
-			if (baseMatcher.group("DamageType") != null && !baseMatcher.group("DamageType").equals("836045448953667")) { // charges
+			if (baseMatcher.group("DamageType") != null && !baseMatcher.group("DamageTypeGuid").equals(EntityGuid.Charges.toString())) {
 				e.setDamage(getEntity(
 						baseMatcher.group("DamageType"),
 						baseMatcher.group("DamageTypeGuid")));
@@ -744,7 +746,7 @@ public class Parser {
 				&& (combat == null
 				|| actorStates.get(e.getSource()).discipline == null
 				|| CharacterRole.HEALER.equals(actorStates.get(e.getSource()).discipline.getRole()))) {
-			processEventHots(e);
+			processEventHots(e, baseMatcher);
 		}
 
 		events.add(e);
@@ -838,7 +840,11 @@ public class Parser {
 					baseMatcher.group(type + "NpcName"),
 					Actor.Type.NPC,
 					guid,
-					baseMatcher.group(type + "NpcInstance") != null ? Long.parseLong(baseMatcher.group(type + "NpcInstance")) : 0L);
+					baseMatcher.group(type + "NpcInstance") != null ? Long.parseLong(baseMatcher.group(type + "NpcInstance")) : 0L,
+					isEffectiveLogged ? baseMatcher.group(type + "X") : null,
+					isEffectiveLogged ? baseMatcher.group(type + "Y") : null,
+					isEffectiveLogged ? baseMatcher.group(type + "Angle") : null
+			);
 
 			if (combat != null && combat.getBoss() != null && combat.getBoss().getRaid().getNpcs().containsKey(guid)) {
 				context.setCombatActorState(combat,
@@ -1761,7 +1767,7 @@ public class Parser {
 		self.setType(Actor.Type.SELF);
 	}
 
-	public void processEventHots(final Event e) {
+	public void processEventHots(final Event e, final Matcher baseMatcher) {
 
 		final CharacterDiscipline currentDiscipline = (combat == null ? null : actorStates.get(e.getSource()).discipline);
 		if (currentDiscipline == null || CharacterDiscipline.Medicine.equals(currentDiscipline)) {
@@ -1781,28 +1787,28 @@ public class Parser {
 		}
 
 		if (currentDiscipline == null || CharacterDiscipline.Bodyguard.equals(currentDiscipline)) {
-			processEventHotsSimple(e, EntityGuid.KoltoShell.getGuid(), null);
+			processEventHotsSimple(e, EntityGuid.KoltoShell.getGuid(), null, baseMatcher);
 			if (currentDiscipline != null) {
 				return;
 			}
 		}
 
 		if (currentDiscipline == null || CharacterDiscipline.CombatMedic.equals(currentDiscipline)) {
-			processEventHotsSimple(e, EntityGuid.TraumaProbe.getGuid(), null);
+			processEventHotsSimple(e, EntityGuid.TraumaProbe.getGuid(), null, baseMatcher);
 			if (currentDiscipline != null) {
 				return;
 			}
 		}
 
 		if (currentDiscipline == null || CharacterDiscipline.Seer.equals(currentDiscipline)) {
-			processEventHotsSimple(e, EntityGuid.ForceArmor.getGuid(), null); // 30000);
+			processEventHotsSimple(e, EntityGuid.ForceArmor.getGuid(), null, baseMatcher); // 30000);
 			if (currentDiscipline != null) {
 				return;
 			}
 		}
 
 		if (currentDiscipline == null || CharacterDiscipline.Corruption.equals(currentDiscipline)) {
-			processEventHotsSimple(e, EntityGuid.StaticBarrier30.getGuid(), null); // 30000);
+			processEventHotsSimple(e, EntityGuid.StaticBarrier30.getGuid(), null, baseMatcher); // 30000);
 			if (currentDiscipline != null) {
 				return;
 			}
@@ -1878,23 +1884,43 @@ public class Parser {
 		}
 	}
 
-	private void processEventHotsSimple(final Event e, final long abilityGuid, @SuppressWarnings("SameParameterValue") final Integer duration) {
+	private void processEventHotsSimple(final Event e, final long abilityGuid, @SuppressWarnings("SameParameterValue") final Integer duration, final Matcher baseMatcher) {
 		final ActorState targetState = getActorState(e.getTarget());
 
 		if (isAbilityEqual(e, abilityGuid)) {
 
-			if ((isEffectEqual(e, abilityGuid) && isActionApply(e))) {
+			if (e.getAction() != null
+					&& e.getAction().getGuid() != null
+					&& e.getAction().getGuid().equals(EntityGuid.ModifyCharges.getGuid()) && baseMatcher.group("Value") != null) {
+				try {
+					targetState.hotStacks = Integer.parseInt(baseMatcher.group("Value"));
+				} catch (Exception ignored) {
+				}
+				return;
+			}
+
+			if (isEffectEqual(e, abilityGuid) && isActionApply(e)) {
 				if (logger.isDebugEnabled() && targetState.hotSince != null) {
 					logger.debug("Unexpected hot since " + new Date(targetState.hotSince) + " at " + e);
 				}
-				targetState.hotStacks = 0;
+				if (isEffectiveLogged
+						&& baseMatcher.group("Value") != null
+						&& baseMatcher.group("DamageTypeGuid").equals(EntityGuid.Charges.toString())) {
+					try {
+						targetState.hotStacks = Integer.parseInt(baseMatcher.group("Value"));
+					} catch (Exception ignored) {
+						targetState.hotStacks = 0;
+					}
+				} else {
+					targetState.hotStacks = 0;
+				}
 				targetState.hotEffect = e.getAbility();
 				targetState.hotSince = targetState.hotLast = e.getTimestamp();
 				targetState.hotDuration = duration;
 				return;
 			}
 
-			if (isActionRemove(e)) {
+			if (isActionRemove(e) && isEffectEqual(e, abilityGuid)) {
 				if (logger.isDebugEnabled() && targetState.hotSince == null) {
 					logger.debug("Unexpected fade of hot at " + e);
 				}

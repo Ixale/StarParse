@@ -16,6 +16,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -39,7 +40,11 @@ public class UploadParselyDialogPresenter extends BaseDialogPresenter {
 	private TextArea uploadNote;
 
 	@FXML
-	private RadioButton visibilityPrivate, visibilityGuildOnly, visibilityPublic;
+	private RadioButton visibilityPrivate, visibilityGuildOnly, visibilityPublic,
+			guildTagYes, guildTagNo;
+
+	@FXML
+	private HBox guildTagText;
 
 	@FXML
 	private Button settingsButton, saveButton, cancelButton;
@@ -73,6 +78,9 @@ public class UploadParselyDialogPresenter extends BaseDialogPresenter {
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
 		setContent(dialogRoot, "Combat Log Upload", null);
+
+		guildTagYes.selectedProperty().addListener((a, b, c) -> guildTagText.getStyleClass().remove("input-error"));
+		guildTagNo.selectedProperty().addListener((a, b, c) -> guildTagText.getStyleClass().remove("input-error"));
 	}
 
 	public void setConfig(final Config config) {
@@ -136,6 +144,12 @@ public class UploadParselyDialogPresenter extends BaseDialogPresenter {
 		}
 		sb.append(".");
 		settingsLabel.setText(sb.toString());
+
+		if (config.getCurrentCharacter().getGuild() != null) {
+			guildTagText.setVisible(true);
+		} else {
+			guildTagText.setVisible(false);
+		}
 	}
 
 	public void setUpload(final CombatLog combatLog, final List<Combat> allCombats, final List<Combat> selectedCombats) {
@@ -188,6 +202,14 @@ public class UploadParselyDialogPresenter extends BaseDialogPresenter {
 			}
 		}
 
+		if (config.getCurrentCharacter().getGuild() != null) {
+			guildTagText.getStyleClass().remove("input-error");
+			if (!guildTagYes.isSelected() && !guildTagNo.isSelected()) {
+				guildTagText.getStyleClass().add("input-error");
+				return;
+			}
+		}
+
 		// 1) slice the log
 		final byte[] content;
 		final List<ParselyCombatInfo> combatsInfo = new ArrayList<>();
@@ -212,6 +234,7 @@ public class UploadParselyDialogPresenter extends BaseDialogPresenter {
 							parselyService.createParams(
 									config,
 									visibilityPrivate.isSelected() ? 0 : (visibilityGuildOnly.isSelected() ? 2 : 1 /* public */),
+									guildTagYes.isSelected(),
 									!uploadNote.getText().isEmpty() ? uploadNote.getText() : null,
 									context
 							),

@@ -314,9 +314,6 @@ public class OverviewPresenter extends BaseStatsPresenter {
 
 	private void updateDamageChart(final List<CombatTickStats> ticks) {
 
-		if (ticks.size() == 0) {
-			return;
-		}
 		if (damageChart == null) {
 			damageChart = new DamageChart(context);
 			dpsChart = new DpsChart(context);

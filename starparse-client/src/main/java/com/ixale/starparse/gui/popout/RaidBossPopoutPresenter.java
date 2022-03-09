@@ -164,7 +164,7 @@ public class RaidBossPopoutPresenter extends BasePopoutPresenter {
 	}
 
 	private String getFullActorLabel(final CombatActorState cas) {
-		if (cas.getNpc().getName() != null) {
+		if (cas.getNpc().getName() != null && cas.getNpc().getNameResolver() == null) {
 			return cas.getNpc().getName();
 		}
 		return CustomTimer.getShortName(cas.getActor().getName(), 18);

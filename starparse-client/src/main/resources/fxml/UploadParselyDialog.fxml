@@ -5,18 +5,27 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox fx:id="dialogRoot" minHeight="-Infinity" minWidth="-Infinity" prefHeight="220.0" prefWidth="300.0" spacing="5.0" styleClass="modal-text" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ixale.starparse.gui.dialog.UploadParselyDialogPresenter">
+<VBox fx:id="dialogRoot" minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="320.0" spacing="5.0" styleClass="modal-text" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ixale.starparse.gui.dialog.UploadParselyDialogPresenter">
   <children>
     <Label fx:id="uploadLabel" alignment="TOP_LEFT" minHeight="-Infinity" prefHeight="32.0" prefWidth="290.0" text="You are about to upload the whole combat log to Parsely abc def." wrapText="true" VBox.vgrow="NEVER">
       <VBox.margin>
-        <Insets />
+        <Insets left="5.0" />
       </VBox.margin>
     </Label>
-    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Optional Note:" VBox.vgrow="NEVER" />
-    <TextArea fx:id="uploadNote" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="40.0" prefRowCount="10" prefWidth="-1.0" wrapText="true" VBox.vgrow="NEVER" />
+    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Optional Note:" VBox.vgrow="NEVER">
+         <VBox.margin>
+            <Insets left="5.0" />
+         </VBox.margin></Text>
+    <TextArea fx:id="uploadNote" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="40.0" prefRowCount="10" prefWidth="-1.0" wrapText="true" VBox.vgrow="NEVER">
+         <VBox.margin>
+            <Insets left="5.0" right="5.0" />
+         </VBox.margin></TextArea>
     <HBox alignment="TOP_LEFT" fillHeight="false" VBox.vgrow="NEVER">
     <children>
-      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Log visibility" />
+      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Log visibility">
+               <HBox.margin>
+                  <Insets left="5.0" />
+               </HBox.margin></Text>
         <RadioButton fx:id="visibilityPublic" mnemonicParsing="false" selected="true" text="Public">
         <toggleGroup>
           <ToggleGroup fx:id="logVisibility" />
@@ -37,21 +46,51 @@
       </RadioButton>
     </children>
     </HBox>
+      <HBox fx:id="guildTagText" fillHeight="false" layoutX="20.0" layoutY="133.0">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Should all participants receive the Guild tag?">
+               <HBox.margin>
+                  <Insets left="5.0" />
+               </HBox.margin></Text>
+            <RadioButton fx:id="guildTagYes" mnemonicParsing="false" text="Yes">
+               <toggleGroup>
+                  <ToggleGroup fx:id="guildTag" />
+               </toggleGroup>
+               <HBox.margin>
+                  <Insets left="5.0" />
+               </HBox.margin>
+            </RadioButton>
+            <RadioButton fx:id="guildTagNo" mnemonicParsing="false" text="No" toggleGroup="$guildTag">
+               <HBox.margin>
+                  <Insets left="5.0" />
+               </HBox.margin>
+            </RadioButton>
+         </children>
+         <padding>
+            <Insets bottom="5.0" top="5.0" />
+         </padding>
+      </HBox>
     <AnchorPane prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <children>
-        <Label fx:id="settingsLabel" alignment="TOP_LEFT" prefHeight="50.0" prefWidth="217.0" text="Using timezone GMT, server Harbinger, guild Zorz., Parsely account Ixale." wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
-        <Button fx:id="settingsButton" onAction="#handleUploadSettings" text="Settings" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+        <Label fx:id="settingsLabel" alignment="TOP_LEFT" prefHeight="50.0" prefWidth="217.0" text="Using timezone GMT, server Harbinger, guild Zorz., Parsely account Ixale." wrapText="true" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="0.0" />
+        <Button fx:id="settingsButton" onAction="#handleUploadSettings" text="Settings" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0" />
       </children>
     </AnchorPane>
     <HBox alignment="TOP_LEFT" fillHeight="false" prefHeight="-1.0" prefWidth="-1.0" spacing="5.0" VBox.vgrow="NEVER">
       <children>
-        <Button fx:id="saveButton" cancelButton="false" defaultButton="true" onAction="#handleUploadSave" text="Upload to Parsely" />
+        <Button fx:id="saveButton" cancelButton="false" defaultButton="true" onAction="#handleUploadSave" text="Upload to Parsely">
+               <HBox.margin>
+                  <Insets left="5.0" />
+               </HBox.margin></Button>
         <Button fx:id="cancelButton" cancelButton="true" onAction="#handleClose" text="Cancel">
           <HBox.margin>
             <Insets />
           </HBox.margin>
         </Button>
       </children>
+         <padding>
+            <Insets bottom="5.0" />
+         </padding>
     </HBox>
   </children>
   <padding>

@@ -44,17 +44,17 @@ public class R4Anomaly extends Raid {
 				null, // HM 16m
 				null);
 
-		RaidBoss.add(this, RaidBossName.LordKanoth,
-				new long[]{LORD_KANOTH_SM_8M}, // SM 8m
-				null, // SM 16m
-				new long[]{LORD_KANOTH_HM_8M}, // HM 8m
-				null, // HM 16m
-				null);
-
 		RaidBoss.add(this, RaidBossName.LordValeo,
 				new long[]{LORD_VALEO_SM_8M}, // SM 8m
 				null, // SM 16m
 				new long[]{LORD_VALEO_HM_8M}, // HM 8m
+				null, // HM 16m
+				null);
+
+		RaidBoss.add(this, RaidBossName.LordKanoth,
+				new long[]{LORD_KANOTH_SM_8M}, // SM 8m
+				null, // SM 16m
+				new long[]{LORD_KANOTH_HM_8M}, // HM 8m
 				null, // HM 16m
 				null);
 

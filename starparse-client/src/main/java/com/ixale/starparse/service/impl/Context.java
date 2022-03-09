@@ -13,6 +13,7 @@ import com.ixale.starparse.domain.CombatActorState;
 import com.ixale.starparse.domain.CombatInfo;
 import com.ixale.starparse.domain.LocationInfo;
 import com.ixale.starparse.domain.Raid;
+import com.ixale.starparse.parser.Helpers;
 import org.springframework.stereotype.Service;
 
 import com.ixale.starparse.domain.Actor;
@@ -70,6 +71,11 @@ public class Context {
 	}
 
 	public Actor getActor(final String name, final Type type, final Long guid, final Long instanceId) {
+		return getActor(name, type, guid, instanceId, null, null, null);
+	}
+
+	public Actor getActor(final String name, final Type type, final Long guid, final Long instanceId,
+			final String x, final String y, final String angle) {
 		if (instanceId == null) {
 			return getActor(name, type, guid);
 		}
@@ -77,6 +83,20 @@ public class Context {
 			return getActor(name, type);
 		}
 		if (!actors.containsKey(instanceId)) {
+			final Raid raid = locationInfo == null || locationInfo.getInstanceGuid() == null ? null : Helpers.getRaidByInstanceGuid(locationInfo.getInstanceGuid());
+			if (raid != null && x != null && y != null && angle != null) {
+				final Raid.Npc npc = raid.getNpcs().get(guid);
+				try {
+					if (npc != null && npc.getNameResolver() != null) {
+						actors.put(instanceId, new Actor(
+								npc.getNameResolver().getNpcName(npc.getName() == null ? name : npc.getName(), Float.valueOf(x), Float.valueOf(y), Float.valueOf(angle)),
+								type, guid, instanceId));
+						return actors.get(instanceId);
+					}
+
+				} catch (Exception ignored) {
+				}
+			}
 			actors.put(instanceId, new Actor(name, type, guid, instanceId));
 		}
 		return actors.get(instanceId);
@@ -150,10 +170,10 @@ public class Context {
 	}
 
 	public void addAttacks(final Map<Long, AttackType> attacks) {
-		for (final long guid: EntityGuid.MR) {
+		for (final long guid : EntityGuid.MR) {
 			attacks.put(guid, AttackType.MR);
 		}
-		for (final long guid: EntityGuid.FT) {
+		for (final long guid : EntityGuid.FT) {
 			attacks.put(guid, AttackType.FT);
 		}
 		this.attacks.putAll(attacks);
@@ -179,11 +199,11 @@ public class Context {
 	}
 
 	public Integer findCombatIdByCombatEvent(final Event.Type type, final long timestamp, final String playerName) {
-		for (final Integer combatId: combatEvents.keySet()) {
+		for (final Integer combatId : combatEvents.keySet()) {
 			if (combatEvents.get(combatId).get(playerName) == null) {
 				continue;
 			}
-			for (final CombatEventStats ce: combatEvents.get(combatId).get(playerName)) {
+			for (final CombatEventStats ce : combatEvents.get(combatId).get(playerName)) {
 				if (Math.abs(ce.getTimestamp() - timestamp) < 1000 && ce.getType().equals(type)) {
 					return combatId;
 				}

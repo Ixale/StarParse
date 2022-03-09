@@ -26,23 +26,34 @@ abstract public class Raid {
 		}
 	}
 
+	public interface NpcNameResolver {
+
+		String getNpcName(String name, Float x, Float y, Float angle);
+	}
+
 	public static class Npc {
 		final NpcType type;
 		final String name;
 		final Double hidePct;
+		final NpcNameResolver nameResolver;
 
 		public Npc(final NpcType type) {
-			this(type, null, null);
+			this(type, null, null, null);
 		}
 
 		public Npc(final NpcType type, final String name) {
-			this(type, name, null);
+			this(type, name, null, null);
 		}
 
 		public Npc(final NpcType type, final String name, final Double hidePct) {
+			this(type, name, hidePct, null);
+		}
+
+		public Npc(final NpcType type, final String name, final Double hidePct, final NpcNameResolver nameResolver) {
 			this.type = type;
 			this.name = name;
 			this.hidePct = hidePct;
+			this.nameResolver = nameResolver;
 		}
 
 		public NpcType getType() {
@@ -56,6 +67,11 @@ abstract public class Raid {
 		public Double getHidePct() {
 			return hidePct;
 		}
+
+		public NpcNameResolver getNameResolver() {
+			return nameResolver;
+		}
+
 	}
 
 	protected final String name;
@@ -71,6 +87,10 @@ abstract public class Raid {
 
 	public String getName() {
 		return name;
+	}
+
+	public Long getInstanceGuid() {
+		return null;
 	}
 
 	public ArrayList<RaidBoss> getBosses() {

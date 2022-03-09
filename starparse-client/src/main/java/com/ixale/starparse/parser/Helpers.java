@@ -340,10 +340,14 @@ public class Helpers {
 	private static final Map<Long, RaidBoss> bossesByGuids = new HashMap<>();
 	private static final Map<String, RaidBoss> bossesByVerbose = new HashMap<>();
 	private static final Map<RaidBossName, Map<Raid.Size, Map<Raid.Mode, RaidBoss>>> bossesInstances = new HashMap<>();
+	private static final Map<Long, Raid> raidsByInstance = new HashMap<>();
 
 	static {
 		// build journal
 		for (final Raid r : raids) {
+			if (r.getInstanceGuid() != null) {
+				raidsByInstance.put(r.getInstanceGuid(), r);
+			}
 			for (final RaidBoss b : r.getBosses()) {
 				if (b.getConfidentNpcGuids() != null) {
 					for (long guid : b.getConfidentNpcGuids()) {
@@ -387,6 +391,10 @@ public class Helpers {
 			return bossesInstances.get(boss.getRaidBossName()).get(size).get(mode);
 		}
 		return boss;
+	}
+
+	public static Raid getRaidByInstanceGuid(final Long guid) {
+		return raidsByInstance.get(guid);
 	}
 
 	private static final List<HashMap<Long, CharacterDiscipline>> disciplines = Arrays.asList(

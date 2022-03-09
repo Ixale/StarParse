@@ -15,6 +15,11 @@ public class TerrorFromBeyond extends Raid {
 	private static final String TFB_PHASE_TENTACLES = "Tentacles",
 			TFB_PHASE_BEYOND = "Beyond";
 
+	@Override
+	public Long getInstanceGuid() {
+		return 137438992720L; // Asation
+	}
+
 	public TerrorFromBeyond() {
 		super("Terror From Beyond");
 
@@ -128,10 +133,35 @@ public class TerrorFromBeyond extends Raid {
 		npcs.put(2994850630729728L, new Npc(NpcType.boss_raid)); // Operator IX, boss.core.core_guardian, npc.qtr.1x4.raid.asation.enemy.difficulty_3.boss.core.core_guardian
 		npcs.put(2994859220664320L, new Npc(NpcType.boss_raid)); // Operator IX, boss.core.core_guardian, npc.qtr.1x4.raid.asation.enemy.difficulty_4.boss.core.core_guardian
 //		npcs.put(3014487221207040L, new Npc(NpcType.boss_1)); // Defragmenter, boss.core.battledroid_add, npc.qtr.1x4.raid.asation.enemy.difficulty_1.boss.core.battledroid_add
-		npcs.put(2940596603846656L, new Npc(NpcType.boss_2)); // Data Core, boss.core.data_core, npc.qtr.1x4.raid.asation.enemy.difficulty_1.boss.core.data_core
-		npcs.put(2994867810598912L, new Npc(NpcType.boss_2)); // Data Core, boss.core.data_core, npc.qtr.1x4.raid.asation.enemy.difficulty_2.boss.core.data_core
-		npcs.put(2994872105566208L, new Npc(NpcType.boss_2)); // Data Core, boss.core.data_core, npc.qtr.1x4.raid.asation.enemy.difficulty_3.boss.core.data_core
-		npcs.put(2994876400533504L, new Npc(NpcType.boss_2)); // Data Core, boss.core.data_core, npc.qtr.1x4.raid.asation.enemy.difficulty_4.boss.core.data_core
+
+		final NpcNameResolver dataCoreResolver = (name, x, y, angle) -> {
+			if (x == null || y == null || angle == null) {
+				return name;
+			}
+			final String n;
+			if (x < -460) {
+				n = "1";
+			} else if (x < -440) {
+				n = "2";
+			} else if (x < -390) {
+				n = "3";
+			} else {
+				n = "4";
+			}
+
+			final String o;
+			if (y < 800) {
+				o = "N";
+			} else {
+				o = "S";
+			}
+			return name + " " + o + n; // angles: [60, 30, -30, -60] / [120, 150, -150, -120]
+		};
+		npcs.put(2940596603846656L, new Npc(NpcType.boss_2, "Data Core", null, dataCoreResolver)); // Data Core, boss.core.data_core, npc.qtr.1x4.raid.asation.enemy.difficulty_1.boss.core.data_core
+		npcs.put(2994867810598912L, new Npc(NpcType.boss_2, "Data Core", null, dataCoreResolver)); // Data Core, boss.core.data_core, npc.qtr.1x4.raid.asation.enemy.difficulty_2.boss.core.data_core
+		npcs.put(2994872105566208L, new Npc(NpcType.boss_2, "Data Core", null, dataCoreResolver)); // Data Core, boss.core.data_core, npc.qtr.1x4.raid.asation.enemy.difficulty_3.boss.core.data_core
+		npcs.put(2994876400533504L, new Npc(NpcType.boss_2, "Data Core", null, dataCoreResolver)); // Data Core, boss.core.data_core, npc.qtr.1x4.raid.asation.enemy.difficulty_4.boss.core.data_core
+
 //		npcs.put(2954606787166208L, new Npc(NpcType.boss_2)); // Regulator, boss.core.mortal_add, npc.qtr.1x4.raid.asation.enemy.difficulty_1.boss.core.mortal_add
 //		npcs.put(2994880695500800L, new Npc(NpcType.boss_2)); // Regulator, boss.core.mortal_add, npc.qtr.1x4.raid.asation.enemy.difficulty_2.boss.core.mortal_add
 //		npcs.put(2994889285435392L, new Npc(NpcType.boss_2)); // Regulator, boss.core.mortal_add, npc.qtr.1x4.raid.asation.enemy.difficulty_3.boss.core.mortal_add

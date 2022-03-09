@@ -110,8 +110,8 @@ public enum RaidBossName {
 	// R-4 Anomaly 7.0
 	IPCPT("IP-CPT"),
 	Watchdog("Watchdog"),
-	LordKanoth("Lord Kanoth"),
 	LordValeo("Lord Valeo"),
+	LordKanoth("Lord Kanoth"),
 	LadyDominique("Lady Dominique")
 	;
 

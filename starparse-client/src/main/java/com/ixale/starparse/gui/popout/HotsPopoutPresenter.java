@@ -315,7 +315,7 @@ public class HotsPopoutPresenter extends BasePopoutPresenter {
 		stacks.setPrefHeight(15);
 		stacks.setAlignment(Pos.CENTER);
 
-		AnchorPane.setTopAnchor(stacks, 1d);
+		AnchorPane.setTopAnchor(stacks, 0d);
 		AnchorPane.setLeftAnchor(stacks, 1d);
 
 		final Button button = new Button("X");
@@ -337,7 +337,7 @@ public class HotsPopoutPresenter extends BasePopoutPresenter {
 			dragBoard.setContent(content);
 			event.consume();
 		});
-		pane.setOnDragDone(dragEvent -> dragEvent.consume());
+		pane.setOnDragDone(Event::consume);
 
 		// try to find space in visible area
 		final PlayerFrame frame = new PlayerFrame(pane, state);

@@ -140,7 +140,7 @@ public class Format {
 
 	public static String formatEffectName(final Entity effect, final Entity ability) {
 		return (ability.getName().isEmpty() || effect.getName().equals(ability.getName()))
-				? effect.getName()
+				? (effect.getName() == null || effect.getName().trim().isEmpty() ? "(" + effect.getGuid() + ")" : effect.getName())
 				: ability.getName() + ": " + effect.getName();
 	}
 

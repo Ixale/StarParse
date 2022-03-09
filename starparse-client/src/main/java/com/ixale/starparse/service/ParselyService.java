@@ -11,6 +11,7 @@ public interface ParselyService {
 	class Params {
 		public String endpoint, serverName, timezone, guild, notes, username, password, version;
 		public int visibility;
+		public boolean guildLog;
 	}
 
 	class ParselyCombatInfo {
@@ -21,7 +22,7 @@ public interface ParselyService {
 		public Long instanceGuid;
 	}
 
-	Params createParams(Config config, int visibility, String notes, Context context);
+	Params createParams(Config config, int visibility, boolean guildLog, String notes, Context context);
 
 	String uploadLog(Params p, String fileName, byte[] content, List<ParselyCombatInfo> combatsInfo) throws Exception;
 }

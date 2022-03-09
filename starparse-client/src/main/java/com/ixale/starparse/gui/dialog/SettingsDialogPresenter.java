@@ -131,8 +131,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 
 	@FXML
 	private ChoiceBox<String> timezoneList, serverList,
-			raidHealingMode, personalMode,
-			timerTrigger, timerTriggerTimer, timerBoss, timerCancel, timerSlot;
+			raidHealingMode, personalMode, timerSlot;
 
 	@FXML
 	private Text currentTime, serverLabel, timerTriggerTimerLabel, timerEffectLabel, timerBossLabel, timerSoundOffsetLabel;
@@ -152,7 +151,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 	private ToggleGroup timerSource, timerTarget;
 
 	@FXML
-	private ComboBox<String> timerSoundFile, timerCountdownVoice;
+	private ComboBox<String> timerBoss, timerTrigger, timerTriggerTimer, timerCancel, timerSoundFile, timerCountdownVoice;
 
 	private Config config;
 
@@ -1686,7 +1685,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 				}
 				return true;
 			});
-			validators.put(timerTriggerTimer, (Validator<ChoiceBox<String>>) c -> {
+			validators.put(timerTriggerTimer, (Validator<ComboBox<String>>) c -> {
 				if (!timerTriggerContainer.isVisible()) {
 					return true;
 				}
@@ -1853,6 +1852,7 @@ public class SettingsDialogPresenter extends BaseDialogPresenter {
 				}
 				timers.add(timer.getName());
 			}
+			timers.sort(String::compareTo);
 			return timers;
 		}
 

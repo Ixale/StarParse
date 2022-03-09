@@ -278,8 +278,8 @@ Text {
 .list-cell:even { /* <=== changed to even */
 }
 
-.list-cell:filled:selected:focused,
-.list-cell:filled:selected,
+.list-view .list-cell:filled:selected:focused,
+.list-view .list-cell:filled:selected,
 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover,
 .menu-bar .menu-item:hover {
@@ -323,6 +323,12 @@ Text {
 .list-cell.combat-pvp:filled:selected:focused .combat-title.label,
 .list-cell.combat-pvp:filled:selected .combat-title.label {
     -fx-text-fill: -fx-light-text-color;
+}
+
+.combo-box .list-cell
+{
+    -fx-padding: 3 0 2 7;
+    /*-fx-cell-size: 1.66667em;*/
 }
 
 .content {

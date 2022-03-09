@@ -1089,7 +1089,7 @@ public class CombatDaoImpl extends H2Dao implements CombatDao {
 		sql = sql.replace("%event_from", "event_id = " + bounds.eventIdFrom);
 		sql = sql.replace("%time_from", "'" + sdf.format(bounds.timeFrom) + "'");
 		sql = sql.replace("%event_to", "s.event_id < " + bounds.eventIdTo); // inclusive (last ID = boundary + 1)
-		sql = sql.replace("%playerName", "'" + (playerName == null ? getCharacterName(combat) : playerName).replace("'", "") + "'");
+		sql = sql.replace("%playerName", "'" + (playerName == null ? getCharacterName(combat) : playerName).replace("'", "''") + "'");
 
 		return getJdbcTemplate().query(sql, (Object[]) null, (rs, rowNum) -> new CombatTickStats(
 				getIntSafe(rs, "duration"),

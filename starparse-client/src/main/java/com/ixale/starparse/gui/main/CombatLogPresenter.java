@@ -236,14 +236,18 @@ public class CombatLogPresenter extends BaseCombatLogPresenter {
 					} else if (a.getInstanceId() == null) {
 						label = "Others";
 					} else {
-						label = a.getName();
+						if (a.getName().matches(".* [NS][0-9]$")) {
+							label = a.getName().replaceFirst(" [NS][0-9]$", "");
+						} else {
+							label = a.getName();
+						}
 					}
 
 					final Menu m = new Menu(label + " (" + (menuTree.get(a) == null ? 1 : menuTree.get(a).size()) + ")");
 
 					if (menuTree.get(a) != null) {
 						if (a.getType() == Actor.Type.NPC) {
-							m.getItems().add(createMenuItem(new Actor(a.getName() + " (all)", a.getType(), a.getGuid())));
+							m.getItems().add(createMenuItem(new Actor(label + " (all)", a.getType(), a.getGuid())));
 						}
 						for (Actor sa : menuTree.get(a)) {
 							m.getItems().add(createMenuItem(sa));

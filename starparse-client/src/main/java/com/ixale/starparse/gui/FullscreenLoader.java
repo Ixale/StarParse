@@ -25,7 +25,7 @@ public class FullscreenLoader extends Stage {
 
 	// https://www.swtor.com/community/archive/index.php/t-736389.html
 	public static String[] quotes = new String[]{
-			"Mathematically impossible. --Fridge",
+			"Mathematically impossible. --Enkay / DNT",
 			"Very well; then we DIE together! --Kreshon",
 			"I have been armed with 24 distinct weapons technologies --XRR-3",
 			"I have waited 20 000 years, but I will wait no longer! --SOA",

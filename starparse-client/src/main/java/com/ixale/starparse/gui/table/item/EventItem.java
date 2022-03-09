@@ -247,7 +247,9 @@ public class EventItem extends BaseItem {
 				&& e.getEffect() != null && e.getEffect().getName() != null
 				&& e.getEffect().getName().contains(e.getAbility().getName()))) {
 			// effect name is enough
-			return e.getEffect() == null ? "" : e.getEffect().getName();
+			return e.getEffect() == null ? "" : (e.getEffect().getName() == null || e.getEffect().getName().isEmpty()
+					? "(" + e.getEffect().getGuid() + ")"
+					: e.getEffect().getName());
 		}
 
 		// both ability and effect name

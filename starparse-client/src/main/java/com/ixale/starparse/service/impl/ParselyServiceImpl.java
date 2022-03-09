@@ -18,7 +18,7 @@ public class ParselyServiceImpl implements ParselyService {
 	private static final Logger logger = LoggerFactory.getLogger(ParselyService.class);
 
 	@Override
-	public Params createParams(final Config config, int visibility, final String notes, final Context context) {
+	public Params createParams(final Config config, int visibility, final boolean guildLog, final String notes, final Context context) {
 		final Params p = new Params();
 
 		p.endpoint = config.getParselyEndpoint();
@@ -33,6 +33,7 @@ public class ParselyServiceImpl implements ParselyService {
 		if (config.getCurrentCharacter().getGuild() != null) {
 			p.guild = config.getCurrentCharacter().getGuild();
 		}
+		p.guildLog = guildLog;
 
 		if (notes != null && !notes.isEmpty()) {
 			p.notes = notes;
@@ -64,6 +65,7 @@ public class ParselyServiceImpl implements ParselyService {
 		if (p.guild != null) {
 			fu.addFormField("guild", p.guild);
 		}
+		fu.addFormField("guild-log", p.guildLog ? "1" : "0");
 
 		if (p.notes != null) {
 			fu.addFormField("notes", p.notes);
