@@ -25,7 +25,7 @@ public class R4Anomaly extends Raid {
 			LORD_VALEO_HM_8M = 4494872253825024L;
 
 	private static final long LADY_DOMINIQUE_SM_8M = 4466199052156928L,
-			LADY_DOMINIQUE_HM_8M = 4494915203497984L; // placeholder
+			LADY_DOMINIQUE_HM_8M = 4608014577303552L;
 
 	public R4Anomaly() {
 		super("R-4 Anomaly");
