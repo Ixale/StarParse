@@ -135,13 +135,13 @@ public class Parser {
 	private final static Pattern v7BasePattern = Pattern.compile(BASE
 			+ ": (?<EffectName>[^{]*) \\{(?<EffectGuid>\\d*)}"
 			+ ")]"
-			+ "( \\((?<Value>-?\\d+)?(?<IsCrit>\\*)? ?(~(?<Effective>-?\\d*))? ?"
+			+ "( \\(((?<Value>-?\\d+)(\\.0)?)?(?<IsCrit>\\*)? ?(~(?<Effective>-?\\d*))? ?"
 			+ "( (?<DamageType>[^ \\-]+) \\{(?<DamageTypeGuid>\\d+)})?"
 			+ "(\\((?<ReflectType>[^ ]+) \\{(?<ReflectTypeGuid>\\d+)}\\))?"
 			+ "(?<IsMitigation> -((?<MitigationType>[^ ]+) \\{(?<MitigationTypeGuid>\\d+)})?)?"
 			+ "( \\((?<AbsorbValue>\\d+) (?<AbsorbType>[^ ]+) \\{(?<AbsorbTypeGuid>\\d+)}\\))?"
 			+ "\\))?"
-			+ "($| <(?<Threat>[^>]*?)>)?");
+			+ "($| <(?<Threat>[^>]*?)(\\.0)?>)?");
 
 	// combat log line pattern for enter/exit combat since 5.4
 	private final static Pattern legacyCombatPattern = Pattern.compile("^"
@@ -1801,14 +1801,22 @@ public class Parser {
 		}
 
 		if (currentDiscipline == null || CharacterDiscipline.Seer.equals(currentDiscipline)) {
-			processEventHotsSimple(e, EntityGuid.ForceArmor.getGuid(), null, baseMatcher); // 30000);
+			processEventHotsSimple(e, new long[]{
+					EntityGuid.ForceArmor.getGuid(),
+					EntityGuid.MendingForceArmor.getGuid(),
+					EntityGuid.PreservedForceArmor.getGuid(),
+					EntityGuid.ImbuedForceArmor.getGuid()}, null, baseMatcher); // 30000);
 			if (currentDiscipline != null) {
 				return;
 			}
 		}
 
 		if (currentDiscipline == null || CharacterDiscipline.Corruption.equals(currentDiscipline)) {
-			processEventHotsSimple(e, EntityGuid.StaticBarrier30.getGuid(), null, baseMatcher); // 30000);
+			processEventHotsSimple(e, new long[]{
+					EntityGuid.StaticBarrier30.getGuid(),
+					EntityGuid.StaticBarrier1.getGuid(),
+					EntityGuid.StaticBarrier2.getGuid(),
+					EntityGuid.StaticBarrier3.getGuid()}, null, baseMatcher); // 30000);
 			if (currentDiscipline != null) {
 				return;
 			}
@@ -1884,6 +1892,14 @@ public class Parser {
 		}
 	}
 
+	private void processEventHotsSimple(final Event e, final long[] abilityGuids, @SuppressWarnings("SameParameterValue") final Integer duration, final Matcher baseMatcher) {
+		for (long abilityGuid : abilityGuids) {
+			if (isAbilityEqual(e, abilityGuid)) {
+				processEventHotsSimple(e, abilityGuid, duration, baseMatcher);
+			}
+		}
+	}
+
 	private void processEventHotsSimple(final Event e, final long abilityGuid, @SuppressWarnings("SameParameterValue") final Integer duration, final Matcher baseMatcher) {
 		final ActorState targetState = getActorState(e.getTarget());
 
@@ -1891,7 +1907,15 @@ public class Parser {
 
 			if (e.getAction() != null
 					&& e.getAction().getGuid() != null
-					&& e.getAction().getGuid().equals(EntityGuid.ModifyCharges.getGuid()) && baseMatcher.group("Value") != null) {
+					&& e.getAction().getGuid().equals(EntityGuid.ModifyCharges.getGuid())
+					&& isEffectEqual(e, abilityGuid)
+					&& baseMatcher.group("Value") != null) {
+				if (logger.isDebugEnabled() && targetState.hotSince == null) {
+					logger.debug("Continuing hot at " + e);
+				}
+				targetState.hotEffect = e.getAbility();
+				targetState.hotSince = targetState.hotLast = e.getTimestamp();
+				targetState.hotDuration = duration;
 				try {
 					targetState.hotStacks = Integer.parseInt(baseMatcher.group("Value"));
 				} catch (Exception ignored) {
@@ -1908,6 +1932,9 @@ public class Parser {
 						&& baseMatcher.group("DamageTypeGuid").equals(EntityGuid.Charges.toString())) {
 					try {
 						targetState.hotStacks = Integer.parseInt(baseMatcher.group("Value"));
+						if (targetState.hotStacks == 6 && (abilityGuid == EntityGuid.KoltoShell.getGuid() || abilityGuid == EntityGuid.TraumaProbe.getGuid())) {
+							targetState.hotStacks = 7; // 7.0.0 passive bug
+						}
 					} catch (Exception ignored) {
 						targetState.hotStacks = 0;
 					}

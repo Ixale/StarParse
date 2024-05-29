@@ -25,7 +25,7 @@ public class R4Anomaly extends Raid {
 			LORD_VALEO_HM_8M = 4494872253825024L;
 
 	private static final long LADY_DOMINIQUE_SM_8M = 4466199052156928L,
-			LADY_DOMINIQUE_HM_8M = 4494915203497984L; // placeholder
+			LADY_DOMINIQUE_HM_8M = 4608014577303552L;
 
 	public R4Anomaly() {
 		super("R-4 Anomaly");
@@ -89,6 +89,7 @@ public class R4Anomaly extends Raid {
 		npcs.put(LORD_VALEO_HM_8M, new Npc(NpcType.boss_raid)); // Lord Valeo, deepstation, raidEncounter
 
 		npcs.put(LADY_DOMINIQUE_SM_8M, new Npc(NpcType.boss_raid)); // Lady Dominique, deepstation, raidEncounter
+		npcs.put(LADY_DOMINIQUE_HM_8M, new Npc(NpcType.boss_raid)); // Lady Dominique, deepstation, raidEncounter
 
 //		npcs.put(4471292883369984L, new Npc(NpcType.boss_2)); // Unknown, deepstation, raidEncounter
 //		npcs.put(4490697545613312L, new Npc(NpcType.boss_1)); // Unknown, deepstation, raidEncounter
